@@ -50,15 +50,15 @@ public:
 	void parse (std::string &);
 	
 	// PRE: takes a MsgType object and an ID which is the NodeID
-	// POST: Creates a message to be able to send it in the appropriate format
+	// POST: Creates a message to be able to send it in the appropriate format. The return value represents the success or failure. -1 for failure and 0 for success.
 	int createMessage (MsgType type, uint32_t ID = -1);
 	
 	// PRE: this function is to be used if the Message object is already created and we want to retrieve the string format.
-	// POST: This function creates a string relative to its attributes that can be used when communicating.
+	// POST: This function creates a string relative to its attributes that can be used when communicating. The function will return an empty string if it fails.
 	std::string createMessage ();
 	
 	// PRE:
-	// POST: returns the Node of File ID. 
+	// POST: returns the Node of File ID.
 	uint32_t getID();
 
 };
