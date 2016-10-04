@@ -2,17 +2,13 @@
 #ifndef include_UserInterface
 #define include_UserInterface
 
-//NOTE: Do we want the key input to be hexadecimal, or decimal?
-//      hexidecimal because it would be easier to determine
-//      the bit pattern if we needed to, or decimal just because?
-//      In the long run, it probably doesn't matter.
-
-
 //PRE: The node has been fully integrated into the network
 //     and is ready to start storing and finding keys.
+//     isRunning is a boolean passed by reference to indicate
+//     the interface is currently running.
 //POST: The user will now have the option to enter input
 //      into the user interface.
-void beginUI();
+void beginUI(bool & isRunning);
 
 //PRE: Input is a string entered in by the user
 //POST: Parses through the input to extract words and/or
@@ -23,11 +19,9 @@ void beginUI();
 void parseInput(string input);
 
 //PRE: The user entered EXIT on the command prompt.
-//POST: The UI should alert the main process to either
-//      change a flag or let the other threads know to
-//      close. It is expected for all threads, and then
-//      finally the main process to have ended. 
-void exit();
+//POST: isRunning is set to false, which will end the
+//      interface and close the thread.
+void exit(bool & isRunning);
 
 //PRE: The user entered STORE along with an unsigned integer key.
 //POST: From here, the UI will know that the Node wants to store
