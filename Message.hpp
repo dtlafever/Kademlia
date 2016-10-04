@@ -22,12 +22,15 @@ class Message
 	// Type of the message
 	MsgType msgType;
 	
-	// ID represents the IP address of the Node we're looking up or the key to the file
+	// ID represents the NodeID we're looking up or the key to the file
 	uint32_t ID =-1;
+	
+	/// This implemententation of Message assumes that there is no need for getting the IP address from the file but rather from the socket.
 	
 public:
 	
-	// Constructor that will call the parse function
+	// PRE: Takes the message as a parameter
+	// POST: Constructor that will call the parse function
 	Message (std::string msg);
 	
 	// Default constructor
@@ -37,18 +40,25 @@ public:
 	~Message ();
 
 	// These functions are used to check the type of the message after parsing
-	bool isSTORE ();
-	bool isPING ();
-	bool isFINDNODE();
-	bool isFINDVALUE();
+	bool isSTORE () const;
+	bool isPING () const;
+	bool isFINDNODE()const;
+	bool isFINDVALUE()const;
 	
-	// This function parses the message and updates the appropriate private members
+	// PRE: takes the message received as a string.
+	// POST: This function parses the message and updates the appropriate private members. This function alters the string and
 	void parse (std::string &);
 	
-	// Creates a message to be able to send it in the appropriate format
+	// PRE: takes a MsgType object and an ID which is the NodeID
+	// POST: Creates a message to be able to send it in the appropriate format
 	int createMessage (MsgType type, uint32_t ID = -1);
 	
-	// get the ID
+	// PRE: this function is to be used if the Message object is already created and we want to retrieve the string format.
+	// POST: This function creates a string relative to its attributes that can be used when communicating.
+	std::string createMessage ();
+	
+	// PRE:
+	// POST: returns the Node of File ID. 
 	uint32_t getID();
 
 };
