@@ -13,10 +13,6 @@ class RoutingTable {
   KBucket* meBuckets;
   int myID;
 
-  //Pre:
-  //Post:
-  RoutingTable(int id);
-
   //Pre: nodeID is the id of an existing node, address is where that
   //     node is from
   //Post: places the triple (node id, upd port, address) represented node
