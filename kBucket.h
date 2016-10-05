@@ -29,7 +29,7 @@ class KBucket {
 
  public:
 
-  //Pre: routing table is initalized
+  //Pre: routing tabKBUcle is initalized
   //Post: Creates a new KBucket where size = constant k
   //      and myTriples is an array of size k of triples
   //      numTriples = 0
