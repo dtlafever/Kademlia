@@ -31,7 +31,9 @@ UserInterface.h Notes
 ---------------------
 - instead of "beginUI," should it be named "runUI"?
 - for "storeKey" and "findKey," shouldn't the UI spawn a thread for send message?
- 
+-RESPONSE: The first note made sense so I changed that. Spawning a thread is a
+           good idea too. I'll have to talk to Ingy to figure that out. --Kimi
+
 Listener.h
 ----------
 - the file name should be "Listener" with a capital "L"
