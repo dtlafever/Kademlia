@@ -29,19 +29,19 @@ RoutingTable.h Notes
  
  UserInterface.h Notes
  ---------------------
- - instead of "beginUI," should it be named "runUI"?
- - for "storeKey" and "findKey," shouldn't the UI spawn a thread for send message?
+- instead of "beginUI," should it be named "runUI"?
+- for "storeKey" and "findKey," shouldn't the UI spawn a thread for send message?
  
- Listener.h
- ----------
- - the file name should be "Listener" with a capital "L"
- - the functions should be camelCase
- - should "startListenSocket" instead be in Socket class?
- - should "sortMessage" spawn a thread for send message?
- 
- Message.h
- ---------
- - Does the constructor do anything specific?
- - for "parse," doesn't the parameter need a name? Why is it passed by reference?
- - Why do you have a "createMessage" function when you have a class with a constructor that creates a message?
- - SHouldn't the second "createMessage" be called "getMessage"?
+Listener.h
+----------
+- the file name should be "Listener" with a capital "L"
+- the functions should be camelCase
+- should "startListenSocket" instead be in Socket class?
+- should "sortMessage" spawn a thread for send message?
+
+Message.h
+---------
+- Does the constructor do anything specific?
+- for "parse," doesn't the parameter need a name? Why is it passed by reference?
+- Why do you have a "createMessage" function when you have a class with a constructor that creates a message?
+- SHouldn't the second "createMessage" be called "getMessage"?
