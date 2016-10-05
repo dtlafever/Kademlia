@@ -8,7 +8,7 @@
 //     the interface is currently running.
 //POST: The user will now have the option to enter input
 //      into the user interface.
-void beginUI(bool & isRunning);
+void runUI(bool & isRunning);
 
 //PRE: Input is a string entered in by the user
 //POST: Parses through the input to extract words and/or
@@ -25,16 +25,14 @@ void exit(bool & isRunning);
 
 //PRE: The user entered STORE along with an unsigned integer key.
 //POST: From here, the UI will know that the Node wants to store
-//      the given key. The UI will pass this along to the Send Message
-//      header functions. It is expected for the key to be stored
-//      in the appropriate node.
+//      the given key. The UI will spawn a thread to Send Message
+//      so the request can be sent out.
 void storeKey(unsigned int key);
 
 //PRE: The user entered FIND along with an unsigned integer key.
 //POST: From here, the UI will know that the Node is looking for
-//      the given key. The UI will give this information, the command
-//      and the key, to the Send Message header functions. It is
-//      expected for the key to be searched and printed if found.
+//      the given key. The UI will spawn a thread and give the
+//      information needed to develop a message to send.
 void findKey(unsigned int key);
 
 

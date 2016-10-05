@@ -10,7 +10,7 @@ using namespace std;
 //     the interface is currently running.
 //POST: The user will now have the option to enter input
 //      into the user interface.
-void beginUI(bool & isRunning){
+void runUI(bool & isRunning){
   //while(isRunning){
   try{
 
