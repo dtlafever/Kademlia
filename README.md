@@ -27,8 +27,8 @@ RoutingTable.h Notes
   - finding a node
   - constructor for the RoutingTable
  
- UserInterface.h Notes
- ---------------------
+UserInterface.h Notes
+---------------------
 - instead of "beginUI," should it be named "runUI"?
 - for "storeKey" and "findKey," shouldn't the UI spawn a thread for send message?
  
