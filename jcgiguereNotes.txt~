@@ -1,0 +1,21 @@
+Node.h:
+
+constants should be in constants.h
+Port is constant, it's redunate to have getPort()
+ping(), nodeLookup() and findNode() each removes a dead node, I think that
+	we could have a function called isDead that takes an id and a bool
+	to simply some code
+May not be necessary, but there's no deconstructor
+
+listener.h:
+
+the Post condition for sort_message doesn't make sense to me. Is listener
+    sending a response?
+
+UI.h:
+
+What are the specific commands? There should be a function for each command
+
+MessageCom.h:
+
+As for sendMessage, 

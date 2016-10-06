@@ -37,8 +37,13 @@ KBucket RoutingTable::findKBucket(int id) {
 //Pre: target is some id
 //Post: RV = array of the K closest nodes to the target
 //      Less than K are returned iff less than K nodes are in the table
-//      If the target is found, it is placed at the head
-myTriples*[K] RoutingTable::getNodes(int target);
+//      The list is ordered by distance, that is, the closest node is
+//      at the head
+myTriples*[K] RoutingTable::getNodes(int target) {
+  myTriples* closeNodes = new myTriples[K];
+  KBucket myBucket = findKBucket(target);
+  myTriples* obtainedNodes 
+}
 
 //Pre: node is a valid node object not in the routing table (id)
 //     address correlates to where node is from

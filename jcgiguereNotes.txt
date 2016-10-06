@@ -1,0 +1,37 @@
+Node.h:
+
+constants should be in constants.h
+Port is constant, it's redunate to have getPort()
+ping(), nodeLookup() and findNode() each removes a dead node, I think that
+	we could have a function called isDead that takes an id and a bool
+	to simply some code
+May not be necessary, but there's no deconstructor
+
+listener.h:
+
+the Post condition for sort_message doesn't make sense to me. Is listener
+    sending a response?
+
+UI.h:
+
+What are the specific commands? There should be a function for each command
+
+MessageCom.h:
+
+As for sendMessage, all messages are being parsed in UI. So whatever is sent
+is dependent on UI, but I personally think that sendMsg should send a string
+in the form of "command value" if command involves a second node. The
+receiving node needs to know the IP and node ID of the sender.
+
+RespondToMessage is going to have to parse a string, but expects a string in
+the form of "command value", and will have to call the specified function.
+
+I believe UI and MessageCom are going to be calling similar functions
+
+Message.hpp:
+
+parse I feel is going to be the same parse in UI
+I don't understand why create a enum type for the different kinds of messages,
+when parse is going to find the message type anyways. Once we know what type
+it is, we can call the corresponding function. Also, I'm not quite sure
+how to call the correct function based on a data type.
