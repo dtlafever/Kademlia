@@ -13,13 +13,26 @@ class UserInterface{
 
  public:
 
+  //default constructor
+  //PRE:
+  //POST: Command and givenID initialized to empty and zero.
+  //      isRunning is set to true until user inputs 'exit'.
   UserInterface();
 
+  //PRE: Object defined
+  //POST: Run the UI where the user will have the option to
+  //      enter input.
   void runUI();
 
-  //void parseInput(string input);
+  //PRE: Object defined. Input is a string entered by user.
+  //POST: Parses through input to find any errors, and once
+  //      a specific command is validated, calls the
+  //      appropriate function to start creating the message.
+  void parseInput(string input);
 
-  //void exit();
+  //PRE: User entered 'exit" as input.
+  //POST: Set isRunning to false, thus closing the UI.
+  void exit();
 
   //void storeKey(unsigned int ID);
 

@@ -1,14 +1,15 @@
 #include "UserInterface.h"
 
 #include <iostream>
-#include <string.h>
 
 using namespace std;
+
+#define MAXCHAR 80
 
 //default constructor
 //PRE:
 //POST: Command and givenID initialized to empty and zero.
-//      isRunning is set to true.
+//      isRunning is set to true until user inputs 'exit'.x
 UserInterface::UserInterface(){
   command = "";
   givenID = 0;
@@ -23,7 +24,7 @@ void UserInterface::runUI(){
   while(isRunning){
     cout << ">>";
 
-    cin >> command;
+    getline(cin, command);
 
     cout << "the command: " << command << endl;
 
@@ -33,24 +34,16 @@ void UserInterface::runUI(){
   }
 }
 
+//PRE: Object defined. Input is a string entered by user.
+//POST: Parses through input to find any errors, and once
+//      a specific command is validated, calls the
+//      appropriate function to start creating the message.
+void UserInterface::parseInput(string input){
+  //stuff hereeeee
+}
 
-//PRE: The node has been fully integrated into the network
-//     and is ready to start storing and finding keys.
-//     isRunning is a boolean passed by reference to indicate
-//     the interface is currently running.
-//POST: The user will now have the option to enter input
-//      into the user interface.
-// void runUI(bool & isRunning){
-//   //while(isRunning){
-//   try{
-
-//     //run UI
-    
-
-//   }
-//   catch(string ErrorMessage){
-//     cout << ErrorMessage << endl;
-//   }
-//   //}
-// }
-
+//PRE: User entered 'exit" as input.
+//POST: Set isRunning to false, thus closing the UI.
+void UserInterface::exit(){
+  isRunning = false;
+}
