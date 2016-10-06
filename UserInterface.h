@@ -2,6 +2,32 @@
 #ifndef include_UserInterface
 #define include_UserInterface
 
+
+class UserInterface{
+
+ private:
+
+  string command;
+  unsigned int givenID;
+  bool isRunning;
+
+ public:
+
+  UserInterface();
+
+  void runUI();
+
+  void parseInput(string input);
+
+  void exit();
+
+  void storeKey(unsigned int ID);
+
+  void findKey(unsigned int ID);
+
+};
+
+
 //PRE: The node has been fully integrated into the network
 //     and is ready to start storing and finding keys.
 //     isRunning is a boolean passed by reference to indicate
