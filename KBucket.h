@@ -34,8 +34,10 @@ class KBucket {
   //     distance > 0
   //      Return at most K such nodes
   //      ordered by distance, that is the closest is at the head
-  //Post: RV = array of nodes within distance of id
-  myTriples* getNodes(int id, int distance);
+  //     nodeHolder is an array of size K
+  //Post: nodeHolder contains the closet nodes in this bucket ordered by
+  //      distance, RV = number nodes placed into nodeHolder
+  int getNodes(int id, int distance, myTriples* nodeHolder);
   
   //Pre: node exists within bucket
   //Post: triple containing the node is moved to the tail of bucket
@@ -46,4 +48,6 @@ class KBucket {
   //Post: triple containing the node is removed from the list
   //      adjust remaining triples as necessary
   void deleteNode(myTriple* node);
+
+  //get all valid triples
 }

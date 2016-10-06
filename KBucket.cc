@@ -2,6 +2,7 @@
 //Header file for kBucket
 
 #include "constants.h"
+#include "commonFunctions.h"
 #include "KBucket.h"
 #include <stdlib.h>
 using namespace std;
@@ -35,21 +36,27 @@ void KBucket::addNode(myTriple* node) {
   numTriples++;
 }
 
+//Pre: 
+//Post:
+void KBucket::insertNode(myTriples* nodes, myTriple* curNode) {
+  int nodeDist = findDist(id, curNode);
+  bool found = false;
+  int spot = 0;
+  myTriple
+  while (!found) {
+    
+  }
+}
+
 //Pre: id is some identifier, ie a key or another node
 //     distance > 0
-//Post: RV = array of nodes within distance of id
 //      Return at most K such nodes
 //      ordered by distance, that is the closest is at the head
-//      Calling function must delete the returned value
-myTriples* KBucket::getNodes(int id, int distance) {
-  myTriples* closeNodes = new myTriples[K];
-  for (int index = 0; (index < numTriples); index++) {
-    //obtain distance for bucket[index] = d
-    //find apprioate spot in closeNodes for bucket[index], if possible
-    //why order it? It is possible to have more nodes in the bucket than we
-    //need, if closeNodes is ordered, then we can more easily tell if we
-    //wish to include bucket[index] or not
-  }
+//     nodeHolder is an array of size K
+//Post: nodeHolder contains the closet nodes in this bucket ordered by
+//      distance, RV = number nodes placed into nodeHolder
+int KBucket::getNodes(int id, int distance, myTriples* nodeHolder) {
+
 }
   
 //Pre: node exists within bucket
