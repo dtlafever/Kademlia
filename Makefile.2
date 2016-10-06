@@ -1,0 +1,15 @@
+
+GCC = g++
+RM = rm
+
+UI: UserInterface.o UImain.o
+	$(GCC) UserInterface.o UImain.o -o UI
+
+UserInterface.o: UserInterface.h UserInterface.cc
+	$(GCC) -c UserInterface.cc
+
+UImain.o: UImain.cc
+	$(GCC) -c UImain.cc
+
+clean:
+	$(RM) UserInterface.o UImain.o UI

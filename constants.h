@@ -15,3 +15,10 @@ struct myTriples {
   int port;
   int node;
 };
+
+
+//Constants for the User Interface
+#define MAXARGUMENTS 2
+#define MINARGUMENTS 1
+#define COMMANDPOS 0
+#define IDPOS 1
