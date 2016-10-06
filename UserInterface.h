@@ -6,9 +6,7 @@
 class UserInterface{
 
  private:
-
-  std::string command;
-  unsigned int givenID;
+  
   bool isRunning;
 
  public:
@@ -52,21 +50,14 @@ class UserInterface{
 //      -The first word not matching EXIT, STORE or FIND.
 //void parseInput(string input);
 
-//PRE: The user entered EXIT on the command prompt.
-//POST: isRunning is set to false, which will end the
-//      interface and close the thread.
-//void exit(bool & isRunning);
-
 //PRE: The user entered STORE along with an unsigned integer key.
 //POST: From here, the UI will know that the Node wants to store
-//      the given key. The UI will spawn a thread to Send Message
-//      so the request can be sent out.
+//      the given key.
 //void storeKey(unsigned int key);
 
 //PRE: The user entered FIND along with an unsigned integer key.
 //POST: From here, the UI will know that the Node is looking for
-//      the given key. The UI will spawn a thread and give the
-//      information needed to develop a message to send.
+//      the given key. 
 //void findKey(unsigned int key);
 
 
