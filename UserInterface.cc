@@ -1,4 +1,5 @@
 #include "UserInterface.h"
+#include "constants.h"
 
 #include <iostream>
 
@@ -40,10 +41,20 @@ void UserInterface::runUI(){
 //      appropriate function to start creating the message.
 void UserInterface::parseInput(string input){
   //stuff hereeeee
+  string ID;
+
 }
 
 //PRE: User entered 'exit" as input.
 //POST: Set isRunning to false, thus closing the UI.
 void UserInterface::exit(){
   isRunning = false;
+}
+
+//PRE: The user entered STORE along with an unsigned integer key.
+//POST: From here, the UI will know that the Node wants to store
+//      the given key. The UI will create the correct Message and
+//      send that to the Listener.
+void UserInterface::storeKey(unsigned int key){
+  //store key
 }
