@@ -9,7 +9,9 @@ using namespace std;
 //POST:
 int main(){
 
+  
   UserInterface UI = UserInterface();
+  //ASSERT: create a UserInterface object for the user
   UI.runUI();
 
 }
