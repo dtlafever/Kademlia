@@ -13,7 +13,7 @@ struct myTriples {
   //port is where the node is listening 
   int address;
   int port;
-  int node;
+  int nodeID;
 };
 
 

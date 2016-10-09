@@ -26,7 +26,7 @@ class RoutingTable {
   
   //Pre: id is some valid node or key
   //Post: RV = the nth kBucket such that d = findDist(id) where 2^n <= d < 2^n+1
-  KBucket findKBucket(uint32_t id);
+  int findKBucket(uint32_t id);
 
   //Pre: target is some id, closeNodes is an array of K -1's
   //Post: RV = array of the K closest nodes to the target
