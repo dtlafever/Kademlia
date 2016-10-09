@@ -1,6 +1,8 @@
 #include "UserInterface.h"
 #include "constants.h"
 #include "ErrorClass.h"
+#include "Message.hpp"
+
 #include <stdlib.h>
 #include <string.h>
 
@@ -55,6 +57,7 @@ void UserInterface::parseInput(char command[]){
 
   try{
     if(numArguments == MAXARGUMENTS){
+      //ASSERT: user entered two arguments.
       if(strcmp(inputWords[COMMANDPOS], allCommands[STOREPOS]) == 0){
 	cout << "You wish to store." << endl;
       }
@@ -62,18 +65,22 @@ void UserInterface::parseInput(char command[]){
 	cout << "You wish to find." << endl;
       }
       else{
+	//ASSERT: the input didn't match the correct commands
 	throw(ErrorClass((char *)"Error: Incorrect input."));
       }
     }
     else if(numArguments == MINARGUMENTS){
+      //ASSERT: user entered one argument
       if (strcmp(inputWords[COMMANDPOS], allCommands[EXITPOS]) == 0){
 	exit();
       }
       else{
+	//ASSERT: user did not input "exit"
 	throw(ErrorClass((char *) "Error: Incorrect input."));
       }
     }
     else{
+      //ASSERT: too many or too little arguments given
       throw(ErrorClass((char *) "Error: Incorrect number of arguments."));
     }
   }
