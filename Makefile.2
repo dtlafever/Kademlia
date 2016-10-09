@@ -2,8 +2,11 @@
 GCC = g++
 RM = rm
 
-UI: UserInterface.o UImain.o
-	$(GCC) UserInterface.o UImain.o -o UI
+UI: ErrorClass.o UserInterface.o UImain.o
+	$(GCC) ErrorClass.o UserInterface.o UImain.o -o UI
+
+ErrorClass.o: ErrorClass.cc ErrorClass.h
+	$(GCC) -c ErrorClass.cc
 
 UserInterface.o: UserInterface.h UserInterface.cc
 	$(GCC) -c UserInterface.cc
@@ -12,4 +15,4 @@ UImain.o: UImain.cc
 	$(GCC) -c UImain.cc
 
 clean:
-	$(RM) UserInterface.o UImain.o UI
+	$(RM) ErrorClass.o UserInterface.o UImain.o UI

@@ -17,8 +17,19 @@ struct myTriples {
 };
 
 
-//Constants for the User Interface
+//========================
+//USER INTERFACE CONSTANTS
+//========================
 #define MAXARGUMENTS 2
 #define MINARGUMENTS 1
 #define COMMANDPOS 0
 #define IDPOS 1
+#define MAXCHAR 30
+#define COMSIZE 3
+
+#define EXITPOS 0
+#define STOREPOS 1
+#define FINDPOS 2
+
+//Constant char array for each command. 
+static char allCommands[COMSIZE][MAXCHAR] = {"exit", "store", "find"};

@@ -1,5 +1,6 @@
 #include <string>
 
+
 #ifndef include_UserInterface
 #define include_UserInterface
 
@@ -8,7 +9,7 @@ class UserInterface{
  private:
   
   bool isRunning;
-
+  
  public:
 
   //default constructor
@@ -26,29 +27,31 @@ class UserInterface{
   //POST: Parses through input to find any errors, and once
   //      a specific command is validated, calls the
   //      appropriate function to start creating the message.
-  void parseInput(string input);
+  void parseInput(char command[]);
 
   //PRE: User entered 'exit" as input.
   //POST: Set isRunning to false, thus closing the UI.
   void exit();
 
-  //void storeKey(unsigned int ID);
+  //PRE: The user entered STORE along with a key ID.
+  //POST: From here, the UI will know that the Node wants to store
+  //      the given key. The UI will create the correct Message.
+  void storeKey(unsigned int ID);
 
+  //PRE: The user entered FIND along with a key ID.
+  //POST: From here, the UI will know that the Node wants to find
+  //      the given key. The UI will create the correct Message.
   //void findKey(unsigned int ID);
+
+  //PRE: Message object created and ready to be sent. 
+  //POST: Creates a socket to communicate with the Listener.
+  //void sendtoListener(Message msg);
 
 };
 
 #endif
 
 
-
-//PRE: Input is a string entered in by the user
-//POST: Parses through the input to extract words and/or
-//      keys given. Error is expected to be thrown if:
-//      -More than two words in input
-//      -The second word not being a key
-//      -The first word not matching EXIT, STORE or FIND.
-//void parseInput(string input);
 
 //PRE: The user entered STORE along with an unsigned integer key.
 //POST: From here, the UI will know that the Node wants to store
