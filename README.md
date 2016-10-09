@@ -1,6 +1,21 @@
 # Kademlia
 peer 2 peer network, XOR metrix.
 
+Routing Table requires the ability to ping an arbitary node, and recieve a
+response.
+
+Currently message class does not provide for this ability. Send message
+returns a KBucket, always. I'm not quite sure why this is the case. Not all
+response will be a KBucket.
+
+Pretty much, I need to be able to ping a node and receive a response stating
+that it is still alive.
+
+Unless I require that the node passed to addNode in Routing Table is 100%
+able to be inserted.
+
+Also, comments are all on one line and they don't exactly make sense.
+
 Questions
 ---------
 - Should be just have a pointer for the least recently used item in a bucket (for pinging when bucket is full) and otherwise order the bucket by distance (which would make searching easier)?
