@@ -1,7 +1,6 @@
 #include "UserInterface.h"
 #include "constants.h"
 #include "ErrorClass.h"
-#include "Message.hpp"
 
 #include <stdlib.h>
 #include <string.h>
@@ -26,17 +25,17 @@ UserInterface::UserInterface(){
 void UserInterface::runUI(){
   char command[MAXCHAR];
   string input;
-  try{
-    while(isRunning){
+  while(isRunning){
+    try{
       cout << "> ";
       getline(cin, input);
       strcpy(command, input.c_str());
       
       parseInput(command);
     }
-  }
-  catch (ErrorClass & error){
-    error.print_error();
+    catch(ErrorClass & error){
+      error.print_error();
+    }
   }
 }
 
