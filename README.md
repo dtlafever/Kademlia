@@ -28,14 +28,18 @@ Also, comments are all on one line and they don't exactly make sense.
 
 Give it the port we want to listen and send on. This function will then create the socket and bind it to the given port. It will throw a SocketException if there is an error.
 
-**sendMessage(string s, string host, int port)**
+**void sendMessage(string s, string host, int port)**
 
 Give it the message you want to send, the host ip, and host port to send it to. The function will then send a non blocking message to that host. It will throw a SocketException if there is an error sending.
 
-**recvMessage(string s)**
+**int recvMessage(string s)**
 
 Give it a buffer to hold the message. The function returns the length of the message and the stores the message in the string given. If -1 is returned then recv failed.
 
-**getRemoteIP()**
+**int getRemoteIP()**
+
+Assumes that you have called recvMessage, it will get the most recent message's host IP.
+
+**string getRemoteIP()**
 
 Assumes that you have called recvMessage, it will get the most recent message's host IP.
