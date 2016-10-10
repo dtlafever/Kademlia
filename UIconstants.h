@@ -1,3 +1,6 @@
+#ifndef include_UICONSTANTS
+#define include_UICONSTANTS
+
 //Constants for the User Interface
 #define MAXARGUMENTS 2
 #define MINARGUMENTS 1
@@ -12,3 +15,5 @@
 
 //Command array for valid inputs
 static char allCommands[MAXCOMMANDS][MAXCHAR] = {"exit", "store", "find"};
+
+#endif

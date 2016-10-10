@@ -1,7 +1,7 @@
-#include "ErrorClass.h"
+#include "UIerror.h"
 #include <string.h>
 
-ErrorClass::ErrorClass (char * errorMsg) {
+UIerror::UIerror (char * errorMsg) {
   msg = new char[MAXERRORSIZE];
   strcpy (msg, errorMsg);
 }

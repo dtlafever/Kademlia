@@ -1,5 +1,5 @@
-#ifndef INCLUDED_ErrorClass
-#define INCLUDED_ErrorClass
+#ifndef INCLUDED_UIerror
+#define INCLUDED_UIerror
 
 #include <iostream>
 
@@ -7,13 +7,13 @@ using namespace std;
 
 #define MAXERRORSIZE 40
 
-class ErrorClass {
+class UIerror {
 
  private:
   char * msg;
   
  public:
-  ErrorClass (char * errorMsg);
+  UIerror (char * errorMsg);
 
   void print_error () { cout << msg << endl; };
 

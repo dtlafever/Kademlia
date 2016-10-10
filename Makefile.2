@@ -1,12 +1,12 @@
 
-GCC = g++
+GCC = g++ -std=c++11
 RM = rm
 
-UI: ErrorClass.o UserInterface.o UImain.o
-	$(GCC) ErrorClass.o UserInterface.o UImain.o -o UI
+UI: UIerror.o UserInterface.o UImain.o
+	$(GCC) UIerror.o UserInterface.o UImain.o -o UI
 
-ErrorClass.o: ErrorClass.cc ErrorClass.h
-	$(GCC) -c ErrorClass.cc
+UIerror.o: UIerror.cc UIerror.h
+	$(GCC) -c UIerror.cc
 
 UserInterface.o: UserInterface.h UserInterface.cc
 	$(GCC) -c UserInterface.cc
@@ -15,4 +15,4 @@ UImain.o: UImain.cc
 	$(GCC) -c UImain.cc
 
 clean:
-	$(RM) ErrorClass.o UserInterface.o UImain.o UI
+	$(RM) UIerror.o UserInterface.o UImain.o UI
