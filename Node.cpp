@@ -83,31 +83,31 @@ Node::Node(Triple contact);
 
 //PRE:
 //POST: parent thread that spawns other threads as needed
-void Node::main_T() {
+void Node::main_T(Node * node) {
 
 }
 
 //PRE: 
 //POST: the thread that handles pinging every node in our k buckets every TIME_TO_PING amount of time
-void Node::refresher_T() {
+void Node::refresher_T(Node * node) {
 
 }
 
 //PRE: 
 //POST: responds to other nodes asking for things like findNode and findValue. This thread
 //      will spawn sendMessage and recieveMessage threads
-void Node::responder_T() {
+void Node::responder_T(Node * node) {
 
 }
 
 //PRE: 
 //POST: responds to messages thread
-void Node::sendMessage_T() {
+void Node::sendMessage_T(Node * node) {
 
 }
 
 //PRE: 
 //POST: recieves messages thread
-void Node::receiveMessage_T() {
+void Node::receiveMessage_T(Node * node) {
 
 }
