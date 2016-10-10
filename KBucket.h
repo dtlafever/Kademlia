@@ -1,6 +1,9 @@
 //Justin Giguere
 //Header file for kBucket
 
+#ifndef INCLUDE_KBucket.h
+#define INCLUDE_KBucket.h
+
 #include "constants.h"
 
 class KBucket {
@@ -55,6 +58,8 @@ class KBucket {
   //Pre: id1 and id2 are two identifiers
   //Post: RV = id1 XOR id2
   int findDist(int id1, int id2);
-
+  
   //get all valid triples
 }
+
+#endif

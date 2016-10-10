@@ -1,6 +1,9 @@
 //Justin Giguere
 //Routing Table Header
 
+#ifndef INCLUDE_RoutingTable
+#define INCLUDE_RoutingTable
+
 #include "KBucket.h"
 #include "constants.h"
 
@@ -13,7 +16,7 @@ class RoutingTable {
 	//Pre: The respected node is going poof
 	//Post: deletes each kBucket
 	~RoutingTable();
-private:
+ private:
 	uint32_t myId;
 	
 	KBucket[K] meBuckets;
@@ -24,7 +27,8 @@ private:
 	
 	
 	//Pre: id is some valid node or key
-	//Post: RV = the nth kBucket such that d = findDist(id) where 2^n <= d < 2^n+1
+	//Post: RV = the nth kBucket such that
+	//      d = findDist(id) where 2^n <= d < 2^n+1
 	int findKBucket(uint32_t id);
 	
 	//Pre: target is some id, closeNodes is an array of K -1's
@@ -39,6 +43,10 @@ private:
 	//Post: RV = true if node was added to the table
 	//           false otherwise
 	bool addNode(uint32_t node, uint32_t address);
+
+	//Pre: id and address represents a new node not seen before
+	//Post: RV = myTriple object representing this new node
+	myTriple* createTriple(uint32_t id, uint32_t address);
 	
 	//Pre: myNode exists inside meBuckets
 	//Post: myNode is placed at the tail of its respected kBucket
@@ -47,3 +55,4 @@ private:
 	
 }
 
+#endif

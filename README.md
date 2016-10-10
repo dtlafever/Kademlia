@@ -1,3 +1,10 @@
+Code was added to the addNode function in RoutingTable.h to handle
+ping functionality. Please check over it to ensure that it was done
+correctly, and/or a better way to write it
+
+In UDPSocket.h, the function revMessage is declared void when the Post
+condition says it returns 'size of that junk'. What is junk?
+
 # Kademlia
 peer 2 peer network, XOR metrix.
 
