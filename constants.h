@@ -4,8 +4,9 @@
 #define UDPPORT 6666
 #define NUMBITS 32
 #define ALPHA 3
-#define RESPONDTIME 2000
-#define PINGTIME 3600000
+#define RESPONDTIME 2000 //in milliseconds, the time to wait before moving on for an operation (such as findNode)
+#define PINGTIME 3600000 //in milliseconds, the time to wait before pinging a node
+#define MAXRECV 500
 
 struct myTriples {
   //a myTriples represents a node who does not own this routing table
@@ -13,23 +14,11 @@ struct myTriples {
   //port is where the node is listening 
   int address;
   int port;
-  int nodeID;
+  int node;
 };
 
-
-//========================
-//USER INTERFACE CONSTANTS
-//========================
+//Constants for the User Interface
 #define MAXARGUMENTS 2
 #define MINARGUMENTS 1
 #define COMMANDPOS 0
 #define IDPOS 1
-#define MAXCHAR 30
-#define COMSIZE 3
-
-#define EXITPOS 0
-#define STOREPOS 1
-#define FINDPOS 2
-
-//Constant char array for each command. 
-static char allCommands[COMSIZE][MAXCHAR] = {"exit", "store", "find"};

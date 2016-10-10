@@ -1,24 +1,19 @@
+#ifndef INCLUDE_NODE
+#define INCLUDE_NODE
+
 #include <Vector>
 #include "RoutingTable.h"
-
-#define K 5
-#define ALPHA 3
-#define INT_SIZE 32
-#define TIME_TO_RESPOND 2000	//in milliseconds, the time to wait before moving on for an operation (such as findNode)
-#define TIME_TO_PING 3600000	//in milliseconds, the time to wait before pinging a node
+#include "constants.h"
 
 class Node{
 
  private:
-  uint32_t ID;						//The ID of this computer
-  vector<uint32_t> keys;				//The keys of the files stored on this pc
+  uint32_t ID;					//The ID of this computer
+  vector<uint32_t> keys;		//The keys of the files stored on this pc
   RoutingTable routingTable;	//The K-Buckets
 
-  uint32_t getID();
-  void setID(uint32_t ID);
-
-  char * getIP();
-  char * getPort();
+  uint32_t getMyID();
+  void setMyID(uint32_t newID);
 
   //PRE: the node we want to ping
   //POST: checks to make sure that node is still alive. Removes from the k-bucket 
@@ -75,26 +70,23 @@ class Node{
 
   //PRE:
   //POST: parent thread that spawns other threads as needed
-  void main_T();
+  static void main_T(Node * node);
 
   //PRE: 
   //POST: the thread that handles pinging every node in our k buckets every TIME_TO_PING amount of time
-  void refresher_T();
+  static void refresher_T(Node * node);
 
   //PRE: 
   //POST: responds to other nodes asking for things like findNode and findValue. This thread
   //      will spawn sendMessage and recieveMessage threads
-  void responder_T();
+  static void responder_T(Node * node);
 
   //PRE: 
   //POST: responds to messages thread
-  void sendMessage_T();
+  static void sendMessage_T(Node * node);
 
   //PRE: 
   //POST: recieves messages thread
-  void receiveMessage_T();
-
-  //PRE: 
-  //POST: handles the command line prompt and ui thread
-  void UI_T();
+  static void receiveMessage_T(Node * node);
 }
+#endif // !INCLUDE_NODE

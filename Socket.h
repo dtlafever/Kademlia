@@ -13,13 +13,12 @@
 #include <arpa/inet.h>
 
 
-#define NON_BLOCK 0
-#define BLOCK 1
+#define TCP true
+#define UDP false
 #define MORE true
 
 const int MAXHOSTNAME = 200;
-const int MAXCONNECTIONS = 5;
-const int MAXRECV = 500;
+const int MAXCONNECTIONS = 20;
 
 class Socket
 {
@@ -28,8 +27,7 @@ class Socket
   virtual ~Socket();
 
   // Server initialization
-  bool create();
-  bool create(int BLOCKING_FLAG);
+  bool create(bool protocol);
   bool bind ( const int port );
   bool listen() const;
   bool accept ( Socket& ) const;
@@ -38,22 +36,31 @@ class Socket
   bool connect ( const std::string host, const int port );
 
   // Data Transimission
-  bool send ( const std::string s ) const;
-  bool send (const std::string s, const bool FLAG ) const;
+  bool send ( const std::string s ) const;					//TCP command
+  bool send (const std::string s, const bool FLAG ) const;	//TCP command
+  bool sendTo ( const std::string s, const string host, 
+				const int port ) const;						//UDP command
   int recv ( std::string& ) const;
+  int recvFrom(std::string&);								//UDP command
 
-
-  void set_non_blocking ( const bool );
+  void set_non_blocking ( const bool );						//TCP command
 
   bool is_valid() const { return m_sock != -1; }
+
+  //PRE: assumes that remaddr has a value (AKA recvMessage called)
+  //POST: returns the IP address of the remote address
+  int getRemoteIP() const;
 
  private:
 
   //Error flag
   int m_sock;
-  sockaddr_in m_addr;
+  struct sockaddr_in m_addr;
 
-
+  //the recieving socket
+  struct sockaddr_in remaddr;
+  //length of the addresses
+  socklen_t addrlen = sizeof(remadrr);
 };
 
 
