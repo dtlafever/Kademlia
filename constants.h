@@ -1,3 +1,6 @@
+#ifndef INCLUDE_CONSTANTS
+#define INCLUDE_CONSTANTS
+
 //list of contants
 
 #define K 5
@@ -17,3 +20,4 @@ struct myTriples {
   int node;
 };
 
+#endif

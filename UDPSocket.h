@@ -11,21 +11,24 @@ public:
 	//      throws error if could not create or bind
 	UDPSocket(uint32_t port);
 	UDPSocket() {};
-	virtual UDPSocket();
+	virtual ~UDPSocket();
 
 	//PRE: a message, host ip, and the port
 	//POST: sends the message to that host and then closes the connection.
 	//      throws error if couldn't send
-	void sendMessage(const std::string s, const string host,
+	void sendMessage(const std::string s, const std::string host,
 						const uint32_t port);
 
 	//PRE: the buffer we want to store the message in
 	//POST: store the message in the string and return the size of that junk
-	void revMessage(string& s);
+	int recvMessage(std::string& s);
 
 	//PRE: assumes that remaddr has a value (AKA recvMessage called)
 	//POST: returns the IP address of the remote address
-	std::string getRemoteIP();
+	int getRemoteIP();
+
+	//same as above except return the string formatted IP and butts
+	std::string getRemoteIP(int dummy);
 private:
 	
 };

@@ -11,6 +11,7 @@
 #include <unistd.h>
 #include <string>
 #include <arpa/inet.h>
+#include "constants.h"
 
 
 #define TCP true
@@ -27,6 +28,7 @@ class Socket
   virtual ~Socket();
 
   // Server initialization
+
   bool create(bool protocol);
   bool bind ( const int port );
   bool listen() const;
@@ -36,21 +38,24 @@ class Socket
   bool connect ( const std::string host, const int port );
 
   // Data Transimission
-  bool send ( const std::string s ) const;					//TCP command
+  bool send ( const std::string s ) const;			//TCP command
   bool send (const std::string s, const bool FLAG ) const;	//TCP command
-  bool sendTo ( const std::string s, const string host, 
-				const int port ) const;						//UDP command
+  bool sendTo ( const std::string s, std::string host, 
+				const int port );		//UDP command
   int recv ( std::string& ) const;
-  int recvFrom(std::string&);								//UDP command
+  int recvFrom(std::string&);		      //UDP command
 
-  void set_non_blocking ( const bool );						//TCP command
+  void set_non_blocking ( const bool );	      //TCP command
 
   bool is_valid() const { return m_sock != -1; }
 
   //PRE: assumes that remaddr has a value (AKA recvMessage called)
   //POST: returns the IP address of the remote address
-  int getRemoteIP() const;
+  int getRemoteIP() ;
 
+  //same as above except return the string formatted IP and butts
+  std::string getRemoteIP(int dummy);
+  
  private:
 
   //Error flag
@@ -60,7 +65,7 @@ class Socket
   //the recieving socket
   struct sockaddr_in remaddr;
   //length of the addresses
-  socklen_t addrlen = sizeof(remadrr);
+  socklen_t addrlen = sizeof(remaddr);
 };
 
 

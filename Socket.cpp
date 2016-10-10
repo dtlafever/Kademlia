@@ -4,6 +4,7 @@
 #include "Socket.h"
 #include "string.h"
 #include <string.h>
+#include <cstring>
 #include <errno.h>
 #include <fcntl.h>
 #include <iostream>
@@ -131,7 +132,7 @@ bool Socket::accept ( Socket& new_socket ) const
 //PRE: given a message to send. Assumes we have a connection
 //POST: uses the sys/socket.h to send message to our client, try to send message.
 //      return false if failed to send message, true otherwise
-bool Socket::send ( const string s ) const
+bool Socket::send ( const std::string s ) const
 {
   int status = ::send ( m_sock, s.c_str(), s.size(), MSG_NOSIGNAL );
   if ( status == -1 )
@@ -148,7 +149,7 @@ bool Socket::send ( const string s ) const
 //     requesting more info
 //POST: uses the sys/socket.h to send message to our client, try to send message.
 //      return false if failed to send message, true otherwise
-bool Socket::send ( const string s, const bool FLAG ) const
+bool Socket::send ( const std::string s, const bool FLAG ) const
 {
   int status;
   if(FLAG == MORE){
@@ -170,20 +171,23 @@ bool Socket::send ( const string s, const bool FLAG ) const
 //     number of that host
 //POST: sends a message to the a given host and port number. Returns true if 
 //      the send succeeds, false otherwise
-bool sendTo(const std::string s, const string host, const int port) const {
+bool Socket::sendTo(const std::string s, std::string host, const int port) {
 
 	//create address to send our message to
-	structsockaddr_in remaddr;
+	struct sockaddr_in remaddr;
 	memset((char *)&remaddr, 0, sizeof(remaddr));
 	int slen = sizeof(remaddr);
 	remaddr.sin_family = AF_INET;
 	remaddr.sin_port = htons(port);
-	if (inet_aton(server, &remaddr.sin_addr) == 0) {
+
+	char * ip = (char *)host.c_str();
+	
+	if (inet_aton(ip, &remaddr.sin_addr) == 0) {
 		return false;
 	}
 
 	//send the message
-	int status = ::sendTo(m_sock, s.c_str(), s.size(), MSG_NOSIGNAL, 
+	int status = ::sendto(m_sock, s.c_str(), s.size(), MSG_NOSIGNAL, 
 							(struct sockaddr *)&remaddr, slen);
 	if (status == -1)
 	{
@@ -198,7 +202,7 @@ bool sendTo(const std::string s, const string host, const int port) const {
 //PRE: a string buffer to hold our message. Assumes we have a connection
 //POST: uses sys/socket.h to recv a message from the paired socket. If
 //      the recv succeeds, string s will hold the message, else it will return the status code
-int Socket::recv ( string& s ) const
+int Socket::recv ( std::string& s ) const
 {
   char buf [ MAXRECV + 1 ];
 
@@ -228,38 +232,50 @@ int Socket::recv ( string& s ) const
 //POST: returns the number of bytes recieved and stores the message in s.
 //      -1 is returned if there was an error.
 //NOTE: remaddr is populated for later use if we need the IP address
-int recvFrom(std::string& s) {
+int Socket::recvFrom(std::string& s) {
 	char buf[MAXRECV + 1];
 
 	s = "";
 	memset(buf, 0, MAXRECV + 1);
 
 	int recvlen = ::recvfrom(m_sock, buf, MAXRECV, 0, 
-								(struct sockaddr *)&remaddr, &addrlen);
+				 (struct sockaddr *)&remaddr, &addrlen);
 	if (recvlen == -1) {
-		printf("There was an error in recvfrom.");
+	  //printf("There was an error in recvfrom.");
 	}
 	else {
 		s = buf;
 	}
+	return (recvlen);
 }
 
 //PRE: assumes that remaddr has a value (AKA recvMessage called)
 //POST: returns the IP address of the remote address
-void  getRemoteIP(string& s) const {
-	char buf[MAXRECV + 1];
-	s = "";
-	memset(buf, 0, MAXRECV + 1);
+int  Socket::getRemoteIP() {
+  return (remaddr.sin_addr.s_addr);
+	
 
-	inet_ntop(AF_INET, &(remaddr.sin_addr), buf, INET_ADDRSTRLEN);
-	s = buf;
 }
+
+//same as above except return the string formatted IP and butts
+std::string Socket::getRemoteIP(int dummy){
+  char buf[MAXRECV + 1];
+  std::string s = "";
+  memset(buf, 0, MAXRECV + 1);
+  
+  inet_ntop(AF_INET, &(remaddr.sin_addr), buf, INET_ADDRSTRLEN);
+
+  s = buf;
+  
+  return(s);
+}
+
 
 //PRE: take the name of the host and the host's port
 //POST: connects our socket with the server's socket.
 //      Returns true if we successfully connected. false otherwise
 //NOTE: Client function only 
-bool Socket::connect ( const string host, const int port )
+bool Socket::connect ( const std::string host, const int port )
 {
   if ( ! is_valid() ) return false;
   //Set to IPv4 on port

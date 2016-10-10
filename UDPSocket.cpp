@@ -22,7 +22,7 @@ UDPSocket::~UDPSocket()
 //PRE: a message, host ip, and the port
 //POST: sends the message to that host and then closes the connection.
 //      throws error if couldn't send
-void UDPSocket::sendMessage(const std::string s, const string host,
+void UDPSocket::sendMessage(const std::string s, const std::string host,
 						const uint32_t port) {
 	if (!Socket::sendTo(s, host, port)) {
 		throw SocketException("Could not send message.");
@@ -31,14 +31,17 @@ void UDPSocket::sendMessage(const std::string s, const string host,
 
 //PRE: the buffer we want to store the message in
 //POST: store the message in the string and return the size of that junk
-int UDPSocket::revMessage(string& s) {
+int UDPSocket::recvMessage(std::string& s) {
 	return (Socket::recvFrom(s));
 }
 
 //PRE: assumes that remaddr has a value (AKA recvMessage called)
 //POST: returns the IP address of the remote address
-std::string UDPSocket::getRemoteIP() {
-	string s;
-	Socket::getRemoteIP(s);
-	return (s);
+int UDPSocket::getRemoteIP() {
+  return (Socket::getRemoteIP());
+}
+
+//same as above except return the string formatted IP and butts
+std::string UDPSocket::getRemoteIP(int dummy){
+  return (Socket::getRemoteIP(dummy));
 }
