@@ -70,7 +70,7 @@ void Node::findValue(uint32_t key) {
 
 //PRE: 
 //POST: lets create a new network and init this node with 32 empty k buckets and a random id
-Node::Node();
+Node::Node(){};
 
 //PRE: the contact node we know about that will allow us to join the network
 //POST: create a random id that is unique in this network, create our 32 k buckets that
