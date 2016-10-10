@@ -45,10 +45,16 @@ void Message::parse (std::string & msg)
 	
 	msgType = NONE;
 	
+	if ((index=msg.find("UI")!= -1))
+	{
+		isUI = true;
+		msg.erase(msg.begin()+index, msg.begin()+index+2);
+	}
+	
 	if(msg == "")
 		Message::msg = msg;
 	
-	if (msg.find("PING") != -1)
+	else if (msg.find("PING") != -1)
 	{
 		msgType = PING;
 	}
@@ -79,11 +85,17 @@ void Message::parse (std::string & msg)
 		
 		ID = atoi(msg.c_str());
 	}
+	else if (msg.find("KB")!= -1)
+	{
+		msg.erase(msg.begin(), msg.begin()+3);
+		/// Iterate and insert
+		
+	}
 }
 
-int Message::createMessage(MsgType type, uint32_t ID)
+std::string Message::toString(MsgType type, uint32_t ID, bool UI)
 {
-	int returnValue = 0;
+	msg = "";
 	
 	switch (type)
 	{
@@ -92,9 +104,7 @@ int Message::createMessage(MsgType type, uint32_t ID)
 			break;
 			
 		case STORE:
-			if(ID == -1)
-				returnValue = -1;
-			else
+			if(ID != -1)
 			{
 				char temp [32];
 				sprintf(temp, "%d", ID); // convert to string
@@ -103,9 +113,7 @@ int Message::createMessage(MsgType type, uint32_t ID)
 			break;
 			
 		case FINDNODE:
-			if (ID == -1)
-				returnValue = -1;
-			else
+			if (ID != -1)
 			{
 				char temp [32];
 				sprintf(temp, "%d", ID); // convert to string
@@ -114,8 +122,7 @@ int Message::createMessage(MsgType type, uint32_t ID)
 			break;
 			
 		case FINDVALUE:
-			if(ID == -1)
-				returnValue = -1;
+			if(ID != -1)
 			{
 				char temp [32];
 				sprintf(temp, "%d", ID); // convert to string
@@ -123,20 +130,28 @@ int Message::createMessage(MsgType type, uint32_t ID)
 			}
 			break;
 			
+		case KB:
+			msg = "KB ";
+			
+			/// iterate over all elements of kclosest and put them in the message.
+			
+			break;
+			
 		default:
-			returnValue = -1;
 			break;
 	}
 	
-	return returnValue;
+	if(UI)
+		msg += " UI";
+	
+	return msg;
 }
 
-std::string Message::createMessage()
+std::string Message::toString()
 {
 	std::string m = "";
 	
-	if(!createMessage(msgType, ID))
-		m = msg;
+	m=toString(msgType, ID, isUI);
 	
 	return m;
 }

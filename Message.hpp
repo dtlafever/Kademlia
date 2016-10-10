@@ -10,9 +10,11 @@
 #define Message_cpp
 #include <string>
 #include <stdio.h>
+#include "kBucket.h"
 
 // Enumerated data type describing the type of message. Accessible outside the class.
-enum MsgType { PING, STORE, FINDNODE, FINDVALUE, NONE};
+// KB is when we format the kclosest kbuckets.
+enum MsgType { PING, STORE, FINDNODE, FINDVALUE, KB, NONE};
 
 class Message
 {
@@ -24,6 +26,12 @@ class Message
 	
 	// ID represents the NodeID we're looking up or the key to the file
 	uint32_t ID =-1;
+	
+	// This boolean flag is set to true when the message came from the User Interface.
+	bool isUI = false;
+	
+	// Represents the KBucket to send
+	KBucket k;
 	
 	/// This implemententation of Message assumes that there is no need for getting the IP address from the file but rather from the socket.
 	
@@ -50,16 +58,20 @@ public:
 	void parse (std::string &);
 	
 	// PRE: takes a MsgType object and an ID which is the NodeID
-	// POST: Creates a message to be able to send it in the appropriate format. The return value represents the success or failure. -1 for failure and 0 for success.
-	int createMessage (MsgType type, uint32_t ID = -1);
+	// POST: Creates a message to be able to send it in the appropriate format.
+	std::string toString (MsgType type, uint32_t ID = -1, bool UI=false);
 	
 	// PRE: this function is to be used if the Message object is already created and we want to retrieve the string format.
 	// POST: This function creates a string relative to its attributes that can be used when communicating. The function will return an empty string if it fails.
-	std::string createMessage ();
+	std::string toString ();
 	
 	// PRE:
 	// POST: returns the Node of File ID.
 	uint32_t getID();
+	
+	// PRE: this function takes a MsgType to set to.
+	// POST:  This function does not check the types, it assumes it's taking the right input and just sets the internal message type.
+	void setType(MsgType type);
 
 };
 #endif /* Message_cpp */

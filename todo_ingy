@@ -1,0 +1,20 @@
+#################################################
+
+This is my personal to do list. If you want/need me to do something you can add it here or if it's a bug you can change my code if it's a small bug. Otherwise You can still add it here.
+
+Ingy
+
+#################################################
+
+Todo:
+
+- Change parse function and create message
+- Update comments in Message.hpp and Message.cpp
+- Update MessageCom back to send message
+- Update comments in sendmessage
+
+
+Notes:
+
+sendMessage figures out who to send to, creates connection and sends.
+
