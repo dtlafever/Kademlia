@@ -5,15 +5,16 @@
 #include "KBucket.h"
 #include <stdlib.h>
 #include <stdint.h>
+#include <iostream>
 using namespace std;
 
 //Pre: routing table is initalized
 //Post: Creates a new KBucket where size = constant k
 //      and myTriples is an array of size k of triples
 //      numTriples = 0
-KBucket() {
+KBucket::KBucket() {
+  cout << "KBucket Constructor" << endl;
   numTriples = 0;
-  bucket = Triple*[K];
   for (int index = 0; (index < K); index++) {
     bucket[index] = NULL;
   }
@@ -21,15 +22,28 @@ KBucket() {
 
 //Pre: the respected routing table is being deleted
 //Post: bucket is destroyed
-~KBucket() {
+KBucket::~KBucket() {
+  cout << "KBucket Destructor called" << endl;
   for (int index = 0; (index < numTriples); index++) {
     delete bucket[index];
   }
 }
 
+//Pre: N/A
+//Post: RV = numTriples
+int KBucket::getNumTriples() {
+  return (numTriples);
+}
+
+//Pre: The Bucket has at least one triple
+//Post: RV = bucket[head]
+Triple* KBucket::getHead() {
+  return (bucket[0]);
+}
+
 //Pre: id1 and id2 are two identifiers
 //Post: RV = id1 XOR id2
-int KBucket::findDist(int id1, int id2) {
+uint32_t KBucket::findDist(uint32_t id1, uint32_t id2) {
   return (id1 ^ id2);
 }
 
@@ -44,13 +58,14 @@ void KBucket::addNode(Triple* node) {
 
 //Pre: nodes is in smallest distance order, currNode has a home in nodes
 //     index is where that home is
+//     nodes is an array of triples, curNode is a pointer to a triple
 //Post: nodes[index] = curNode and nodes is shifted as needed
-void KBucket::insertNode(myTriples* nodes, int insertDex,
-			 myTriple* curNode, int size) {
-  Triple* myCopy;
-  myCopy.nodeID = curNode.nodeID;
+void KBucket::insertNode(Triple* nodes, int insertDex,
+			 Triple* curNode, int size) {
+  Triple myCopy;
+  myCopy.node = curNode->node;
   myCopy.port = UDPPORT;
-  myCopy.address = curNode.address;
+  myCopy.address = curNode->address;
   //right shift
   for (int index = size - 1; (index > insertDex); index--) {
     nodes[index] = nodes[index - 1];
@@ -64,15 +79,15 @@ void KBucket::insertNode(myTriples* nodes, int insertDex,
 //      nodeHolder is currently in smallest distance order
 //Post: nodeHolder contains the closet nodes in this bucket ordered by
 //      distance
-void KBucket::getNodes(uint32_t target, myTriples* nodeHolder, int& size) {
+void KBucket::getNodes(uint32_t target, Triple* nodeHolder, int& size) {
   bool inserted = false;
   for (int index = 0; (index < numTriples); index++) {
     Triple* currTriple = bucket[index];
-    uint32_t currDist = findDist(target, currTriple.nodeID);
+    uint32_t currDist = findDist(target, currTriple->node);
     bool found = false;
     int insertDex = 0;
     while ((!found) and (insertDex < size)) {
-      uint32_t compareDist = findDist(target, bucket[insertDex].nodeID);
+      uint32_t compareDist = findDist(target, bucket[insertDex]->node);
       if (currDist > compareDist) {
 	insertDex++;
       }

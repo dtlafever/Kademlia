@@ -34,8 +34,8 @@ uint32_t RoutingTable::findDist(uint32_t id1, uint32_t id2) {
 //Pre: id is some valid node or key
 //Post: RV = the nth kBucket such that d = findDist(id) where 2^n <= d < 2^n+1
 int RoutingTable::findKBucket(uint32_t id) {
-  int myDist = findDist(myId, id);
-  int tempt = myDist;
+  uint32_t myDist = findDist(myId, id);
+  uint32_t tempt = myDist;
   int twoPower = 0;
   while (tempt % 2 == 0) {
     tempt = tempt / 2;
