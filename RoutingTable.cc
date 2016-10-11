@@ -9,7 +9,7 @@
 #include <string.h>
 #include "UDPSocket.h"
 #include <iostream>
-#include <time.h>    //Clock function
+#include <stdint.h>
 
 using namespace std;
 

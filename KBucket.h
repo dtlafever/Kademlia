@@ -11,7 +11,7 @@ class KBucket {
  private:
   
   int numTriples;
-  myTriples*[K] bucket;     //each bucket has k triples in it
+  myTriples* bucket;     //each bucket has k triples in it
                             //ease of moving triples around
 
   //bucket is organized by time last seen, head is least recently, tail is most
