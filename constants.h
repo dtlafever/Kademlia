@@ -1,7 +1,6 @@
 #ifndef INCLUDE_CONSTANTS
 #define INCLUDE_CONSTANTS
 
-#include <stdint.h>
 //list of contants
 
 #define K 5
