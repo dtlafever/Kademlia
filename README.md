@@ -26,16 +26,44 @@ Also, comments are all on one line and they don't exactly make sense.
 ## UDPSocket Usage
 **UDPSocket(int port)**
 
-Give it the port we want to listen and send on. This function will then create the socket and bind it to the given port. It will throw a SocketException if there is an error.
+INPUT: a port number we want to listen and send on.
 
-**sendMessage(string s, string host, int port)**
+OUTPUT:
 
-Give it the message you want to send, the host ip, and host port to send it to. The function will then send a non blocking message to that host. It will throw a SocketException if there is an error sending.
+SIDE EFFECTS: creates the socket and binds the socket to the given port. Throws a SocketException if there is an error.
 
-**recvMessage(string s)**
 
-Give it a buffer to hold the message. The function returns the length of the message and the stores the message in the string given. If -1 is returned then recv failed.
+**void sendMessage(string s, string host, int port)**
 
-**getRemoteIP()**
+INPUT: the message we want to send, the host ip and port we want to send our message to
 
-Assumes that you have called recvMessage, it will get the most recent message's host IP.
+OUTPUT: 
+
+SIDE EFFECTS: sends a UDP message to that host. Throws a SocketException if there is an error.
+
+
+**int recvMessage(string s)**
+
+INPUT: a buffer to hold our message
+
+OUTPUT: returns the length of the message (in bytes). Returns -1 if recv failed.
+
+SIDE EFFECTS: stores the message in the buffer.
+
+
+**int getRemoteIP()**
+
+INPUT: None, but assumes that you ahve called recvMessage and it returned a value > 0
+
+OUTPUT: returns the IP address (integer) of the most recent message
+
+SIDE EFFECTS: 
+
+
+**string getRemoteIP()**
+
+INPUT: None, but assumes that you ahve called recvMessage and it returned a value > 0
+
+OUTPUT: returns the IP address (string) of the most recent message
+
+SIDE EFFECTS: 
