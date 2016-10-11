@@ -40,12 +40,16 @@ class Message
 	
 public:
 	
+	// Default constructor
+	Message ();
+	
 	// PRE: Takes the message as a parameter
 	// POST: Constructor that will call the parse function
 	Message (std::string msg);
 	
-	// Default constructor
-	Message ();
+	// PRE:
+	// POST:
+	Message(MsgType type, uint32_t ID = -1, bool UI = false);
 	
 	// Copy constructor
 	Message (const  Message & rhs);
@@ -75,6 +79,14 @@ public:
 	// PRE: this function takes a MsgType to set to.
 	// POST:  This function does not check the types, it assumes it's taking the right input and just sets the internal message type.
 	void setType(MsgType type);
+	
+	// PRE:
+	// POST:
+	void setID(uint32_t id);
+	
+	// PRE:
+	// POST:
+	void setUI(bool UI);
 
 };
 #endif /* Message_cpp */

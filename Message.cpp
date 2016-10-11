@@ -16,6 +16,12 @@ Message::Message (std::string msg) : msgType(NONE), msg(msg)
 	parse(msg);
 }
 
+Message::Message(MsgType type, uint32_t ID, bool UI)
+{
+	initializeKClos();
+	toString(type, ID, UI);
+}
+
 Message::Message(const Message & rhs) : msg(rhs.msg), msgType(rhs.msgType), ID(rhs.ID), isUI(rhs.isUI)
 {
 	initializeKClos();
@@ -240,5 +246,21 @@ void Message::initializeKClos ()
 		i.node = -1;
 		i.address = -1;
 	}
+}
+
+
+void Message::setType(MsgType type)
+{
+	this->msgType = type;
+}
+
+void Message::setID(uint32_t id)
+{
+	this->ID= id;
+}
+
+void Message::setUI(bool UI)
+{
+	this->isUI = UI;
 }
 
