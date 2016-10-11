@@ -1,7 +1,6 @@
 #ifndef INCLUDE_CONSTANTS
 #define INCLUDE_CONSTANTS
 
-#include <stdint.h>
 //list of contants
 
 #define K 5
@@ -14,7 +13,7 @@
                          //pinging a node
 #define MAXRECV 500
 
-struct myTriple {
+struct Triple {
   //a myTriples represents a node who does not own this routing table
   //address is the ip address of where the node is
   //port is where the node is listening 
