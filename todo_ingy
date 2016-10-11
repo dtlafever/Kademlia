@@ -9,8 +9,8 @@ Ingy
 Todo:
 
 - Write sendmessage in Node + figure out receiver stuff.
-- Add Ping response and Findvalue response in the Message class.
-- Update comments in Message.hpp and Message.cpp
+- Update comments in Message.cpp
+- make the parsing more efficient?
 
 
 Notes:
