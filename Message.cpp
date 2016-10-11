@@ -8,6 +8,7 @@
 
 #include "Message.hpp"
 #include <cstdlib>
+#include <iostream>
 
 Message::Message (std::string msg) : msgType(NONE), msg(msg)
 {
@@ -17,26 +18,11 @@ Message::Message (std::string msg) : msgType(NONE), msg(msg)
 Message::Message(): msgType(NONE)
 {}
 
-Message::~Message (){}
+Message::~Message(){}
 
-bool Message::isSTORE () const
+MsgType Message::getMsgType() const
 {
-	return (msgType==STORE);
-}
-
-bool Message::isPING () const
-{
-	return (msgType==PING);
-}
-
-bool Message::isFINDNODE() const
-{
-	return (msgType==FINDNODE);
-}
-
-bool Message::isFINDVALUE() const
-{
-	return (msgType==FINDVALUE);
+	return msgType;
 }
 
 void Message::parse (std::string & msg)
@@ -54,42 +40,52 @@ void Message::parse (std::string & msg)
 	if(msg == "")
 		Message::msg = msg;
 	
-	else if (msg.find("PING") != -1)
+	else if (msg.find(msgStrings[PING]) != -1)
 	{
 		msgType = PING;
 	}
-	else if ((index = msg.find("STORE")) != -1)
+	else if ((index = msg.find(msgStrings[STORE])) != -1)
 	{
 		msgType = STORE;
 		
-		msg.erase(msg.begin(), msg.begin()+6);
+		msg.erase(msg.begin(), msg.begin()+msgStrings[STORE].size());
 		
 		index = msg.find(" ");
 		
 		std::string id = msg.substr(0, index);
 		ID = atoi(id.c_str());
 	}
-	else if ( msg.find("FINDNODE")!= -1)
+	else if ( msg.find(msgStrings[FINDNODE])!= -1)
 	{
 		msgType = FINDNODE;
 		
-		msg.erase(msg.begin(), msg.begin()+9);
+		msg.erase(msg.begin(), msg.begin()+msgStrings[FINDNODE].size());
 		
 		ID = atoi (msg.c_str());
 	}
-	else if (msg.find("FINDVALUE")!= -1)
+	else if (msg.find(msgStrings[FINDVALUE])!= -1)
 	{
 		msgType = FINDVALUE;
 		
-		msg.erase(msg.begin(), msg.begin()+10);
+		msg.erase(msg.begin(), msg.begin()+msgStrings[FINDVALUE].size());
 		
 		ID = atoi(msg.c_str());
 	}
-	else if (msg.find("KB")!= -1)
+	else if (msg.find(msgStrings[KCLOSEST])!= -1)
 	{
-		msg.erase(msg.begin(), msg.begin()+3);
-		/// Iterate and insert
+		msg.erase(msg.begin(), msg.begin()+msgStrings[KCLOSEST].size());
+		/// Iterate and insert in Kclos
+		/// One line is of the form :
+		/// IP   UDPPort   NodeID
 		
+	}
+	else if(msg.find(msgStrings[PINGRESP]) != -1)
+	{
+		msgType = PINGRESP;
+	}
+	else if(msg.find(msgStrings[FVRESP]) != -1)
+	{
+		msgType = FVRESP;
 	}
 }
 
@@ -100,7 +96,7 @@ std::string Message::toString(MsgType type, uint32_t ID, bool UI)
 	switch (type)
 	{
 		case PING:
-			msg = "PING";
+			msg = msgStrings[PING];
 			break;
 			
 		case STORE:
@@ -108,7 +104,7 @@ std::string Message::toString(MsgType type, uint32_t ID, bool UI)
 			{
 				char temp [32];
 				sprintf(temp, "%d", ID); // convert to string
-				msg = "STORE "+ std::string(temp);
+				msg = msgStrings[STORE]+ std::string(temp);
 			}
 			break;
 			
@@ -117,7 +113,7 @@ std::string Message::toString(MsgType type, uint32_t ID, bool UI)
 			{
 				char temp [32];
 				sprintf(temp, "%d", ID); // convert to string
-				msg = "FINDNODE "+ std::string(temp);
+				msg = msgStrings[FINDNODE]+ std::string(temp);
 			}
 			break;
 			
@@ -126,18 +122,39 @@ std::string Message::toString(MsgType type, uint32_t ID, bool UI)
 			{
 				char temp [32];
 				sprintf(temp, "%d", ID); // convert to string
-				msg = "FINDVALUE "+ std::string(temp);
+				msg = msgStrings[FINDVALUE]+ std::string(temp);
 			}
 			break;
 			
-		case KB:
-			msg = "KB ";
+		case KCLOSEST:
+			msg = msgStrings[KCLOSEST];
 			
 			/// iterate over all elements of kclosest and put them in the message.
+			/// One line is of the form :
+			/// IP   UDPPort   NodeID
+			
+			for (Triple i : Kclos)
+			{
+				msg += "\n";
+				
+				// Adding the IP
+				char temp [32];
+				sprintf(temp, "%d", i.ip); // convert to string
+				msg +=
+			}
 			
 			break;
 			
+		case PINGRESP:
+			msg = msgStrings[PINGRESP];
+			break;
+		
+		case FVRESP:
+			msg= msgStrings[FVRESP];
+			break;
+			
 		default:
+			std::cout << "Unable to create string properly!"<<std::endl;
 			break;
 	}
 	
