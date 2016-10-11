@@ -28,6 +28,10 @@ class KBucket {
   //Post: bucket is destroyed
   ~KBucket();
 
+  //Pre: N/A
+  //Post: Prints the contents of the Routing Table
+  void printBucket();
+
   //Pre: The Bucket has at least one triple
   //Post: RV = bucket[head]
   Triple* getHead();
@@ -48,10 +52,10 @@ class KBucket {
   //      distance
   void getNodes(uint32_t target, Triple* nodeHolder, int& size);
   
-  //Pre: node exists within bucket
+  //Pre: nodeID exists within bucket
   //Post: triple containing the node is moved to the tail of bucket
   //      adjust triples to the left as necessary
-  void adjustNode(Triple* node);
+  void adjustNode(uint32_t nodeID);
 
   //Pre: node exists within bucket
   //Post: triple containing the node is removed from the list

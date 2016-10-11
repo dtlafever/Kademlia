@@ -53,10 +53,14 @@ class RoutingTable {
   //           false otherwise
   bool addNode(uint32_t node, uint32_t address);
 	
-  //Pre: myNode exists inside meBuckets
+  //Pre: myNode is the id of a node inside of RoutingTable
   //Post: myNode is placed at the tail of its respected kBucket
   //      the other triples are left shifted as needed
-  void updateTable(Triple* myNode);
+  void updateTable(uint32_t nodeID);
+
+  //Pre: N/A
+  //Post: Prints the contents of the Routing Table
+  void printTable();
 	
 };
 

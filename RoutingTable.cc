@@ -25,6 +25,16 @@ RoutingTable::~RoutingTable() {
 }
 */
 
+//Pre: N/A
+//Post: Prints the contents of the Routing Table
+void RoutingTable::printTable() {
+  cout << "Routing Table" << endl;
+  for (int index = 0; (index < K); index++) {
+    cout << "nthBucket: " << index << endl;
+    meBuckets[index].printBucket();
+  }
+}
+
 //Pre: id1 and id2 are two identifiers
 //Post: RV = id1 XOR id2
 uint32_t RoutingTable::findDist(uint32_t id1, uint32_t id2) {
@@ -34,8 +44,8 @@ uint32_t RoutingTable::findDist(uint32_t id1, uint32_t id2) {
 //Pre: id is some valid node or key
 //Post: RV = the nth kBucket such that d = findDist(id) where 2^n <= d < 2^n+1
 int RoutingTable::findKBucket(uint32_t id) {
-  int myDist = findDist(myId, id);
-  int tempt = myDist;
+  uint32_t myDist = findDist(myId, id);
+  uint32_t tempt = myDist;
   int twoPower = 0;
   while (tempt % 2 == 0) {
     tempt = tempt / 2;
@@ -116,8 +126,7 @@ bool RoutingTable::addNode(uint32_t node, uint32_t address) {
 //Pre: myNode exists inside meBuckets
 //Post: myNode is placed at the tail of its respected kBucket
 //      the other triples are left shifted as needed
-void RoutingTable::updateTable(Triple* myNode) {
-  uint32_t nodeID = myNode->node;
+void RoutingTable::updateTable(uint32_t nodeID) {
   int myKBucket = findKBucket(nodeID);
-  meBuckets[myKBucket].adjustNode(myNode);
+  meBuckets[myKBucket].adjustNode(nodeID);
 }

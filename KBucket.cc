@@ -30,6 +30,14 @@ KBucket::~KBucket() {
 }
 
 //Pre: N/A
+//Post: Prints the contents of the Routing Table
+void KBucket::printBucket() {
+  for (int index = 0; (index < numTriples); index++) {
+    cout << "nodeID: " << bucket[index]->node << endl;
+  }
+}
+
+//Pre: N/A
 //Post: RV = numTriples
 int KBucket::getNumTriples() {
   return (numTriples);
@@ -110,22 +118,25 @@ void KBucket::getNodes(uint32_t target, Triple* nodeHolder, int& size) {
 //Pre: node exists within bucket
 //Post: triple containing the node is moved to the tail of bucket
 //      adjust triples to the left as necessary
-void KBucket::adjustNode(Triple* node) {
+void KBucket::adjustNode(uint32_t nodeID) {
   int index = 0;
+  Triple* currTriple;
+  uint32_t currID;
   bool found = false;
   while (!found) {
-    if (node == bucket[index]) {
+    currTriple = bucket[index];
+    currID = currTriple->node;
+    if (currID == nodeID) {
       found = true;
     }
     else {
       index++;
     }
-  }
-  //for reference, bucket[index] = node
+  } //At this point, currTriple is the one containing nodeID
   for (int otherDex = index; (otherDex < numTriples - 1); otherDex++) {
     bucket[otherDex] = bucket[otherDex + 1];
   } 
-  bucket[numTriples - 1] = node;
+  bucket[numTriples - 1] = currTriple;
 }
 
 //Pre: node exists within bucket
