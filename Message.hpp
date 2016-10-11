@@ -34,7 +34,9 @@ class Message
 	Triple Kclos [K];
 	
 	// This array stores the names of the different types to simplify the parsing
-	std::string msgStrings [8] = {"PING ", "STORE ", "FINDNODE ", "FINDVALUE ", "KCLOSEST ", "PINGRESP", "FVRESP", "NONE "};
+	const std::string msgStrings [8] = {"PING ", "STORE ", "FINDNODE ", "FINDVALUE ", "KCLOSEST ", "PINGRESP", "FVRESP", "NONE "};
+	
+	void initializeKClos ();
 	
 public:
 	
@@ -44,6 +46,9 @@ public:
 	
 	// Default constructor
 	Message ();
+	
+	// Copy constructor
+	Message (const  Message & rhs);
 	
 	// Destructor
 	~Message();

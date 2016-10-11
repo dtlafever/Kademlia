@@ -19,9 +19,9 @@ struct Triple {
   //a myTriples represents a node who does not own this routing table
   //address is the ip address of where the node is
   //port is where the node is listening 
-  uint32_t address;
-  uint32_t port;
-  uint32_t node;
+	uint32_t address; // IP Address
+	uint32_t port; // UDP Port
+	uint32_t node; // Node ID
 };
 
 #endif

@@ -47,5 +47,5 @@ void start_listen_socket();
 POST: Sends the message to the proper sendMessage function to execute the
       proper response
 */
-void sort_message(Message message);
+void sort_message(Message &message);
 #endif
