@@ -10,11 +10,11 @@
 #define Message_cpp
 #include <string>
 #include <stdio.h>
-#include "kBucket.h"
+#include "constants.h"
 
 // Enumerated data type describing the type of message. Accessible outside the class.
 // KB is when we format the kclosest kbuckets.
-enum MsgType { PING, STORE, FINDNODE, FINDVALUE, KB, NONE};
+enum MsgType { PING, STORE, FINDNODE, FINDVALUE, KCLOSEST, PINGRESP, FVRESP, NONE};
 
 class Message
 {
@@ -30,10 +30,11 @@ class Message
 	// This boolean flag is set to true when the message came from the User Interface.
 	bool isUI = false;
 	
-	// Represents the KBucket to send
-	KBucket k;
+	// Represents the KClosest Array
+	Triple Kclos [K];
 	
-	/// This implemententation of Message assumes that there is no need for getting the IP address from the file but rather from the socket.
+	// This array stores the names of the different types to simplify the parsing
+	std::string msgStrings [8] = {"PING ", "STORE ", "FINDNODE ", "FINDVALUE ", "KCLOSEST ", "PINGRESP", "FVRESP", "NONE "};
 	
 public:
 	
@@ -45,13 +46,10 @@ public:
 	Message ();
 	
 	// Destructor
-	~Message ();
+	~Message();
 
-	// These functions are used to check the type of the message after parsing
-	bool isSTORE () const;
-	bool isPING () const;
-	bool isFINDNODE()const;
-	bool isFINDVALUE()const;
+	// This function is to help checking for the type of the Message
+	MsgType getMsgType() const;
 	
 	// PRE: takes the message received as a string.
 	// POST: This function parses the message and updates the appropriate private members. This function alters the string and
