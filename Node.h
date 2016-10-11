@@ -4,17 +4,18 @@
 #include <Vector>
 #include "RoutingTable.h"
 #include "constants.h"
+#include <mutex>
 
 class Node{
 	
 private:
-	uint32_t ID;					//The ID of this computer
+	uint32_t ID;				//The ID of this computer
 	vector<uint32_t> keys;		//The keys of the files stored on this pc
 	RoutingTable routingTable;	//The K-Buckets
- 	bool exit = false;
-	
+ 	bool exit;
+	mutex mut;					//The mutex lock for threads
+
 	uint32_t getMyID();
-	void setMyID(uint32_t newID);
 	
 	//PRE: the node we want to ping
 	//POST: checks to make sure that node is still alive. Removes from the k-bucket
@@ -57,21 +58,18 @@ private:
 	
 public:
 	//PRE:
-	//POST: lets create a new network and init this node with 32 empty k buckets and a random id
-	Node();
+	//POST: lets create a new network and init this node with 32 empty k buckets and a given id
+	Node(uint32_t nodeID);
 	
 	//PRE: the contact node we know about that will allow us to join the network
-	//POST: create a random id that is unique in this network, create our 32 k buckets that
+	//POST: create a given id that is unique in this network, create our 32 k buckets that
 	//      correspond to the network
-	Node(Triple contact);
+	Node(uint32_t nodeID, uint32_t contactID, uint32_t contactIP,
+		uint32_t contactPort);
 	
 	//---------------------------------------------------------------------------------
 	//            THREAD FUNCTIONS
 	//---------------------------------------------------------------------------------
-	
-	//PRE:
-	//POST: parent thread that spawns other threads as needed
-	static void main_T(Node * node);
 	
 	//PRE:
 	//POST: the thread that handles pinging every node in our k buckets every TIME_TO_PING amount of time
@@ -80,7 +78,7 @@ public:
 	//PRE:
 	//POST: responds to other nodes asking for things like findNode and findValue. This thread
 	//      will spawn sendMessage and recieveMessage threads
-	static void responder_T(Node * node);
+	static void listenerLoop(Node * node);
 	
 	/*
 	 PRE: Assumes that the Node has been initialized properly. It takes a pointer to a boolean which is assumed to be set to true only when the program should exit. The msgType will enable the function to decide what type of message to create. IP is the IP address of the Node we want to contact. ID is the file or Node ID that we are looking for.

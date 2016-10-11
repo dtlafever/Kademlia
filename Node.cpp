@@ -1,4 +1,5 @@
 #include "Node.h"
+#include "UDPSocket.h"
 
 //---------------------------------------------------------------------------------
 //            PRIVATE FUNCTIONS
@@ -6,9 +7,6 @@
 
 uint32_t Node::getMyID() {
 	return ID;
-}
-void Node::setMyID(uint32_t newID) {
-	ID = newID;
 }
 
 //PRE: the node we want to ping
@@ -27,7 +25,7 @@ void Node::findCandidatesForStore(uint32_t key) {
 //PRE: the key that represents our file
 //POST: adds the key to our list of keys
 void Node::store(uint32_t key) {
-
+	keys.push_back(key);
 }
 
 //PRE: the node ID we are looking for in our network
@@ -69,35 +67,57 @@ void Node::findValue(uint32_t key) {
 //---------------------------------------------------------------------------------
 
 //PRE: 
-//POST: lets create a new network and init this node with 32 empty k buckets and a random id
-Node::Node(){};
+//POST: lets create a new network and init this node with 32 empty k buckets and a given id
+Node::Node(uint32_t nodeID) {} {
+	ID = nodeID;
+	exit = false;
+}
 
 //PRE: the contact node we know about that will allow us to join the network
-//POST: create a random id that is unique in this network, create our 32 k buckets that
+//POST: create a given id that is unique in this network, create our 32 k buckets that
 //      correspond to the network
-Node::Node(Triple contact);
+Node::Node(uint32_t nodeID, uint32_t contactID, uint32_t contactIP, 
+	uint32_t contactPort) {
+	ID = nodeID;
+	exit = false;
+	routingTable.addNode(contactID, contactIP);
+	//TODO: find_node to the contact node
+}
 
 //---------------------------------------------------------------------------------
 //            THREAD FUNCTIONS
 //---------------------------------------------------------------------------------
 
-//PRE:
-//POST: parent thread that spawns other threads as needed
-void Node::main_T(Node * node) {
-
-}
-
 //PRE: 
 //POST: the thread that handles pinging every node in our k buckets every TIME_TO_PING amount of time
 void Node::refresher_T(Node * node) {
+	UDPSocket socket(UDPPORT);
 
+	node->mut.lock();
+
+	node->mut.unlock();
 }
 
 //PRE: 
 //POST: responds to other nodes asking for things like findNode and findValue. This thread
 //      will spawn sendMessage and recieveMessage threads
-void Node::responder_T(Node * node) {
+void Node::listenerLoop() {
+	std::string msg;
+	int recvlen;
+	
+	try {
+		UDPSocket socket(UDPPORT);
 
+		for (;;) {
+			recvlen = socket.recvMessage(msg);
+			if (recvlen > 0) {
+				//TODO: the handing of messages and spawning of threads
+			}
+		}
+	}
+	catch (SocketException & e) {
+		printf("ERROR: %s\n", (char *(e.description().c_str());
+	}
 }
 
 //PRE: 
