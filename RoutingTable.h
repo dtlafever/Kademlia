@@ -6,6 +6,7 @@
 
 #include "KBucket.h"
 #include "constants.h"
+#include <stdint.h>
 
 class RoutingTable {
 	

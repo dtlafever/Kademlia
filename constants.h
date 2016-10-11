@@ -3,6 +3,8 @@
 
 //list of contants
 
+#include <stdint.h>
+
 #define K 5
 #define UDPPORT 6666
 #define NUMBITS 32

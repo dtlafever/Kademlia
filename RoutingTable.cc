@@ -4,12 +4,8 @@
 #include "KBucket.h"
 #include "constants.h"
 #include "RoutingTable.h"
-#include "Message.hpp"
-#include "sendMessage.hpp"
-#include <string.h>
-#include "UDPSocket.h"
-#include <iostream>
 #include <stdint.h>
+#include <iostream>
 
 using namespace std;
 
@@ -108,33 +104,7 @@ bool RoutingTable::addNode(uint32_t node, uint32_t address) {
 //Post: myNode is placed at the tail of its respected kBucket
 //      the other triples are left shifted as needed
 void RoutingTable::updateTable(Triple* myNode) {
-  uint32_t nodeID = myNode.nodeID;
+  uint32_t nodeID = myNode->nodeID;
   int myKBucket = findKBucket(nodeID);
-  myKBucket.adjustNode(myNode);
+  meBuckets[myKBucket].adjustNode(myNode);
 }
-
-
-    try {
-      Message myMsg;
-      String myMsgForm = myMsg.toString(PING, node);
-      String response = NULL;
-      UDPSocket mySock(UDPPORT);
-      mySock.sendMessage(myMsgForm, curTriple.address, UDPPORT);
-      clock_t startTime = clock();
-      clock_t currTime = startTime;
-      int currDiff = 0;
-      while ((currDiff <  RESPONDTIME) and (response == NULL)) {
-	revMessage(response); //We only care if we got a response
-	currTime = clock();
-	currDiff = (currTime - startTime / CLOCKS_PER_SEC);
-	//clock returns time as number of clocks
-      }
-      if (response == NULL) { //the current node is dead
-	myKBucket.deleteNode(curTriple);
-	myKBucket.addNode(newTriple);
-	added = true;
-      }
-    }
-    catch () {
-      cout << "RoutingTable: error in sending message" << endl;
-    }

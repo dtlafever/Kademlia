@@ -4,6 +4,7 @@
 #include "constants.h"
 #include "KBucket.h"
 #include <stdlib.h>
+#include <stdint.h>
 using namespace std;
 
 //Pre: routing table is initalized
