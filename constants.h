@@ -14,7 +14,7 @@
                          //pinging a node
 #define MAXRECV 500
 
-struct myTriple {
+struct Triple {
   //a myTriples represents a node who does not own this routing table
   //address is the ip address of where the node is
   //port is where the node is listening 

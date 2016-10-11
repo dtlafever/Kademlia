@@ -12,7 +12,7 @@ using namespace std;
 //      numTriples = 0
 KBucket() {
   numTriples = 0;
-  bucket = myTriples*[K];
+  bucket = Triple*[K];
   for (int index = 0; (index < K); index++) {
     bucket[index] = NULL;
   }
@@ -35,7 +35,7 @@ int KBucket::findDist(int id1, int id2) {
 //Pre: node does not exist within bucket, and the bucket is not full
 //Post: node is placed at the tail of bucket
 //      numTriples = numTriples + 1
-void KBucket::addNode(myTriple* node) {
+void KBucket::addNode(Triple* node) {
   bucket[numTriples] = node;
   //In this regard, the tail is where the 1st NULL is at
   numTriples++;
@@ -46,7 +46,7 @@ void KBucket::addNode(myTriple* node) {
 //Post: nodes[index] = curNode and nodes is shifted as needed
 void KBucket::insertNode(myTriples* nodes, int insertDex,
 			 myTriple* curNode, int size) {
-  myTriple* myCopy;
+  Triple* myCopy;
   myCopy.nodeID = curNode.nodeID;
   myCopy.port = UDPPORT;
   myCopy.address = curNode.address;
@@ -66,7 +66,7 @@ void KBucket::insertNode(myTriples* nodes, int insertDex,
 void KBucket::getNodes(uint32_t target, myTriples* nodeHolder, int& size) {
   bool inserted = false;
   for (int index = 0; (index < numTriples); index++) {
-    myTriple* currTriple = bucket[index];
+    Triple* currTriple = bucket[index];
     uint32_t currDist = findDist(target, currTriple.nodeID);
     bool found = false;
     int insertDex = 0;
@@ -94,7 +94,7 @@ void KBucket::getNodes(uint32_t target, myTriples* nodeHolder, int& size) {
 //Pre: node exists within bucket
 //Post: triple containing the node is moved to the tail of bucket
 //      adjust triples to the left as necessary
-void KBucket::adjustNode(myTriple* node) {
+void KBucket::adjustNode(Triple* node) {
   int index = 0;
   bool found = false;
   while (!found) {
@@ -115,7 +115,7 @@ void KBucket::adjustNode(myTriple* node) {
 //Pre: node exists within bucket
 //Post: triple containing the node is removed from the list
 //      adjust remaining triples as necessary
-void KBucket::deleteNode(myTriple* node) {
+void KBucket::deleteNode(Triple* node) {
   int index = 0;
   bool found = false;
   while (!found) {

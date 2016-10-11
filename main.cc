@@ -5,11 +5,12 @@
 #include "KBucket.h"
 #include <iostream>
 
-using namespace;
+using namespace std;
 
 //Pre: N/A
 //Post: Heap stuff is deleted
 int main() {
+  /*   temporaryily commented out
   int address = 0; //We don't care about address for this testing
   bool end = false;
   int id;
@@ -26,6 +27,6 @@ int main() {
       myTable.print(table);
     }
     
-  }
+    } */
   return (0);
 }

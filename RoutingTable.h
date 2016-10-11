@@ -19,7 +19,7 @@ class RoutingTable {
  private:
 	uint32_t myId;
 	
-	KBucket[K] meBuckets;
+	KBucket* meBuckets;
 	
 	//Pre: id1 and id2 are two identifiers
 	//Post: RV = id1 XOR id2
@@ -36,7 +36,7 @@ class RoutingTable {
 	//      Less than K are returned iff less than K nodes are in the table
 	//      The list is ordered by distance, that is, the closest node is
 	//      at the head
-	void getNodes(uint32_t target, myTriples* closeNodes);
+	void getNodes(uint32_t target, Triple* closeNodes);
 	
 	//Pre: node is a valid node object not in the routing table (id)
 	//     address correlates to where node is from
@@ -45,14 +45,14 @@ class RoutingTable {
 	bool addNode(uint32_t node, uint32_t address);
 
 	//Pre: id and address represents a new node not seen before
-	//Post: RV = myTriple object representing this new node
-	myTriple* createTriple(uint32_t id, uint32_t address);
+	//Post: RV = Triple object representing this new node
+	Triple* createTriple(uint32_t id, uint32_t address);
 	
 	//Pre: myNode exists inside meBuckets
 	//Post: myNode is placed at the tail of its respected kBucket
 	//      the other triples are left shifted as needed
-	void updateTable(myTriple* myNode);
+	void updateTable(Triple* myNode);
 	
-}
+};
 
 #endif
