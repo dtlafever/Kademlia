@@ -161,7 +161,42 @@ void Node::listenerLoop()
 }
 
 void Node::UITagResponse(Message & m, uint32_t ip) {
+	MsgType type = m.getMsgType();
+	if (type == STORE) {
+		UDPSocket socket(UDPPORT);
+		//TODO: FIND_NODE and get k closest Nodes
+		Triple clos[K];
 
+		for (int i = 0; i < K; i++) {
+			Message sendMsg(STORE, ID);
+			socket.sendMessage(sendMsg, clos[i].address, UDPPORT);
+		}
+
+		UDPSocket socketUI(UIPORT);
+		socketUI.sendMessage();
+	}
+	else if (type == FINDVALUE) {
+		uint32_t key = stoi(m.toString());
+
+		//Send a message to the UI client saying we found the value
+		if (std::find(keys.begin(), keys.end(), key) != keys.end()) {
+			Message sendMsg(FVRESP, ID);
+			UDPSocket socket(UDPPORT);
+			socket.sendMessage(sendMsg.toString(), ip, UDPPORT);
+		}
+		else { //Send a message to the node asking us for find value
+			Message sendMsg(KCLOSEST, ID);
+			//TODO: send snapshot/K closest of K-closest nodes
+			//NOTE: snapshot because it will be sorted by distance,
+			//      if we iterate through the list and reach a Triple
+			//      that is further than the closest node, stop going 
+			//      through the list
+			Triple clos[K];
+			sendMsg.setKClos(clos);
+			UDPSocket socket(UDPPORT);
+			socket.sendMessage(sendMsg.toString(), ip, UDPPORT);
+		}
+	}
 }
 
 void Node::nonUIResponse(Message & m, uint32_t ip) {
