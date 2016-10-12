@@ -4,8 +4,8 @@
 //PRE: an array of triples up to nodeSize.
 //     We are assuming the nodes array is sorted
 //POST: Triples from node placed into pair array
-SnapShot::SnapShot(Triple nodes[], uint32_t nodeSize, uint32_t NodeID){
-  for(int i = 0; i < nodeSize; i++){
+SnapShot::SnapShot(Triple nodes[], uint32_t nodesSize, uint32_t NodeID){
+  for(int i = 0; i < nodesSize; i++){
     copyTriple(closest[i].first, nodes[i]);
     closest[i].second = false;
 		size++;
@@ -14,8 +14,24 @@ SnapShot::SnapShot(Triple nodes[], uint32_t nodeSize, uint32_t NodeID){
   compareID = NodeID;
 }
 
+//PRE: a key we want to find the distance from compareID
+//POST: returns the bitwise XOR distance from compareID to key
+uint32_t SnapShot::getDistance(uint32_t key) {
+	return (compareID ^ key);
+}
+
+//PRE: a k closest array already in closest to least closest order,
+//     as well as its size (not greater than K)
+//POST: add to the snapshot any items that are closer
+//      then what we already know, if any
+void SnapShot::addClosest(Triple * kClos, uint32_t kClosSize) {
+	for (int i = kClos - 1; i <= 0; i--) {
+		
+	}
+}
+
 //PRE: Object defined
-//POST: set the next closest Triple that doesn't have to our t.
+//POST: set t to the value of the next non queried Triple.
 //      a true for its boolean. It will set the bool to true.
 //      Returns true if there is a next, false otherwise
 bool SnapShot::getNext(Triple & t); {
@@ -35,16 +51,12 @@ bool SnapShot::getNext(Triple & t); {
 	}
 }
 
-
-
-//PRE: triple array of size K 
-//POST: returns the triples from our array of pairs,
-//      as well as the size of it
-uint32_t SnapShot::getTriples(Triple * snapTriples) {
-	
+//PRE: Object defined
+//POST: will set all triples to 0's and all bools to trues
+void SnapShot::clear() {
+	Triple zero;
 	for (int i = 0; i < K; i++) {
-		copyTriple(snapTriples, closest[i].first);
+		copyTriple(closest.first, zero);
+		closest.second = false;
 	}
-
-	return(snapTriples);
 }

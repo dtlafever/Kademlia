@@ -23,6 +23,7 @@ struct Triple {
 	uint32_t address; // IP Address
 	uint32_t port; // UDP Port
 	uint32_t node; // Node ID
+	Triple() : address(0), port(0), node(0) {} //DEFAULT VALUES
 };
 
 //PRE: the Triple we want to copy our data do and the data triple we want
