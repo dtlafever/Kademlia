@@ -16,7 +16,7 @@ Message::Message (std::string msg) : msgType(NONE), msg(msg)
 	parse(msg);
 }
 
-Message::Message(MsgType type, uint32_t ID, bool UI)
+Message::Message(MsgType type, uint32_t ID, bool UI): msgType(type), ID(ID), isUI(UI)
 {
 	initializeKClos();
 	toString(type, ID, UI);
@@ -331,5 +331,10 @@ uint32_t Message::getKClos(Triple *clos)
 bool Message::getUI()
 {
 	return isUI;
+}
+
+void Message::printMessageType()
+{
+	std::cout << "Type : "<< msgStrings[msgType] <<std::endl;
 }
 
