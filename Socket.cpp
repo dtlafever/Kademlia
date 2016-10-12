@@ -203,7 +203,7 @@ bool Socket::sendTo(const std::string s, std::string host, const int port) {
 //     number of that host
 //POST: sends a message to the a given host and port number. Returns true if 
 //      the send succeeds, false otherwise
-bool Socket::sendTo(const std::string s, const int host,
+bool Socket::sendTo(const std::string s, int host,
 	const int port) {
 	//create address to send our message to
 	struct sockaddr_in remaddr;

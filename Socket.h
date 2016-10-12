@@ -42,7 +42,7 @@ class Socket
   bool send (const std::string s, const bool FLAG ) const;	//TCP command
   bool sendTo ( const std::string s, std::string host, 
 				const int port );		//UDP command
-  bool sendTo(const std::string s, const int host,
+  bool sendTo(const std::string s, int host,
 	  const int port);		//UDP command
   int recv ( std::string& ) const;
   int recvFrom(std::string&);		      //UDP command
