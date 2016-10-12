@@ -5,6 +5,7 @@
 #include "KBucket.h"
 #include <stdlib.h>
 #include <stdint.h>
+#include <stdio.h>
 #include <iostream>
 using namespace std;
 
@@ -13,7 +14,7 @@ using namespace std;
 //      and myTriples is an array of size k of triples
 //      numTriples = 0
 KBucket::KBucket() {
-  cout << "KBucket Constructor" << endl;
+  printf("KBucket Constructor \n");
   numTriples = 0;
   for (int index = 0; (index < K); index++) {
     bucket[index] = NULL;
@@ -23,7 +24,7 @@ KBucket::KBucket() {
 //Pre: the respected routing table is being deleted
 //Post: bucket is destroyed
 KBucket::~KBucket() {
-  cout << "KBucket Destructor called" << endl;
+  printf("KBucket Destructor called \n");
   for (int index = 0; (index < numTriples); index++) {
     delete bucket[index];
   }
@@ -32,9 +33,11 @@ KBucket::~KBucket() {
 //Pre: N/A
 //Post: Prints the contents of the Routing Table
 void KBucket::printBucket() {
+  printf("numTriples: %d \n \n", numTriples);
   for (int index = 0; (index < numTriples); index++) {
-    cout << "nodeID: " << bucket[index]->node << endl;
+    printf("index: %d nodeId: %u \n", index, bucket[index]->node);
   }
+  printf("\n");
 }
 
 //Pre: N/A
@@ -87,7 +90,7 @@ void KBucket::insertNode(Triple* nodes, int insertDex,
 //      nodeHolder is currently in smallest distance order
 //Post: nodeHolder contains the closet nodes in this bucket ordered by
 //      distance
-void KBucket::getNodes(uint32_t target, Triple* nodeHolder, int& size) {
+void KBucket::getKClosestNodes(uint32_t target, Triple* nodeHolder, int& size) {
   bool inserted = false;
   for (int index = 0; (index < numTriples); index++) {
     Triple* currTriple = bucket[index];
@@ -142,18 +145,23 @@ void KBucket::adjustNode(uint32_t nodeID) {
 //Pre: node exists within bucket
 //Post: triple containing the node is removed from the list
 //      adjust remaining triples as necessary
-void KBucket::deleteNode(Triple* node) {
+void KBucket::deleteNode(uint32_t nodeID) {
+  //Regardless if we know what the triple is beforehand, we still don;t
+  //know where it is. And having the ID is more readily available
+  
   int index = 0;
   bool found = false;
+  Triple* toDie;
   while (!found) {
-    if (node == bucket[index]) {
+    toDie = bucket[index];
+    if (nodeID == toDie->node) {
       found = true;
     }
     else {
       index++;
     }
   }
-  delete node;
+  delete toDie;
   for (int otherDex = index; (otherDex < numTriples - 1); otherDex++) {
     bucket[otherDex] = bucket[otherDex + 1];
   }
@@ -161,3 +169,29 @@ void KBucket::deleteNode(Triple* node) {
   numTriples--;
 }
   
+//Pre: The current object exists
+//Post: The current object is deleted and becomes a deep copy of other
+KBucket KBucket::operator= (const KBucket& other) {
+
+  printf("KBucket Assignment Operator entered \n");
+  
+  for (int index = 0; (index < numTriples); index++) {
+    delete bucket[index];
+  }
+  for (int index = 0; (index < other.numTriples); index++) {
+    Triple* toCopy = other.bucket[index];
+    Triple* newTriple = new Triple;
+    newTriple->node = toCopy->node;
+    newTriple->address = toCopy->address;
+    newTriple->port = toCopy->port;
+    bucket[index] = newTriple;    
+    /*
+          Triple* toCopy = other.bucket[index];
+	  bucket[index] = new Triple;
+	  bucket[index]->node = toCopy->node;
+	  bucket[index]->address = toCopy->address;
+	  bucket[index]->port = toCopy->port;
+     */
+  }
+  return (*this);
+}

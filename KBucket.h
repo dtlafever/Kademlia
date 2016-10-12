@@ -50,7 +50,7 @@ class KBucket {
   //      size is the current number of nodes in nodeHolder
   //Post: nodeHolder contains the closet nodes in this bucket ordered by
   //      distance
-  void getNodes(uint32_t target, Triple* nodeHolder, int& size);
+  void getKClosestNodes(uint32_t target, Triple* nodeHolder, int& size);
   
   //Pre: nodeID exists within bucket
   //Post: triple containing the node is moved to the tail of bucket
@@ -60,7 +60,7 @@ class KBucket {
   //Pre: node exists within bucket
   //Post: triple containing the node is removed from the list
   //      adjust remaining triples as necessary
-  void deleteNode(Triple* node);
+  void deleteNode(uint32_t nodeID);
 
   //Pre: nodes is in smallest distance order, currNode has a home in nodes
   //     index is where that home is
@@ -71,6 +71,10 @@ class KBucket {
   //Post: RV = id1 XOR id2
   uint32_t findDist(uint32_t id1, uint32_t id2);
 
+  //Pre: The current object exists
+  //Post: The current object is deleted and becomes a deep copy of other
+  KBucket operator= (const KBucket& other);
+  
 };
 
 #endif

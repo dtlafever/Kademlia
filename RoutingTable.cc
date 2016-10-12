@@ -6,6 +6,7 @@
 #include "RoutingTable.h"
 #include <stdint.h>
 #include <iostream>
+#include <stdio.h>
 
 using namespace std;
 
@@ -28,9 +29,9 @@ RoutingTable::~RoutingTable() {
 //Pre: N/A
 //Post: Prints the contents of the Routing Table
 void RoutingTable::printTable() {
-  cout << "Routing Table" << endl;
+  printf("Routing Table \n \n");
   for (int index = 0; (index < K); index++) {
-    cout << "nthBucket: " << index << endl;
+    printf("nthBucket: %d \n", index);
     meBuckets[index].printBucket();
   }
 }
@@ -47,44 +48,40 @@ int RoutingTable::findKBucket(uint32_t id) {
   uint32_t myDist = findDist(myId, id);
   uint32_t tempt = myDist;
   int twoPower = 0;
-  while (tempt % 2 == 0) {
+  while (tempt != 1) {
     tempt = tempt / 2;
     twoPower++;
   }
+  printf("in findKBucket, id = %u, dist = %u nthBucket = %d \n",
+	 id, myDist, twoPower);
   return (twoPower);
 }
 
-/*
-//Pre:
-//Post:
-void getNodesHelper(int size, uint32_t target, Triple* closeNodes) {
-  nextBucket
-}
-*/
-
-//Pre: target is some id, closeNodes is an array of K -1's
-//Post: RV = array of the K closest nodes to the target
+//Pre: target is some id, closeNodes is an array Triples with node = -1
+//Post: closeNodes = array of the K closest nodes to the target
 //      Less than K are returned iff less than K nodes are in the table
 //      The list is ordered by distance, that is, the closest node is
 //      at the head
-void RoutingTable::getNodes(uint32_t target, Triple* closeNodes) {
+//      RV = number nodes in closeNodes
+int RoutingTable::getKClosetNodes(uint32_t target, Triple* closeNodes) {
   int nthBucket = findKBucket(target);
   int nextBucket = nthBucket + 1;
   int lastBucket = nthBucket - 1;
   bool searchMore = ((nextBucket < K) or (lastBucket >= 0));
   int size = 0;
-  meBuckets[nthBucket].getNodes(target, closeNodes, size);
+  meBuckets[nthBucket].getKClosestNodes(target, closeNodes, size);
   while ((size < K) and searchMore) {
     if (nextBucket < K) {
-      meBuckets[nextBucket].getNodes(target, closeNodes, size);
+      meBuckets[nextBucket].getKClosestNodes(target, closeNodes, size);
     }
     if (lastBucket >= 0) {
-      meBuckets[lastBucket].getNodes(target, closeNodes, size);
+      meBuckets[lastBucket].getKClosestNodes(target, closeNodes, size);
     }
     nextBucket++;
     lastBucket--;
     searchMore = ((nextBucket < K) or (lastBucket >= 0));
   }
+  return (size);
 }
 
 //Pre: id and address represents a new node not seen before
@@ -103,24 +100,40 @@ Triple* RoutingTable::createTriple(uint32_t id, uint32_t address) {
 //           false otherwise
 bool RoutingTable::addNode(uint32_t node, uint32_t address) {
   int nthBucket = findKBucket(node);
-  KBucket currBucket = meBuckets[nthBucket];
-  Triple* currTriple = currBucket.getHead();
+
+  //Is there a better way to do this
+  KBucket* currBucket = &(meBuckets[nthBucket]);
+
+  Triple* currTriple = currBucket->getHead();
   bool added = false;
   Triple* newTriple = createTriple(node, address);
-  if (currBucket.getNumTriples() == K) {  //the bucket is full
+  if (currBucket->getNumTriples() == K) {  //the bucket is full
+    printf("Rout addNode: bucketOverFlow \n");
     // bool dead = ping(curTriple.address);
-    bool dead = true;
+    //    bool dead = true;
+    bool dead = false;
     if (dead) {
-      //the least recently seen node is dead
-      currBucket.deleteNode(currTriple);
-      currBucket.addNode(newTriple);
+      currBucket->deleteNode(currTriple->node);
+      currBucket->addNode(newTriple);
+      added = true;
+    }
+    else { //Move the alive node to the tail of the bucket
+      currBucket->adjustNode(currTriple->node);
     }
   }
   else {
-    currBucket.addNode(newTriple);
+    printf("Rout addNode: bucket not full \n");
+    currBucket->addNode(newTriple);
     added = true;
   }
   return (added);
+}
+
+//Pre: nodeID exists in the table, and is known to be dead
+//Post: Removes the respected Triple from the table
+void RoutingTable::deleteNode(uint32_t nodeID) {
+  int nthBucket = findKBucket(nodeID);
+  meBuckets[nthBucket].deleteNode(nodeID);
 }
   
 //Pre: myNode exists inside meBuckets
