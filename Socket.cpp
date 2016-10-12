@@ -267,7 +267,7 @@ int Socket::recvFrom(std::string& s) {
 	s = "";
 	memset(buf, 0, MAXRECV + 1);
 
-	int recvlen = ::recvfrom(m_sock, buf, MAXRECV, 0, 
+	int recvlen = ::recvfrom(m_sock, buf, MAXRECV, MSG_DONTWAIT,
 				 (struct sockaddr *)&remaddr, &addrlen);
 	if (recvlen == -1) {
 	  //printf("There was an error in recvfrom.");
