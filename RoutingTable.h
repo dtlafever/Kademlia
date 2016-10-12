@@ -45,8 +45,12 @@ class RoutingTable {
   //      Less than K are returned iff less than K nodes are in the table
   //      The list is ordered by distance, that is, the closest node is
   //      at the head
-  void getNodes(uint32_t target, Triple* closeNodes);
-	
+  int getKClosetNodes(uint32_t target, Triple* closeNodes);
+
+  //Pre: nodeID exists in the table, and is known to be dead
+  //Post: Removes the respected Triple from the table
+  void deleteNode(uint32_t nodeID);
+  
   //Pre: node is a valid node object not in the routing table (id)
   //     address correlates to where node is from
   //Post: RV = true if node was added to the table

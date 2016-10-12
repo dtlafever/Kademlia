@@ -40,6 +40,12 @@ class SnapShot{
 	//POST: returns the triples from	our array of pairs,
 	//      as well as the size of it
 	uint32_t getTriples(Triple * snapTriples);
+	// THIS FUNCTION MAY NOT BE NEEDED.PERHAPS JUST USING getNext
+
+	Triple getNext (); // Should set the one return to used
+
+	// Maybe add a getAlphaNext function???
+	// And a clear function PLZ
 
 };
 
