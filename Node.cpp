@@ -160,6 +160,8 @@ void Node::listenerLoop()
 	}
 }
 
+//PRE: the message we want to read and the UI IP address
+//POST: 
 void Node::UITagResponse(Message & m, uint32_t ip) {
 	MsgType type = m.getMsgType();
 	if (type == STORE) {
@@ -173,15 +175,16 @@ void Node::UITagResponse(Message & m, uint32_t ip) {
 		}
 
 		UDPSocket socketUI(UIPORT);
-		socketUI.sendMessage();
+		Message sendMsgUI(STORERESP, ID);
+		socketUI.sendMessage(sendMsgUI.toString(), ip, UIPORT);
 	}
 	else if (type == FINDVALUE) {
 		uint32_t key = stoi(m.toString());
 
 		//Send a message to the UI client saying we found the value
 		if (std::find(keys.begin(), keys.end(), key) != keys.end()) {
-			Message sendMsg(FVRESP, ID);
-			UDPSocket socket(UDPPORT);
+			Message sendMsg(FVRESPP, ID);
+			UDPSocket socket(UIPORT);
 			socket.sendMessage(sendMsg.toString(), ip, UDPPORT);
 		}
 		else { //Send a message to the node asking us for find value
@@ -192,13 +195,21 @@ void Node::UITagResponse(Message & m, uint32_t ip) {
 			//      that is further than the closest node, stop going 
 			//      through the list
 			Triple clos[K];
-			sendMsg.setKClos(clos);
+			//TODO: do alpha at a time for this thingy
+			/*sendMsg.setKClos(clos);
 			UDPSocket socket(UDPPORT);
+			socket.sendMessage(sendMsg.toString(), ip, UDPPORT);*/
+
+			//We get to the end, no one has value
+			Message sendMsgUI(FVRESPN, ID);
+			UDPSocket socket(UIPORT);
 			socket.sendMessage(sendMsg.toString(), ip, UDPPORT);
 		}
 	}
 }
 
+//PRE: the message we want to read and the UDP IP address
+//POST: 
 void Node::nonUIResponse(Message & m, uint32_t ip) {
 	MsgType type = m.getMsgType();
 	if (type == STORE) {
