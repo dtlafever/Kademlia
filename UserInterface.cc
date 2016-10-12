@@ -1,6 +1,8 @@
 #include "UserInterface.h"
 #include "UIconstants.h"
 #include "UIerror.h"
+#include "Message.hpp"
+#include "UDPSocket.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -113,22 +115,21 @@ void UserInterface::exit(){
 //POST: From here, the UI will know that the Node wants to store
 //      the given key. The UI will create the message.
 void UserInterface::storeKey(uint32_t ID){
-  //Message msg:
-  //MsgType type = STORE:
-  //msg.create(type, ID);
-
-  //sendtoListener(msg)
+  MsgType type = STORE;
+  Message storeMessage(type, ID, true);
+  string store = storeMessage.toString();
+  //talkToListener(store);
 }
 
 //PRE: The user entered 'find' along with a key ID.
 //POST: From here, the UI will know that the Node wants to find
 //      the given key. The UI will create the message.
 void UserInterface::findKey(uint32_t ID){
-  //Message msg:
-  //MsgType type = FIND:
-  //msg.create(type, ID);
-  
-  //sendtoListener(msg)
+  MsgType type = FINDVALUE;
+  Message findMessage(type, ID, true);
+  string find = findMessage.toString();
+
+  //talkToListener(find);
 }
 
 
