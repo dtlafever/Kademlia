@@ -212,7 +212,8 @@ bool Socket::sendTo(const std::string s, int host,
 	remaddr.sin_family = AF_INET;
 	remaddr.sin_port = htons(port);
 
-	remaddr.sin_addr = host;
+	
+	remaddr.sin_addr.s_addr = host;
 
 	//send the message
 	int status = ::sendto(m_sock, s.c_str(), s.size(), MSG_NOSIGNAL,
