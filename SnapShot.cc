@@ -1,16 +1,17 @@
 
 #include "SnapShot.h"
 
-//PRE: Constructor
+//PRE: an array of triples up to nodeSize.
+//     We are assuming the nodes array is sorted
 //POST: Triples from node placed into pair array
 SnapShot::SnapShot(Triple nodes[], int nodeSize, uint32_t NodeID){
-	//TODO: sort the nodes array before insertion
   for(int i = 0; i < nodeSize; i++){
-    closest[i].first = nodes[i];
+    copyTriple(closest[i].first, nodes[i]);
     closest[i].second = false;
+		size++;
   }
 
-  currentID = NodeID;
+  compareID = NodeID;
 }
 
 //PRE: triple array of size K 
