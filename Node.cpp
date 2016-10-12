@@ -9,7 +9,7 @@ using namespace std;
 //---------------------------------------------------------------------------------
 
 uint32_t Node::getMyID() {
-	return ID;
+  return ID;
 }
 
 //PRE: the node we want to ping
@@ -28,7 +28,7 @@ void Node::findCandidatesForStore(uint32_t key) {
 //PRE: the key that represents our file
 //POST: adds the key to our list of keys
 void Node::store(uint32_t key) {
-	keys.push_back(key);
+  keys.push_back(key);
 }
 
 //PRE: the node ID we are looking for in our network
@@ -71,20 +71,22 @@ void Node::findValue(uint32_t key) {
 
 //PRE: 
 //POST: lets create a new network and init this node with 32 empty k buckets and a given id
+
 Node::Node(uint32_t nodeID) : routingTable(nodeID)
 {
 	ID = nodeID;
 	exit = false;
+
 }
 
 //PRE: the contact node we know about that will allow us to join the network
 //POST: create a given id that is unique in this network, create our 32 k buckets that
 //      correspond to the network
 Node::Node(uint32_t nodeID, uint32_t contactID, uint32_t contactIP, 
-	uint32_t contactPort) {
-	ID = nodeID;
-	exit = false;
-	routingTable.addNode(contactID, contactIP);
+	   uint32_t contactPort) {
+  ID = nodeID;
+  exit = false;
+  routingTable.addNode(contactID, contactIP);
 	
 	//TODO: FIX WHAT WE WANT TO DO WITH THIS
 	//find_node to the contact node
@@ -92,6 +94,7 @@ Node::Node(uint32_t nodeID, uint32_t contactID, uint32_t contactIP,
 	MsgType t = FINDNODE;
 	Message msg(t, nodeID);
 	socket.sendMessage(msg.toString(), contactIP, contactPort);
+
 }
 
 //---------------------------------------------------------------------------------
@@ -99,32 +102,40 @@ Node::Node(uint32_t nodeID, uint32_t contactID, uint32_t contactIP,
 //---------------------------------------------------------------------------------
 
 //PRE: 
-//POST: the thread that handles pinging every node in our k buckets every TIME_TO_PING amount of time
+//POST: the thread that handles pinging every node in our k buckets
+//      every TIME_TO_PING amount of time
 void Node::refresher_T(Node * node) {
-	UDPSocket socket(UDPPORT);
+  UDPSocket socket(UDPPORT);
 
-	node->mut.lock();
+  node->mut.lock();
 
-	node->mut.unlock();
+  node->mut.unlock();
 }
 
 //PRE: 
-//POST: responds to other nodes asking for things like findNode and findValue. This thread
-//      will spawn sendMessage and recieveMessage threads
+//POST: responds to other nodes asking for things like findNode and
+//      findValue. This thread will spawn sendMessage and recieveMessage
+//      threads
 void Node::listenerLoop() {
-	std::string msg;
-	int recvlen;
-	
-	try {
-		UDPSocket socket(UDPPORT);
+  std::string msg;
+  int recvlen;
 
-		for (;;) {
-			recvlen = socket.recvMessage(msg);
-			if (recvlen > 0) {
-				//TODO: the handing of messages and spawning of threads
-			}
+	try {
+	UDPSocket socket(UDPPORT);
+
+	for (;;) {
+		recvlen = socket.recvMessage(msg);
+		if (recvlen > 0) {
+			//TODO: the handing of messages and spawning of threads
+			//ASSERT: we definitely got a message from someone
+			int sendTo = socket.getRemoteIP(); // getting the ip of who
+											   // sent the message to us
+											   // so we can respond to the
+											   // message
+											   //send to the heavy lifting thread sendTo, msg
 		}
 	}
+}
 	catch (SocketException & e) {
 		printf("ERROR: %s\n", (char *(e.description().c_str());
 	}
@@ -137,3 +148,4 @@ void Node::handler_T(Node * node, string * msg, uint32_t * ip) {
 
 
 }
+
