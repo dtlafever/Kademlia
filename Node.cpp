@@ -2,7 +2,7 @@
 #include "UDPSocket.h"
 #include "Message.hpp"
 #include "SocketException.h"
-
+#include <algorithm>
 
 //---------------------------------------------------------------------------------
 //            PRIVATE FUNCTIONS
@@ -83,7 +83,7 @@ Node::Node(uint32_t nodeID) : routingTable(nodeID)
 //POST: create a given id that is unique in this network, create our 32 k buckets that
 //      correspond to the network
 Node::Node(uint32_t nodeID, uint32_t contactID, uint32_t contactIP,
-		   uint32_t contactPort) : routingTable(nodeID)
+		  uint32_t contactPort) : routingTable(nodeID)
 {
 	ID = nodeID;
 	exit = false;
@@ -119,25 +119,36 @@ void Node::refresher_T() {
 //      threads
 void Node::listenerLoop()
 {
-	std::string msg;
-	int recvlen;
+	std::string msgUDP;
+	std::string msgUI;
+	
+	uint32_t recvlenUDP;
+	uint32_t recvlenUI;
+
+	uint32_t ipUI = 0;
 	
 	try
 	{
-		UDPSocket socket(UDPPORT);
-		
+		UDPSocket socketUDP(UDPPORT);
+		UDPSocket socketUI(UIPORT);
+
 		for (;;)
 		{
-			recvlen = socket.recvMessage(msg);
-			if (recvlen > 0)
+			recvlenUI = socketUI.recvMessage(msgUI);
+			if (recvlenUI > 0) {
+				ipUI = socketUI.getRemoteIP();
+			}
+
+			recvlenUDP = socketUDP.recvMessage(msgUDP);
+			if (recvlenUDP > 0)
 			{
 				//TODO: the handing of messages and spawning of threads
 				//ASSERT: we definitely got a message from someone
-				int sendTo = socket.getRemoteIP(); // getting the ip of who
-												   // sent the message to us
-												   // so we can respond to the
-												   // message
-												   //send to the heavy lifting thread sendTo, msg
+				int sendTo = socketUDP.getRemoteIP(); // getting the ip of who
+														// sent the message to us
+														// so we can respond to the
+														// message
+														//send to the heavy lifting thread sendTo, msg
 			}
 		}
 	}
@@ -146,10 +157,52 @@ void Node::listenerLoop()
 	}
 }
 
+void Node::nonUIResponse(Message & m, uint32_t ip) {
+	MsgType type = m.getMsgType();
+	if (type == STORE) {
+		keys.push_back(stoi(m.toString()));
+	}
+	else if (type == PINGRESP) {
+		//TODO: update K-bucket with this node being most recently used
+	}
+	else if (type == FINDVALUE) {
+		uint32_t key = stoi(m.toString());
+
+		//Send a message to the UI client saying we found the value
+		if (std::find(keys.begin(), keys.end(), key) != keys.end()) {
+			Message sendMsg(FVRESP, ID);
+			UDPSocket socket(UIPORT);
+			socket.sendMessage(sendMsg.toString(), ip, UDPPORT);
+		}
+		else { //Send a message to the node asking us for find value
+			Message sendMsg(KCLOSEST, ID);
+			//TODO: send snapshot of K-closest nodes
+			Triple clos[K];
+			sendMsg.setKClos(clos);
+			UDPSocket socket(UDPPORT);
+			socket.sendMessage(sendMsg.toString(), ip, UDPPORT);
+		}
+	}
+	else if (type == PING) {
+		Message sendMsg(PINGRESP, ID);
+		UDPSocket socket(UDPPORT);
+		socket.sendMessage(sendMsg.toString(), ip, UDPPORT);
+	}else if(type == FINDNODE)
+}
+
 //PRE:
 //POST: recieves messages thread
 void Node::handler_T( string * msg, uint32_t * ip){
+	Message m(msg);
+	if (m.getUI()) {
+
+	}
+	else {
+		nonUIResponse(m, &ip);
+	}
+
 	
-	UDPSocket socket(UDPPORT);
+
+
 }
 
