@@ -26,7 +26,7 @@ Message::Message(const Message & rhs) : msg(rhs.msg), msgType(rhs.msgType), ID(r
 {
 	initializeKClos();
 	for (int i =0; i<K; ++i)
-		this->Kclos[i] = rhs.Kclos[i];
+		this->kclos[i] = rhs.kclos[i];
 }
 
 Message::Message(): msgType(NONE)
@@ -41,7 +41,7 @@ MsgType Message::getMsgType() const
 	return msgType;
 }
 
-void Message::parse (std::string & message)
+void Message::parse (std::string message)
 {
 	int index = -1;
 	
@@ -90,12 +90,26 @@ void Message::parse (std::string & message)
 	else if (message.find(msgStrings[KCLOSEST])!= -1)
 	{
 		message.erase(message.begin(), message.begin()+msgStrings[KCLOSEST].size());
+
+		// "Retrieving the size from the message
+		int ind = 0;
+		std::string temp;
+	
+		ind = message.find("\n");
+		
+		if(ind == -1)
+			throw std::invalid_argument("Error in parsing message invalid format");
+		
+		temp = message.substr(0, ind); // take the size
+		message.erase(message.begin(), message.begin()+ind);
+		
+		size = atoi(temp.c_str()); // Converting the size to an integer.
+		
 		/// Iterate and insert in Kclos
 		/// One line is of the form :
 		/// IP   UDPPort   NodeID
-		int ind = 0;
-		std::string temp;
-		for (Triple & i: Kclos)
+		
+		for (int i=0; i<size; ++i)
 		{
 			ind = message.find(" ");
 			
@@ -104,7 +118,7 @@ void Message::parse (std::string & message)
 			
 			// IP
 			temp = message.substr(0, ind);
-			i.address = atoi(temp.c_str());
+			kclos[i].address = atoi(temp.c_str());
 			
 			message.erase(message.begin(), message.begin()+ind+1);
 			
@@ -115,7 +129,7 @@ void Message::parse (std::string & message)
 			
 			//UDPPort
 			temp = message.substr(0, ind);
-			i.port = atoi(temp.c_str());
+			kclos[i].port = atoi(temp.c_str());
 			
 			message.erase(message.begin(), message.begin()+ind+1);
 
@@ -126,7 +140,7 @@ void Message::parse (std::string & message)
 			// Node ID
 
 			temp = message.substr(0, ind);
-			i.node = atoi(temp.c_str());
+			kclos[i].node = atoi(temp.c_str());
 			
 			message.erase(message.begin(), message.begin()+ind+1);
 		}
@@ -198,11 +212,16 @@ std::string Message::toString(MsgType type, uint32_t ID, bool UI)
 		case KCLOSEST:
 			msg = msgStrings[KCLOSEST];
 			
+			// Adding the size of the array to the message
+			char temp [32];
+			sprintf(temp, "%d", size);
+			msg += std::string(temp);
+			
 			/// iterate over all elements of kclosest and put them in the message.
 			/// One line is of the form :
 			/// IP   UDPPort   NodeID
 			
-			for (Triple i : Kclos)
+			for (Triple i : kclos)
 			{
 				msg += "\n";
 				
@@ -269,7 +288,7 @@ uint32_t Message::getID()
 
 void Message::initializeKClos ()
 {
-	for (Triple & i : Kclos)
+	for (Triple & i : kclos)
 	{
 		i.port= -1;
 		i.node = -1;
@@ -293,17 +312,20 @@ void Message::setUI(bool UI)
 	this->isUI = UI;
 }
 
-void Message::setKClos ( Triple clos [K])
+void Message::setKClos ( Triple clos [K], uint32_t s)
 {
-	for (int i =0; i<K; ++i)
+	for (int i =0; i<s; ++i)
+		
 	{
-		Kclos[i]= clos [i];
+		kclos[i]= clos [i];
 	}
 }
 
-void Message::getKClos(Triple *clos)
+uint32_t Message::getKClos(Triple *clos)
 {
-	clos = Kclos;
+	clos = kclos;
+	return size;
+	
 }
 
 bool Message::getUI()
