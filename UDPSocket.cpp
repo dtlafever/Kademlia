@@ -32,7 +32,7 @@ void UDPSocket::sendMessage(const std::string s, const std::string host,
 //PRE: a message, host ip, and the port
 //POST: sends the message to that host and then closes the connection.
 //      throws error if couldn't send
-void sendMessage(const std::string s, const std::uint32_t host,
+void UDPSocket::sendMessage(const std::string s, const std::uint32_t host,
 	const uint32_t port) {
 	if (!Socket::sendTo(s, host, port)) {
 		throw SocketException("Could not send message.");
