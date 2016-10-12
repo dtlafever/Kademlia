@@ -23,5 +23,11 @@ UserInterface.o: UserInterface.h UserInterface.cc
 UImain.o: UImain.cc
 	$(GCC) -c UImain.cc
 
+test.o: test.cc
+	$(GCC) -c test.cc
+
+test: test.o UDPSocket.o Socket.o
+	$(GCC) test.o UDPSocket.o Socket.o -o test
+
 clean:
-	$(RM) UIerror.o UserInterface.o UImain.o Message.o Socket.o UDPSocket.o UI
+	$(RM) UIerror.o UserInterface.o UImain.o Message.o Socket.o UDPSocket.o UI test.o test

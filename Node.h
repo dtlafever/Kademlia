@@ -1,7 +1,7 @@
 #ifndef INCLUDE_NODE
 #define INCLUDE_NODE
 
-#include <Vector>
+#include <vector>
 #include "RoutingTable.h"
 #include "constants.h"
 #include "Message.hpp"
