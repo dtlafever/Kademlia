@@ -5,6 +5,8 @@
 
 #include <stdint.h>
 
+#define MAXTHREADS 15 //maximum number of threads
+
 #define K 5
 #define UDPPORT 6666
 #define UIPORT 6667

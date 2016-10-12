@@ -7,6 +7,8 @@
 #include "Message.hpp"
 #include <mutex>
 #include "SnapShot.h"
+#include <thread>
+
 
 using namespace std;
 
@@ -23,6 +25,9 @@ private:
 	
 	SnapShot snap;
 
+	int threadCount; //number of threads owned
+	vector<thread> currentThreads; //a vector to hold all current open threads
+	
 	uint32_t getMyID();
 	
 	//PRE: the node we want to ping
@@ -78,6 +83,11 @@ public:
 	//---------------------------------------------------------------------------------
 	//            THREAD FUNCTIONS
 	//---------------------------------------------------------------------------------
+
+	//PRE: Object defined. threadCount is member data.
+	//POST: RV is true iff threadCount with the new thread added is less
+	//      than MAXTHREADS. Otherwise, RV is false.
+	bool canSpawn();
 	
 	//PRE:
 	//POST: the thread that handles pinging every node in our k buckets every TIME_TO_PING amount of time

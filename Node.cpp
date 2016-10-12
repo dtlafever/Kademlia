@@ -102,6 +102,18 @@ Node::Node(uint32_t nodeID, uint32_t contactID, uint32_t contactIP,
 //            THREAD FUNCTIONS
 //---------------------------------------------------------------------------------
 
+//PRE: Object defined. threadCount is member data.
+//POST: RV is true iff threadCount with the new thread added is less
+//      than MAXTHREADS. Otherwise, RV is false.
+bool Node::canSpawn(){
+  bool allowed = false;
+  if( (threadCount + 1) < MAXTHREADS){
+    allowed = true;
+  }
+  return(allowed);
+}
+
+
 //PRE:
 //POST: the thread that handles pinging every node in our k buckets
 //      every TIME_TO_PING amount of time
@@ -139,6 +151,12 @@ void Node::listenerLoop()
 			if (recvlenUI > 0) {
 				//Update the ip for the UI
 				ipUI = socketUI.getRemoteIP();
+
+				//Handler
+
+				//thread HandlerThread(msgUI, ipUI);
+
+				
 			}
 			
 			//Listening on the UDP socket
@@ -148,11 +166,19 @@ void Node::listenerLoop()
 				//TODO: the handing of messages and spawning of threads
 				//ASSERT: we definitely got a message from someone
 				int sendTo = socketUDP.getRemoteIP(); // getting the ip of who
-																							// sent the message to us
-																							// so we can respond to the
-																							// message
-																							//send to the heavy lifting thread sendTo, msg
+				// sent the message to us
+				// so we can respond to the
+				// message
+				//send to the heavy lifting thread sendTo, msg
+
+				//Handler
+
+				//thread HandlerThread(msgUDP, sendTo);
+
+				
 			}
+
+			
 		}
 	}
 	catch (SocketException & e) {
