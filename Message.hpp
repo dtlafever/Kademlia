@@ -113,6 +113,8 @@ public:
 	// PRE: takes an array of triple to updated by reference.
 	// POST: returns the size of the array and updates the clos array passed by reference
 	uint32_t getKClos (Triple clos[K]);
+	
+	void printMessageType ();
 
 };
 #endif /* Message_cpp */

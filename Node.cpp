@@ -154,7 +154,7 @@ void Node::listenerLoop()
 
 				//Handler
 				if(canSpawn()){
-				  thread Handler(&handler_T, msgUI, ipUI, this);
+				  thread Handler(&Node::handler_T, msgUI, ipUI, this);
 				  currentThreads.push_back(Handler);
 				  threadCount = threadCount + 1;
 				  
@@ -174,7 +174,7 @@ void Node::listenerLoop()
 				//send to the heavy lifting thread sendTo, msg
 
 				if(canSpawn()){
-				  thread Handler(&handler_T, msgUDP, sendTo, this);
+				  thread Handler(&Node::handler_T, msgUDP, sendTo, this);
 				  currentThreads.push_back(Handler);
 				  threadCount = threadCount + 1;
 				  
