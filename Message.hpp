@@ -13,7 +13,18 @@
 #include "constants.h"
 
 // Enumerated data type describing the type of message. Accessible outside the class.
-// KB is when we format the kclosest kbuckets.
+// ========================================================
+// PING 		: Message sent to a node we want to ping.
+// STORE 		: Message sent to a node that should store some value.
+// FINDNODE : Message sent to a node that should return its K closest nodes.
+// FINDVALUE: Message sent to a node to ask if that node has the desired value.
+// KCLOSEST : Message the a node may return in case it fails to find a value or respoinding to a findnode request.
+// PINGRESP : response to a ping request. (Acknowledging we are alive)
+// FVRESP   : Positive response to a findvalue.
+// STORERESP: Acknowledgement of the completion of the UI's STORE request.
+// FVRESPP	: Positive response to the UI for a FINDVALUE request.
+// FVRESPN	: Negative response to the UI for a FINDVALUE request.
+// ========================================================
 enum MsgType { PING, STORE, FINDNODE, FINDVALUE, KCLOSEST, PINGRESP, FVRESP, STORERESP, FVRESPP, FVRESPN, NONE};
 
 class Message
