@@ -83,7 +83,7 @@ Node::Node(uint32_t nodeID) : routingTable(nodeID)
 //POST: create a given id that is unique in this network, create our 32 k buckets that
 //      correspond to the network
 Node::Node(uint32_t nodeID, uint32_t contactID, uint32_t contactIP,
-		  uint32_t contactPort) : routingTable(nodeID)
+					 uint32_t contactPort) : routingTable(nodeID)
 {
 	ID = nodeID;
 	exit = false;
@@ -124,14 +124,14 @@ void Node::listenerLoop()
 	
 	uint32_t recvlenUDP;
 	uint32_t recvlenUI;
-
+	
 	uint32_t ipUI = 0;
 	
 	try
 	{
 		UDPSocket socketUDP(UDPPORT);
 		UDPSocket socketUI(UIPORT);
-
+		
 		for (;;)
 		{
 			//Listening on UI socket
@@ -140,18 +140,18 @@ void Node::listenerLoop()
 				//Update the ip for the UI
 				ipUI = socketUI.getRemoteIP();
 			}
-
-			//Listening on the UDP socket 
+			
+			//Listening on the UDP socket
 			recvlenUDP = socketUDP.recvMessage(msgUDP);
 			if (recvlenUDP > 0)
 			{
 				//TODO: the handing of messages and spawning of threads
 				//ASSERT: we definitely got a message from someone
 				int sendTo = socketUDP.getRemoteIP(); // getting the ip of who
-														// sent the message to us
-														// so we can respond to the
-														// message
-														//send to the heavy lifting thread sendTo, msg
+																							// sent the message to us
+																							// so we can respond to the
+																							// message
+																							//send to the heavy lifting thread sendTo, msg
 			}
 		}
 	}
@@ -161,6 +161,7 @@ void Node::listenerLoop()
 }
 
 //PRE: the message we want to read and the UI IP address
+<<<<<<< HEAD
 //POST: Handle the messages send directly from the UI client
 //      STORE:
 //        - Call find node to find the k closest nodes
@@ -174,6 +175,9 @@ void Node::listenerLoop()
 //        - if they respond yes, we will send a message to the UI,
 //        - otherwise we will update our k closest until there is
 //          no more closest. If no more closest, send fail message to UI
+
+//POST:
+
 void Node::UITagResponse(Message & m, uint32_t ip) {
 	MsgType type = m.getMsgType();
 	uint32_t key = stoi(m.toString());
@@ -182,6 +186,7 @@ void Node::UITagResponse(Message & m, uint32_t ip) {
 		UDPSocket socket(UDPPORT);
 		
 		Triple clos[K];
+
 		routingTable.getKClosest(key, clos);
 
 		//TODO: FIND_NODE and get k closest Nodes
@@ -191,17 +196,22 @@ void Node::UITagResponse(Message & m, uint32_t ip) {
 		snap.getTriples(snapTriples);
 		
 		//Send store to the k closest nodes
+
 		for (int i = 0; i < K; i++) {
 			Message sendMsg(STORE, ID);
 			socket.sendMessage(sendMsg, snapTriples[i].address, UDPPORT);
 		}
 
 		//Send to UI that store suceeded
+
 		UDPSocket socketUI(UIPORT);
 		Message sendMsgUI(STORERESP, ID);
 		socketUI.sendMessage(sendMsgUI.toString(), ip, UIPORT);
 	}
 	else if (type == FINDVALUE) {
+
+		uint32_t key = stoi(m.toString());
+		
 		//Send a message to the UI client saying we found the value
 		if (std::find(keys.begin(), keys.end(), key) != keys.end()) {
 			Message sendMsg(FVRESPP, ID);
@@ -213,14 +223,14 @@ void Node::UITagResponse(Message & m, uint32_t ip) {
 			//TODO: send snapshot/K closest of K-closest nodes
 			//NOTE: snapshot because it will be sorted by distance,
 			//      if we iterate through the list and reach a Triple
-			//      that is further than the closest node, stop going 
+			//      that is further than the closest node, stop going
 			//      through the list
 			Triple clos[K];
 			//TODO: do alpha at a time for this thingy
 			/*sendMsg.setKClos(clos);
-			UDPSocket socket(UDPPORT);
-			socket.sendMessage(sendMsg.toString(), ip, UDPPORT);*/
-
+			 UDPSocket socket(UDPPORT);
+			 socket.sendMessage(sendMsg.toString(), ip, UDPPORT);*/
+			
 			//We get to the end, no one has value
 			Message sendMsgUI(FVRESPN, ID);
 			UDPSocket socket(UIPORT);
@@ -230,7 +240,7 @@ void Node::UITagResponse(Message & m, uint32_t ip) {
 }
 
 //PRE: the message we want to read and the UDP IP address
-//POST: 
+//POST:
 void Node::nonUIResponse(Message & m, uint32_t ip) {
 	MsgType type = m.getMsgType();
 	if (type == STORE) {
@@ -241,7 +251,7 @@ void Node::nonUIResponse(Message & m, uint32_t ip) {
 	}
 	else if (type == FINDVALUE) {
 		uint32_t key = stoi(m.toString());
-
+		
 		//Send a message to the UI client saying we found the value
 		if (std::find(keys.begin(), keys.end(), key) != keys.end()) {
 			Message sendMsg(FVRESP, ID);
@@ -253,7 +263,7 @@ void Node::nonUIResponse(Message & m, uint32_t ip) {
 			//TODO: send snapshot/K closest of K-closest nodes
 			//NOTE: snapshot because it will be sorted by distance,
 			//      if we iterate through the list and reach a Triple
-			//      that is further than the closest node, stop going 
+			//      that is further than the closest node, stop going
 			//      through the list
 			Triple clos[K];
 			sendMsg.setKClos(clos);
@@ -271,7 +281,7 @@ void Node::nonUIResponse(Message & m, uint32_t ip) {
 		//TODO: send snapshot/K closest of K-closest nodes
 		//NOTE: snapshot because it will be sorted by distance,
 		//      if we iterate through the list and reach a Triple
-		//      that is further than the closest node, stop going 
+		//      that is further than the closest node, stop going
 		//      through the list
 		Triple clos[K];
 		sendMsg.setKClos(clos);
@@ -284,34 +294,50 @@ void Node::nonUIResponse(Message & m, uint32_t ip) {
 //POST: recieves messages thread
 void Node::handler_T( string * msg, uint32_t * ip){
 	Message m(*msg);
-	if (m.getUI()) {
+	if (m.getUI())
+	{
 		UITagResponse();
 	}
 	else {
-		nonUIResponse(m, *ip);
+		if(m.getMsgType() == KCLOSEST || m.getMsgType() == FVRESP)
+		{
+			nonUITagResponse(m);
+		}
+		else
+		{
+			nonUIResponse(m, *ip);
+		}
 	}
 }
 
 void Node::nonUITagResponse (Message m)
 {
-	MsgType msgType = m.getMsgType();
-	
-	if(msgType==FVRESP)
+	UDPSocket sock(UIPORT);
+	Message msg;
+
+	if( m.getMsgType()==FVRESP) // The message returned indicates that FindValue response.
 	{
-		UDPSocket sock(UIPORT);
+		m.setType(FVRESPP);
 		sock.sendMessage(m.toString(), "localhost", UIPORT);
 		
 	}
-	else if(msgType == KCLOSEST)
+	else if( m.getMsgType() == KCLOSEST) // The message is an answer to a store or findvalue and contains the k closest nodes.
 	{
 		snap.addClosest(m);
-		if(snap.nextExists())
+		if(snap.nextExists()) // Check if there are unqueried nodes
 		{
-			
+			Triple next = snap.getNext();
+			sock.sendMessage(curRequest.toString(), next.address, UDPPORT);
 		}
-		else
+		else // The process is finished no more nodes to query.
 		{
-			//Message response ("Store completed \n");
+			if(curRequest.getMsgType()== STORE)
+				msg.setType(STORERESP);
+			
+			else if(curRequest.getMsgType() == FINDVALUE)
+				msg.setType(FVRESPN);
+			
+			sock.sendMessage(msg, "localhost", UIPORT);
 			
 		}
 	}

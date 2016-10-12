@@ -29,13 +29,13 @@ class SnapShot{
   //PRE: Object defined. 
   void addClosest(Message newMsg);
 
-	Triple getNext ();
+	Triple getNext (); // Should set the one return to used
 	
 	//PRE: 
 	//POST: returns the triples from our array of pairs
 	void getTriples(Triple * snapTriples);
 
-	bool nextExists ();
+	bool nextExists (); // checks if there is still one not used.
 
 };
 
