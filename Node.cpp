@@ -263,11 +263,19 @@ void Node::nonUIResponse(Message & m, uint32_t ip) {
 //POST: recieves messages thread
 void Node::handler_T( string * msg, uint32_t * ip){
 	Message m(*msg);
-	if (m.getUI()) {
+	if (m.getUI())
+	{
 		UITagResponse();
 	}
 	else {
-		nonUIResponse(m, *ip);
+		if(m.getMsgType() == KCLOSEST || m.getMsgType() == FVRESP)
+		{
+			nonUITagResponse(m);
+		}
+		else
+		{
+			nonUIResponse(m, *ip);
+		}
 	}
 }
 
