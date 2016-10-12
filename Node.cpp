@@ -193,16 +193,29 @@ void Node::nonUIResponse(Message & m, uint32_t ip) {
 //PRE:
 //POST: recieves messages thread
 void Node::handler_T( string * msg, uint32_t * ip){
-	Message m(msg);
+	Message m(*msg);
 	if (m.getUI()) {
 
 	}
 	else {
 		nonUIResponse(m, &ip);
 	}
+}
 
+void Node::nonUITagResponse (Message m)
+{
+	MsgType msgType = m.getMsgType();
 	
-
-
+	if(msgType==FVRESP)
+	{
+		UDPSocket sock(UIPORT);
+		sock.sendMessage(m.toString(), "localhost", UIPORT);
+		
+	}
+	else if(msgType == KCLOSEST)
+	{
+		
+	}
+	else printf("Error in response format or parsing \n");
 }
 

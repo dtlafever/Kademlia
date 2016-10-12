@@ -90,5 +90,8 @@ public:
 	//PRE:
 	//POST: recieves messages thread
 	void handler_T( std::string * msg, uint32_t * ip);
+	
+	void nonUITagResponse (Message m);
+
 };
 #endif // !INCLUDE_NODE
