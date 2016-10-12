@@ -31,6 +31,9 @@ class SnapShot{
 
 	Triple getNext (); // Should set the one return to used
 	
+	// Maybe add a getAlphaNext function???
+	// And a clear function PLZ
+	
 	//PRE: 
 	//POST: returns the triples from our array of pairs
 	void getTriples(Triple * snapTriples);

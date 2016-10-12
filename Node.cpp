@@ -161,7 +161,6 @@ void Node::listenerLoop()
 }
 
 //PRE: the message we want to read and the UI IP address
-<<<<<<< HEAD
 //POST: Handle the messages send directly from the UI client
 //      STORE:
 //        - Call find node to find the k closest nodes
@@ -310,6 +309,14 @@ void Node::handler_T( string * msg, uint32_t * ip){
 	}
 }
 
+// PRE: Takes the message that was received
+// POST: This function is to be used when the current node receives a response to UI request sent earlier which can be checked through the type of the message, it must be KCLOSEST or FVRESP.
+
+// KCLOSEST:
+//     - Check if there are more node to query in the snapshot. **Snapshot should update automatically.
+//     - If there are send messages to the alpha next nodes.
+//     - Else the process of the current is finished, either it's a Findvalue and it failed or the store is finished.
+/// Case when you put STORE in the currequest but actually get answer to a findnode. ????
 void Node::nonUITagResponse (Message m)
 {
 	UDPSocket sock(UIPORT);
@@ -320,23 +327,30 @@ void Node::nonUITagResponse (Message m)
 		m.setType(FVRESPP);
 		sock.sendMessage(m.toString(), "localhost", UIPORT);
 		
+		//////// Clear the snapshot
+		
 	}
 	else if( m.getMsgType() == KCLOSEST) // The message is an answer to a store or findvalue and contains the k closest nodes.
 	{
 		snap.addClosest(m);
 		if(snap.nextExists()) // Check if there are unqueried nodes
 		{
+			///////// TODO: send to alpha.
 			Triple next = snap.getNext();
 			sock.sendMessage(curRequest.toString(), next.address, UDPPORT);
+			
 		}
 		else // The process is finished no more nodes to query.
 		{
+			// Send back a response to the UI
+			///////// Clear the Snapshot
 			if(curRequest.getMsgType()== STORE)
 				msg.setType(STORERESP);
 			
 			else if(curRequest.getMsgType() == FINDVALUE)
 				msg.setType(FVRESPN);
 			
+			// Respond directly to UI
 			sock.sendMessage(msg, "localhost", UIPORT);
 			
 		}
