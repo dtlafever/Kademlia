@@ -31,6 +31,10 @@ class SnapShot{
 
 	Triple getNext ();
 	
+	//PRE: 
+	//POST: returns the triples from our array of pairs
+	void getTriples(Triple * snapTriples);
+
 	bool nextExists ();
 
 };

@@ -25,4 +25,12 @@ struct Triple {
 	uint32_t node; // Node ID
 };
 
+//PRE: the Triple we want to copy our data do and the data triple we want
+//POST: deep copy from onto to
+void copyTriple(Triple & to, Triple & from) {
+	to.address = from.address;
+	to.port = from.port;
+	to.node = from.node;
+};
+
 #endif

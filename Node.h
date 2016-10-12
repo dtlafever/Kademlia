@@ -92,6 +92,20 @@ public:
 	//POST: recieves messages thread
 	void handler_T( std::string * msg, uint32_t * ip);
 
+	//PRE: the message we want to read and the UI IP address
+	//POST: Handle the messages send directly from the UI client
+	//      STORE:
+	//        - Call find node to find the k closest nodes
+	//          to the key value we want to store
+	//        - Send the STORE message to the k closest nodes
+	//      FINDVALUE:
+	//        - check if the key is stored with us. If so,
+	//          send to UI that we found it.
+	//        - Otherwise, get the k closest nodes to the key
+	//        - send findValue to those nodes
+	//        - if they respond yes, we will send a message to the UI,
+	//        - otherwise we will update our k closest until there is
+	//          no more closest. If no more closest, send fail message to UI
 	void UITagResponse(Message & m, uint32_t ip);
 
 	void nonUIResponse(Message & m, uint32_t ip);

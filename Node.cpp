@@ -161,26 +161,47 @@ void Node::listenerLoop()
 }
 
 //PRE: the message we want to read and the UI IP address
-//POST: 
+//POST: Handle the messages send directly from the UI client
+//      STORE:
+//        - Call find node to find the k closest nodes
+//          to the key value we want to store
+//        - Send the STORE message to the k closest nodes
+//      FINDVALUE:
+//        - check if the key is stored with us. If so,
+//          send to UI that we found it.
+//        - Otherwise, get the k closest nodes to the key
+//        - send findValue to those nodes
+//        - if they respond yes, we will send a message to the UI,
+//        - otherwise we will update our k closest until there is
+//          no more closest. If no more closest, send fail message to UI
 void Node::UITagResponse(Message & m, uint32_t ip) {
 	MsgType type = m.getMsgType();
+	uint32_t key = stoi(m.toString());
+
 	if (type == STORE) {
 		UDPSocket socket(UDPPORT);
-		//TODO: FIND_NODE and get k closest Nodes
+		
 		Triple clos[K];
+		routingTable.getKClosest(key, clos);
 
+		//TODO: FIND_NODE and get k closest Nodes
+		snap = SnapShot(clos, , );
+
+		Triple snapTriples[K];
+		snap.getTriples(snapTriples);
+		
+		//Send store to the k closest nodes
 		for (int i = 0; i < K; i++) {
 			Message sendMsg(STORE, ID);
-			socket.sendMessage(sendMsg, clos[i].address, UDPPORT);
+			socket.sendMessage(sendMsg, snapTriples[i].address, UDPPORT);
 		}
 
+		//Send to UI that store suceeded
 		UDPSocket socketUI(UIPORT);
 		Message sendMsgUI(STORERESP, ID);
 		socketUI.sendMessage(sendMsgUI.toString(), ip, UIPORT);
 	}
 	else if (type == FINDVALUE) {
-		uint32_t key = stoi(m.toString());
-
 		//Send a message to the UI client saying we found the value
 		if (std::find(keys.begin(), keys.end(), key) != keys.end()) {
 			Message sendMsg(FVRESPP, ID);
