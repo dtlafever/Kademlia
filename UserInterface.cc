@@ -166,6 +166,18 @@ string UserInterface::findKey(uint32_t ID){
 //POST: Parses through the string using the Message class
 //      to determine whether our request was a success
 //      or failure.
-void UserInterface::handleMessage(string newMesg){
-  //bro
+void UserInterface::handleMessage(string newMsg){
+  Message receivedMsg(newMsg);
+  if(receivedMsg.getMsgType() == STORERESP){
+    //ASSERT: Store was successful
+    cout << "Success!" << endl;
+  }
+  else if(receivedMsg.getMsgType() == FVRESPP){
+    //ASSERT: Key was found
+    cout << "Success!" << endl;
+  }
+  else if(receivedMsg.getMsgType() == FVRESPN){
+    //ASSERT: Key was not found
+    cout << "Failure." << endl;
+  }
 }
