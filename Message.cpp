@@ -264,3 +264,15 @@ void Message::setUI(bool UI)
 	this->isUI = UI;
 }
 
+void Message::setKClos ( Triple clos [K])
+{
+	for (int i =0; i<K; ++i)
+	{
+		Kclos[i]= clos [i];
+	}
+}
+
+void Message::getKClos(Triple *clos)
+{
+	clos = Kclos;
+}

@@ -4,6 +4,7 @@
 #include <Vector>
 #include "RoutingTable.h"
 #include "constants.h"
+#include "Message.hpp"
 #include <mutex>
 
 using namespace std;
@@ -16,6 +17,10 @@ private:
 	RoutingTable routingTable;	//The K-Buckets
  	bool exit;
 	mutex mut;					//The mutex lock for threads
+	
+	Message curRequest; // Keeps track of the last request sent by the UI.
+	
+	
 
 	uint32_t getMyID();
 	

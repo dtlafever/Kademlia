@@ -87,6 +87,14 @@ public:
 	// PRE:
 	// POST:
 	void setUI(bool UI);
+	
+	// PRE:
+	// POST:
+	void setKClos (Triple clos [K]);
+	
+	// PRE:
+	// POST:
+	void getKClos (Triple clos[K]);
 
 };
 #endif /* Message_cpp */
