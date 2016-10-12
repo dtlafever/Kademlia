@@ -27,7 +27,9 @@ KBucket::~KBucket() {
   printf("KBucket Destructor called \n");
   for (int index = 0; (index < numTriples); index++) {
     delete bucket[index];
+    bucket[index] = NULL;
   }
+  numTriples = 0;
 }
 
 //Pre: N/A
@@ -70,13 +72,14 @@ void KBucket::addNode(Triple* node) {
 //Pre: nodes is in smallest distance order, currNode has a home in nodes
 //     index is where that home is
 //     nodes is an array of triples, curNode is a pointer to a triple
+//     size <= K
 //Post: nodes[index] = curNode and nodes is shifted as needed
 void KBucket::insertNode(Triple* nodes, int insertDex,
 			 Triple* curNode, int size) {
   Triple myCopy;
   myCopy.node = curNode->node;
-  myCopy.port = UDPPORT;
   myCopy.address = curNode->address;
+  myCopy.port = curNode->port;
   //right shift
   for (int index = size - 1; (index > insertDex); index--) {
     nodes[index] = nodes[index - 1];
@@ -88,6 +91,7 @@ void KBucket::insertNode(Triple* nodes, int insertDex,
 //      nodeHolder is an array of size K,
 //      size is the current number of nodes in nodeHolder
 //      nodeHolder is currently in smallest distance order
+//      size <= K
 //Post: nodeHolder contains the closet nodes in this bucket ordered by
 //      distance
 void KBucket::getKClosestNodes(uint32_t target, Triple* nodeHolder, int& size) {
@@ -98,7 +102,7 @@ void KBucket::getKClosestNodes(uint32_t target, Triple* nodeHolder, int& size) {
     bool found = false;
     int insertDex = 0;
     while ((!found) and (insertDex < size)) {
-      uint32_t compareDist = findDist(target, bucket[insertDex]->node);
+      uint32_t compareDist = findDist(target, nodeHolder[insertDex].node);
       if (currDist > compareDist) {
 	insertDex++;
       }
@@ -112,7 +116,9 @@ void KBucket::getKClosestNodes(uint32_t target, Triple* nodeHolder, int& size) {
       found = true;
     }
     if (found) {
-      size++;
+      if (size < K) {
+	size++;
+      }
       insertNode(nodeHolder, insertDex, currTriple, size);
     }
   }
@@ -168,7 +174,8 @@ void KBucket::deleteNode(uint32_t nodeID) {
   bucket[numTriples - 1] = NULL;
   numTriples--;
 }
-  
+
+/*
 //Pre: The current object exists
 //Post: The current object is deleted and becomes a deep copy of other
 KBucket KBucket::operator= (const KBucket& other) {
@@ -191,7 +198,8 @@ KBucket KBucket::operator= (const KBucket& other) {
 	  bucket[index]->node = toCopy->node;
 	  bucket[index]->address = toCopy->address;
 	  bucket[index]->port = toCopy->port;
-     */
+     
   }
   return (*this);
-}
+
+  } */

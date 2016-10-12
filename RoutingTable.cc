@@ -16,16 +16,6 @@ RoutingTable::RoutingTable(uint32_t id) {
   myId = id;
 }
 
-/*
-//Pre: The respected node is going poof
-//Post: deletes each kBucket
-RoutingTable::~RoutingTable() {
-  for (int index = 0; (index < K); index++) {
-    delete meBuckets[index];
-  }
-}
-*/
-
 //Pre: N/A
 //Post: Prints the contents of the Routing Table
 void RoutingTable::printTable() {
@@ -64,22 +54,9 @@ int RoutingTable::findKBucket(uint32_t id) {
 //      at the head
 //      RV = number nodes in closeNodes
 int RoutingTable::getKClosetNodes(uint32_t target, Triple* closeNodes) {
-  int nthBucket = findKBucket(target);
-  int nextBucket = nthBucket + 1;
-  int lastBucket = nthBucket - 1;
-  bool searchMore = ((nextBucket < K) or (lastBucket >= 0));
   int size = 0;
-  meBuckets[nthBucket].getKClosestNodes(target, closeNodes, size);
-  while ((size < K) and searchMore) {
-    if (nextBucket < K) {
-      meBuckets[nextBucket].getKClosestNodes(target, closeNodes, size);
-    }
-    if (lastBucket >= 0) {
-      meBuckets[lastBucket].getKClosestNodes(target, closeNodes, size);
-    }
-    nextBucket++;
-    lastBucket--;
-    searchMore = ((nextBucket < K) or (lastBucket >= 0));
+  for (int index = 0; (index < K); index++) {
+    meBuckets[index].getKClosestNodes(target, closeNodes, size);
   }
   return (size);
 }

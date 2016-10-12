@@ -71,9 +71,11 @@ class KBucket {
   //Post: RV = id1 XOR id2
   uint32_t findDist(uint32_t id1, uint32_t id2);
 
+  /*
   //Pre: The current object exists
   //Post: The current object is deleted and becomes a deep copy of other
   KBucket operator= (const KBucket& other);
+  */
   
 };
 
