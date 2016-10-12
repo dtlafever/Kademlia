@@ -14,7 +14,7 @@
 
 // Enumerated data type describing the type of message. Accessible outside the class.
 // KB is when we format the kclosest kbuckets.
-enum MsgType { PING, STORE, FINDNODE, FINDVALUE, KCLOSEST, PINGRESP, FVRESP, NONE};
+enum MsgType { PING, STORE, FINDNODE, FINDVALUE, KCLOSEST, PINGRESP, FVRESP, STORERESP, FVRESPP, FVRESPN, NONE};
 
 class Message
 {
@@ -34,7 +34,7 @@ class Message
 	Triple Kclos [K];
 	
 	// This array stores the names of the different types to simplify the parsing
-	const std::string msgStrings [8] = {"PING ", "STORE ", "FINDNODE ", "FINDVALUE ", "KCLOSEST ", "PINGRESP", "FVRESP", "NONE "};
+	const std::string msgStrings [11] = {"PING ", "STORE ", "FINDNODE ", "FINDVALUE ", "KCLOSEST ", "PINGRESP", "FVRESP", "STORERESP", "FVRESPP", "FVRESPN",  "NONE "};
 	
 	void initializeKClos ();
 	

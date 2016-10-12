@@ -140,15 +140,27 @@ void Message::parse (std::string & message)
 	{
 		msgType = FVRESP;
 	}
+	else if(message.find(msgStrings[STORERESP]) != -1)
+	{
+		msgType = STORERESP;
+	}
+	else if (message.find(msgStrings[FVRESPP])!= -1)
+	{
+		msgType = FVRESPP;
+	}
+	else if (message.find(msgStrings[FVRESPN])!= -1)
+	{
+		msgType = FVRESPN;
+	}
 	
 	if(msgType == NONE)
-		msg = message;
+		msg = "";
 		
 }
 
 std::string Message::toString(MsgType type, uint32_t ID, bool UI)
 {
-	//	msg = "";
+		msg = "";
 	
 	switch (type)
 	{
@@ -217,7 +229,16 @@ std::string Message::toString(MsgType type, uint32_t ID, bool UI)
 			msg= msgStrings[FVRESP];
 			break;
 			
-		case NONE:
+		case STORERESP:
+			msg = msgStrings[FINDVALUE];
+			break;
+			
+		case FVRESPP:
+			msg= msgStrings[FVRESPP];
+			break;
+			
+		case FVRESPN:
+			msg = msgStrings[FINDVALUE];
 			break;
 			
 		default:

@@ -279,7 +279,8 @@ void Node::nonUITagResponse (Message m)
 		}
 		else
 		{
-			//Message response
+			//Message response ("Store completed \n");
+			
 		}
 	}
 	else printf("Error in response format or parsing \n");
