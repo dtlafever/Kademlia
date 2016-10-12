@@ -1,6 +1,8 @@
 #include "Node.h"
 #include "UDPSocket.h"
-#include "Message.h"
+#include "Message.hpp"
+
+using namespace std;
 
 //---------------------------------------------------------------------------------
 //            PRIVATE FUNCTIONS
@@ -69,7 +71,8 @@ void Node::findValue(uint32_t key) {
 
 //PRE: 
 //POST: lets create a new network and init this node with 32 empty k buckets and a given id
-Node::Node(uint32_t nodeID) {} {
+Node::Node(uint32_t nodeID) : routingTable(nodeID)
+{
 	ID = nodeID;
 	exit = false;
 }
@@ -83,6 +86,7 @@ Node::Node(uint32_t nodeID, uint32_t contactID, uint32_t contactIP,
 	exit = false;
 	routingTable.addNode(contactID, contactIP);
 	
+	//TODO: FIX WHAT WE WANT TO DO WITH THIS
 	//find_node to the contact node
 	UDPSocket socket(UDPPORT);
 	MsgType t = FINDNODE;
@@ -128,6 +132,8 @@ void Node::listenerLoop() {
 
 //PRE: 
 //POST: recieves messages thread
-void Node::handler_T(Node * node) {
+void Node::handler_T(Node * node, string * msg, uint32_t * ip) {
+	UDPSocket socket(UDPPORT);
+
 
 }

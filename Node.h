@@ -83,5 +83,5 @@ public:
 	//PRE:
 	//POST: recieves messages thread
 	static void handler_T(Node * node);
-}
+};
 #endif // !INCLUDE_NODE
