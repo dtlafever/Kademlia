@@ -21,21 +21,25 @@ class SnapShot{
   
  public:
 
-  //PRE: Constructor 
-  //POST: Triples from node placed into pair array. 
-  SnapShot(Triple nodes[], int nodeSize, uint32_t NodeId);
+	 //PRE: an array of triples up to nodeSize.
+	 //     We are assuming the nodes array is sorted
+	 //POST: Triples from node placed into pair array
+  SnapShot(Triple nodes[], uint32_t nodeSize, uint32_t NodeId);
 
 
   //PRE: Object defined. 
   void addClosest(Message newMsg);
 
-	Triple getNext (); // Should set the one return to used
+	//PRE: Object defined
+	//POST: set the next closest Triple that doesn't have to our t.
+	//      a true for its boolean. It will set the bool to true.
+	//      Returns true if there is a next, false otherwise
+	bool getNext (Triple & t);
 	
 	//PRE: triple array of size K 
-	//POST: returns the triples from our array of pairs
-	void getTriples(Triple * snapTriples);
-
-	bool nextExists (); // checks if there is still one not used.
+	//POST: returns the triples from	our array of pairs,
+	//      as well as the size of it
+	uint32_t getTriples(Triple * snapTriples);
 
 };
 

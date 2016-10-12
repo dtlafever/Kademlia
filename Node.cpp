@@ -187,23 +187,21 @@ void Node::UITagResponse(Message & m, uint32_t ip) {
 		
 		Triple clos[K];
 
-		routingTable.getKClosest(key, clos);
+		uint32_t size = routingTable.getKClosest(key, clos);
 
 		//TODO: FIND_NODE and get k closest Nodes
-		snap = SnapShot(clos, , );
+		snap = SnapShot(clos, size, );
 
 		Triple snapTriples[K];
 		snap.getTriples(snapTriples);
 		
 		//Send store to the k closest nodes
-
 		for (int i = 0; i < K; i++) {
 			Message sendMsg(STORE, ID);
 			socket.sendMessage(sendMsg, snapTriples[i].address, UDPPORT);
 		}
 
 		//Send to UI that store suceeded
-
 		UDPSocket socketUI(UIPORT);
 		Message sendMsgUI(STORERESP, ID);
 		socketUI.sendMessage(sendMsgUI.toString(), ip, UIPORT);
