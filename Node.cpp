@@ -134,11 +134,14 @@ void Node::listenerLoop()
 
 		for (;;)
 		{
+			//Listening on UI socket
 			recvlenUI = socketUI.recvMessage(msgUI);
 			if (recvlenUI > 0) {
+				//Update the ip for the UI
 				ipUI = socketUI.getRemoteIP();
 			}
 
+			//Listening on the UDP socket 
 			recvlenUDP = socketUDP.recvMessage(msgUDP);
 			if (recvlenUDP > 0)
 			{
@@ -157,6 +160,10 @@ void Node::listenerLoop()
 	}
 }
 
+void Node::UITagResponse(Message & m, uint32_t ip) {
+
+}
+
 void Node::nonUIResponse(Message & m, uint32_t ip) {
 	MsgType type = m.getMsgType();
 	if (type == STORE) {
@@ -171,12 +178,16 @@ void Node::nonUIResponse(Message & m, uint32_t ip) {
 		//Send a message to the UI client saying we found the value
 		if (std::find(keys.begin(), keys.end(), key) != keys.end()) {
 			Message sendMsg(FVRESP, ID);
-			UDPSocket socket(UIPORT);
+			UDPSocket socket(UDPPORT);
 			socket.sendMessage(sendMsg.toString(), ip, UDPPORT);
 		}
 		else { //Send a message to the node asking us for find value
 			Message sendMsg(KCLOSEST, ID);
-			//TODO: send snapshot of K-closest nodes
+			//TODO: send snapshot/K closest of K-closest nodes
+			//NOTE: snapshot because it will be sorted by distance,
+			//      if we iterate through the list and reach a Triple
+			//      that is further than the closest node, stop going 
+			//      through the list
 			Triple clos[K];
 			sendMsg.setKClos(clos);
 			UDPSocket socket(UDPPORT);
@@ -187,7 +198,19 @@ void Node::nonUIResponse(Message & m, uint32_t ip) {
 		Message sendMsg(PINGRESP, ID);
 		UDPSocket socket(UDPPORT);
 		socket.sendMessage(sendMsg.toString(), ip, UDPPORT);
-	}else if(type == FINDNODE)
+	}
+	else if (type == FINDNODE) {
+		Message sendMsg(KCLOSEST, ID);
+		//TODO: send snapshot/K closest of K-closest nodes
+		//NOTE: snapshot because it will be sorted by distance,
+		//      if we iterate through the list and reach a Triple
+		//      that is further than the closest node, stop going 
+		//      through the list
+		Triple clos[K];
+		sendMsg.setKClos(clos);
+		UDPSocket socket(UDPPORT);
+		socket.sendMessage(sendMsg.toString(), ip, UDPPORT);
+	}
 }
 
 //PRE:
@@ -195,14 +218,11 @@ void Node::nonUIResponse(Message & m, uint32_t ip) {
 void Node::handler_T( string * msg, uint32_t * ip){
 	Message m(msg);
 	if (m.getUI()) {
-
+		UITagResponse();
 	}
 	else {
 		nonUIResponse(m, &ip);
 	}
-
-	
-
 
 }
 
