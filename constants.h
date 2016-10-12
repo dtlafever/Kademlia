@@ -30,7 +30,7 @@ struct Triple {
 
 //PRE: the Triple we want to copy our data do and the data triple we want
 //POST: deep copy from onto to
-void copyTriple(Triple & to, Triple & from) {
+static void copyTriple(Triple & to, Triple & from) {
 	to.address = from.address;
 	to.port = from.port;
 	to.node = from.node;
