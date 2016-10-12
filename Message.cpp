@@ -276,3 +276,9 @@ void Message::getKClos(Triple *clos)
 {
 	clos = Kclos;
 }
+
+bool Message::getUI()
+{
+	return isUI;
+}
+

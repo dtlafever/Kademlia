@@ -76,6 +76,10 @@ public:
 	// POST: returns the Node of File ID.
 	uint32_t getID();
 	
+	// PRE:
+	// POST: returns true if the Message is from the UI and false if it is not.
+	bool getUI();
+	
 	// PRE: this function takes a MsgType to set to.
 	// POST:  This function does not check the types, it assumes it's taking the right input and just sets the internal message type.
 	void setType(MsgType type);
