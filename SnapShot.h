@@ -12,8 +12,8 @@ class SnapShot{
 
   pair<Triple, bool> closest [K];
 
-  int closestSize;
-  uint32_t currentID;
+  int size;
+  uint32_t compareID;
 
   void sort();
 	
@@ -31,7 +31,7 @@ class SnapShot{
 
 	Triple getNext (); // Should set the one return to used
 	
-	//PRE: 
+	//PRE: triple array of size K 
 	//POST: returns the triples from our array of pairs
 	void getTriples(Triple * snapTriples);
 
