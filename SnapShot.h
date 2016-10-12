@@ -15,9 +15,10 @@ class SnapShot{
   int size;
   uint32_t compareID;
 
-  void sort();
-	
-	bool compare ();
+	//PRE: two Pair objects we want to compare distances
+	//POST: returns whether lhs's distance is closer than rhs
+	bool sortByDistance(const Pair<Triple, bool> &lhs, 
+											const Pair<Triple, bool> &rhs);
 
 	//PRE: a key we want to find the distance from compareID
 	//POST: returns the bitwise XOR distance from compareID to key
@@ -42,6 +43,10 @@ class SnapShot{
 	//      a true for its boolean. It will set the bool to true.
 	//      Returns true if there is a next, false otherwise
 	bool getNext (Triple & t);
+
+	//PRE: Object defined
+	//POST: returns true if we have a triple we haven't parsed yet
+	bool nextExist();
 
 	//PRE: Object defined
 	//POST: will set all triples to 0's and all bools to trues

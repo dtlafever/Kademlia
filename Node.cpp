@@ -102,6 +102,18 @@ Node::Node(uint32_t nodeID, uint32_t contactID, uint32_t contactIP,
 //            THREAD FUNCTIONS
 //---------------------------------------------------------------------------------
 
+//PRE: Object defined. threadCount is member data.
+//POST: RV is true iff threadCount with the new thread added is less
+//      than MAXTHREADS. Otherwise, RV is false.
+bool Node::canSpawn(){
+  bool allowed = false;
+  if( (threadCount + 1) < MAXTHREADS){
+    allowed = true;
+  }
+  return(allowed);
+}
+
+
 //PRE:
 //POST: the thread that handles pinging every node in our k buckets
 //      every TIME_TO_PING amount of time
@@ -139,6 +151,14 @@ void Node::listenerLoop()
 			if (recvlenUI > 0) {
 				//Update the ip for the UI
 				ipUI = socketUI.getRemoteIP();
+
+				//Handler
+				if(canSpawn()){
+				  thread Handler(&Node::handler_T, msgUI, ipUI, this);
+				  currentThreads.push_back(Handler);
+				  threadCount = threadCount + 1;
+				  
+				}				
 			}
 			
 			//Listening on the UDP socket
@@ -148,11 +168,21 @@ void Node::listenerLoop()
 				//TODO: the handing of messages and spawning of threads
 				//ASSERT: we definitely got a message from someone
 				int sendTo = socketUDP.getRemoteIP(); // getting the ip of who
-																							// sent the message to us
-																							// so we can respond to the
-																							// message
-																							//send to the heavy lifting thread sendTo, msg
+				// sent the message to us
+				// so we can respond to the
+				// message
+				//send to the heavy lifting thread sendTo, msg
+
+				if(canSpawn()){
+				  thread Handler(&Node::handler_T, msgUDP, sendTo, this);
+				  currentThreads.push_back(Handler);
+				  threadCount = threadCount + 1;
+				  
+				}
+						
 			}
+
+			
 		}
 	}
 	catch (SocketException & e) {
@@ -180,17 +210,17 @@ void Node::listenerLoop()
 void Node::UITagResponse(Message & m, uint32_t ip) {
 	MsgType type = m.getMsgType();
 	uint32_t key = stoi(m.toString());
-
+	
 	if (type == STORE) {
 		UDPSocket socket(UDPPORT);
 		
 		Triple clos[K];
-
+		
 		uint32_t size = routingTable.getKClosest(key, clos);
-
+		
 		//TODO: FIND_NODE and get k closest Nodes
 		snap = SnapShot(clos, size, );
-
+		
 		Triple snapTriples[K];
 		snap.getTriples(snapTriples);
 		
@@ -199,14 +229,14 @@ void Node::UITagResponse(Message & m, uint32_t ip) {
 			Message sendMsg(STORE, ID);
 			socket.sendMessage(sendMsg, snapTriples[i].address, UDPPORT);
 		}
-
+		
 		//Send to UI that store suceeded
 		UDPSocket socketUI(UIPORT);
 		Message sendMsgUI(STORERESP, ID);
 		socketUI.sendMessage(sendMsgUI.toString(), ip, UIPORT);
 	}
 	else if (type == FINDVALUE) {
-
+		
 		uint32_t key = stoi(m.toString());
 		
 		//Send a message to the UI client saying we found the value
@@ -280,6 +310,7 @@ void Node::nonUIResponse(Message & m, uint32_t ip) {
 		//      if we iterate through the list and reach a Triple
 		//      that is further than the closest node, stop going
 		//      through the list
+		
 		Triple clos[K];
 		sendMsg.setKClos(clos);
 		UDPSocket socket(UDPPORT);
@@ -289,7 +320,7 @@ void Node::nonUIResponse(Message & m, uint32_t ip) {
 
 //PRE:
 //POST: recieves messages thread
-void Node::handler_T( string * msg, uint32_t * ip){
+void Node::handler_T( string * msg, uint32_t ip){
 	Message m(*msg);
 	if (m.getUI())
 	{
@@ -319,29 +350,38 @@ void Node::nonUITagResponse (Message m)
 {
 	UDPSocket sock(UIPORT);
 	Message msg;
-
+	
 	if( m.getMsgType()==FVRESP) // The message returned indicates that FindValue response.
 	{
 		m.setType(FVRESPP);
 		sock.sendMessage(m.toString(), "localhost", UIPORT);
 		
-		//////// Clear the snapshot
+		// Clear the snapshot
+		snap.clear();
 		
 	}
 	else if( m.getMsgType() == KCLOSEST) // The message is an answer to a store or findvalue and contains the k closest nodes.
 	{
-		snap.addClosest(m);
-		if(snap.nextExists()) // Check if there are unqueried nodes
+		Triple clos [5]; int size= 0;
+		size= m.getKClos(clos);
+		
+		snap.addClosest(clos, size);
+		
+		// Check if there are unqueried nodes & send a max of alpha
+		for(int i=0; i<ALPHA && snap.nextExists(); ++i)
 		{
-			///////// TODO: send to alpha.
-			Triple next = snap.getNext();
-			sock.sendMessage(curRequest.toString(), next.address, UDPPORT);
 			
+			Triple next;
+			snap.getNext(next); // check if there is a next triple, if yes if will update the Triple.
+			sock.sendMessage(curRequest.toString(), next.address, UDPPORT);
+	
+		}
+		
 		}
 		else // The process is finished no more nodes to query.
 		{
 			// Send back a response to the UI
-			///////// Clear the Snapshot
+			snap.clear();
 			if(curRequest.getMsgType()== STORE)
 				msg.setType(STORERESP);
 			

@@ -1,12 +1,14 @@
 #ifndef INCLUDE_NODE
 #define INCLUDE_NODE
 
-#include <Vector>
+#include <vector>
 #include "RoutingTable.h"
 #include "constants.h"
 #include "Message.hpp"
 #include <mutex>
 #include "SnapShot.h"
+#include <thread>
+
 
 using namespace std;
 
@@ -23,6 +25,9 @@ private:
 	
 	SnapShot snap;
 
+	int threadCount; //number of threads owned
+	vector<thread> currentThreads; //a vector to hold all current open threads
+	
 	uint32_t getMyID();
 	
 	//PRE: the node we want to ping
@@ -78,6 +83,11 @@ public:
 	//---------------------------------------------------------------------------------
 	//            THREAD FUNCTIONS
 	//---------------------------------------------------------------------------------
+
+	//PRE: Object defined. threadCount is member data.
+	//POST: RV is true iff threadCount with the new thread added is less
+	//      than MAXTHREADS. Otherwise, RV is false.
+	bool canSpawn();
 	
 	//PRE:
 	//POST: the thread that handles pinging every node in our k buckets every TIME_TO_PING amount of time
@@ -90,7 +100,7 @@ public:
 		
 	//PRE:
 	//POST: recieves messages thread
-	void handler_T( std::string * msg, uint32_t * ip);
+	void handler_T( std::string * msg, uint32_t ip);
 
 	//PRE: the message we want to read and the UI IP address
 	//POST: Handle the messages send directly from the UI client

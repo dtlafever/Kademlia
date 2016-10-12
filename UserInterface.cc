@@ -50,7 +50,6 @@ void UserInterface::runUI(){
 	
 	recNum = -1;
 	while(recNum < 0){
-	  cout << "Listening" << endl;
 	  recNum = UIsocket.recvMessage(receivedMessage);
 	}
 
