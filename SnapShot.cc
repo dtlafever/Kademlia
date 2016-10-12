@@ -34,10 +34,11 @@ void SnapShot::addClosest(Triple * kClos, uint32_t kClosSize) {
 //POST: set t to the value of the next non queried Triple.
 //      a true for its boolean. It will set the bool to true.
 //      Returns true if there is a next, false otherwise
-bool SnapShot::getNext(Triple & t); {
+bool SnapShot::getNext(Triple & t)
+{
 	int index = -1;
 	for (int i = 0; (i < size) && (index == -1); i++) {
-		if (closest.second == true) {
+		if (closest[i].second == true) {
 			index = i;
 		}
 	}
@@ -56,7 +57,7 @@ bool SnapShot::getNext(Triple & t); {
 void SnapShot::clear() {
 	Triple zero;
 	for (int i = 0; i < K; i++) {
-		copyTriple(closest.first, zero);
-		closest.second = false;
+		copyTriple(closest[i].first, zero);
+		closest[i].second = false;
 	}
 }
