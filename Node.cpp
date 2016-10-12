@@ -216,12 +216,12 @@ void Node::nonUIResponse(Message & m, uint32_t ip) {
 //PRE:
 //POST: recieves messages thread
 void Node::handler_T( string * msg, uint32_t * ip){
-	Message m(msg);
+	Message m(*msg);
 	if (m.getUI()) {
 		UITagResponse();
 	}
 	else {
-		nonUIResponse(m, &ip);
+		nonUIResponse(m, *ip);
 	}
 }
 
@@ -237,7 +237,15 @@ void Node::nonUITagResponse (Message m)
 	}
 	else if(msgType == KCLOSEST)
 	{
-		
+		snap.addClosest(m);
+		if(snap.nextExists())
+		{
+			
+		}
+		else
+		{
+			//Message response
+		}
 	}
 	else printf("Error in response format or parsing \n");
 }

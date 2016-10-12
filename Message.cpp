@@ -140,11 +140,15 @@ void Message::parse (std::string & message)
 	{
 		msgType = FVRESP;
 	}
+	
+	if(msgType == NONE)
+		msg = message;
+		
 }
 
 std::string Message::toString(MsgType type, uint32_t ID, bool UI)
 {
-	msg = "";
+	//	msg = "";
 	
 	switch (type)
 	{
@@ -213,7 +217,11 @@ std::string Message::toString(MsgType type, uint32_t ID, bool UI)
 			msg= msgStrings[FVRESP];
 			break;
 			
+		case NONE:
+			break;
+			
 		default:
+			msg = "";
 			std::cout << "Unable to create string properly!"<<std::endl;
 			break;
 	}

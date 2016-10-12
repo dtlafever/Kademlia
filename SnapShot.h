@@ -1,17 +1,23 @@
 #ifndef included_SnapShot
 #define included_SnapShot
 
+#include "Message.hpp"
+#include <utility>
+#include <algorithm>
 
+using namespace std;
 class SnapShot{
 
  private:
 
-  pair<Triple, bool> closest[k];
+  pair<Triple, bool> closest [K];
 
   int closestSize;
   uint32_t currentID;
 
-  sort();
+  void sort();
+	
+	bool compare ();
   
  public:
 
@@ -21,11 +27,11 @@ class SnapShot{
 
 
   //PRE: Object defined. 
-  addCloset(Message newMsg);
+  void addClosest(Message newMsg);
 
-
-
-
+	Triple getNext ();
+	
+	bool nextExists ();
 
 };
 

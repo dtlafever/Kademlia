@@ -6,6 +6,7 @@
 #include "constants.h"
 #include "Message.hpp"
 #include <mutex>
+#include "SnapShot.h"
 
 using namespace std;
 
@@ -20,7 +21,7 @@ private:
 	
 	Message curRequest; // Keeps track of the last request sent by the UI.
 	
-	
+	SnapShot snap;
 
 	uint32_t getMyID();
 	
