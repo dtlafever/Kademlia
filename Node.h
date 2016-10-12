@@ -91,10 +91,11 @@ public:
 	//POST: recieves messages thread
 	void handler_T( std::string * msg, uint32_t * ip);
 
-	UITagResponse(Message & m, uint32_t ip);
+	void UITagResponse(Message & m, uint32_t ip);
 
-	nonUIResponse(Message & m, uint32_t ip);
-
+	void nonUIResponse(Message & m, uint32_t ip);
+	
+	void nonUITagResponse (Message m);
 
 };
 #endif // !INCLUDE_NODE
