@@ -6,6 +6,8 @@
 #include "constants.h"
 #include <mutex>
 
+using namespace std;
+
 class Node{
 	
 private:
@@ -73,15 +75,15 @@ public:
 	
 	//PRE:
 	//POST: the thread that handles pinging every node in our k buckets every TIME_TO_PING amount of time
-	static void refresher_T(Node * node);
-	
+	 void refresher_T();
+
 	//PRE:
 	//POST: responds to other nodes asking for things like findNode and findValue. This thread
 	//      will spawn sendMessage and recieveMessage threads
-	static void listenerLoop(Node * node);
+	 void listenerLoop();
 		
 	//PRE:
 	//POST: recieves messages thread
-	static void handler_T(Node * node);
+	void handler_T( std::string * msg, uint32_t * ip);
 };
 #endif // !INCLUDE_NODE
