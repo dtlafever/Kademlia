@@ -7,6 +7,7 @@
 
 #define K 5
 #define UDPPORT 6666
+#define UIPORT 9999
 #define NUMBITS 32
 #define ALPHA 3
 #define RESPONDTIME 2000 //in milliseconds, the time to wait before

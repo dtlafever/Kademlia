@@ -4,6 +4,8 @@
 #ifndef include_UserInterface
 #define include_UserInterface
 
+using namespace std;
+
 class UserInterface{
 
  private:
@@ -34,9 +36,9 @@ class UserInterface{
   
   //PRE: Object defined. Input is a string entered by user.
   //POST: Parses through input to find any errors, and once
-  //      a specific command is validated, calls the
-  //      appropriate function to start creating the message.
-  void parseInput(char command[]);
+  //      a specific command is validated, creates the
+  //      Message object/string and returns it.
+  string parseInput(char command[]);
 
   //PRE: User entered 'exit" as input.
   //POST: Set isRunning to false, thus closing the UI.
@@ -45,18 +47,20 @@ class UserInterface{
   //PRE: The user entered STORE along with an unsigned integer key.
   //POST: From here, the UI will know that the Node wants to store
   //      the given key. The UI will create the correct Message and
-  //      send that to the Listener.
-  void storeKey(uint32_t ID);
+  //      return the string.
+  string storeKey(uint32_t ID);
 
   //PRE: The user entered FIND along with a key ID.
   //POST: From here, the UI will know that the Node wants to find
   //      the given key. The UI will create the correct Message and
-  //      send that to the Listener.
-  void findKey(uint32_t ID);
+  //      return the string.
+  string findKey(uint32_t ID);
 
-  //PRE: Message object created and ready to be sent. 
-  //POST: Creates a socket to communicate with the Listener.
-  void talkToListener();
+  //PRE: newMsg is a string received from the Listener socket
+  //POST: Parses through the string using the Message class
+  //      to determine whether our request was a success
+  //      or failure.  
+  void handleMessage(string newMsg);
 
 
 };
