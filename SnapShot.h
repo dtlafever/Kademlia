@@ -29,9 +29,9 @@ class SnapShot{
   //PRE: Object defined. 
   void addClosest(Message newMsg);
 
-	Triple getNext ();
+	Triple getNext (); // Should set the one return to used
 	
-	bool nextExists ();
+	bool nextExists (); // checks if there is still one not used.
 
 };
 
