@@ -153,10 +153,12 @@ void Node::listenerLoop()
 				ipUI = socketUI.getRemoteIP();
 
 				//Handler
-
-				//thread HandlerThread(msgUI, ipUI);
-
-				
+				if(canSpawn()){
+				  thread Handler(&handler_T, msgUI, ipUI, this);
+				  currentThreads.push_back(Handler);
+				  threadCount = threadCount + 1;
+				  
+				}				
 			}
 			
 			//Listening on the UDP socket
@@ -171,11 +173,13 @@ void Node::listenerLoop()
 				// message
 				//send to the heavy lifting thread sendTo, msg
 
-				//Handler
-
-				//thread HandlerThread(msgUDP, sendTo);
-
-				
+				if(canSpawn()){
+				  thread Handler(&handler_T, msgUDP, sendTo, this);
+				  currentThreads.push_back(Handler);
+				  threadCount = threadCount + 1;
+				  
+				}
+						
 			}
 
 			
@@ -315,7 +319,7 @@ void Node::nonUIResponse(Message & m, uint32_t ip) {
 
 //PRE:
 //POST: recieves messages thread
-void Node::handler_T( string * msg, uint32_t * ip){
+void Node::handler_T( string * msg, uint32_t ip){
 	Message m(*msg);
 	if (m.getUI())
 	{
