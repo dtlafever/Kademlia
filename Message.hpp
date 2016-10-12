@@ -42,7 +42,10 @@ class Message
 	bool isUI = false;
 	
 	// Represents the KClosest Array
-	Triple Kclos [K];
+	Triple kclos [K];
+	
+	// Number of valid elements in KClos
+	uint32_t size =0;
 	
 	// This array stores the names of the different types to simplify the parsing
 	const std::string msgStrings [11] = {"PING ", "STORE ", "FINDNODE ", "FINDVALUE ", "KCLOSEST ", "PINGRESP", "FVRESP", "STORERESP", "FVRESPP", "FVRESPN",  "NONE "};
@@ -73,7 +76,7 @@ public:
 	
 	// PRE: takes the message received as a string.
 	// POST: This function parses the message and updates the appropriate private members. This function alters the string and
-	void parse (std::string &);
+	void parse (std::string );
 	
 	// PRE: takes a MsgType object and an ID which is the NodeID
 	// POST: Creates a message to be able to send it in the appropriate format.
@@ -103,13 +106,13 @@ public:
 	// POST:
 	void setUI(bool UI);
 	
-	// PRE:
-	// POST:
-	void setKClos (Triple clos [K]);
+	// PRE: Takes the array of triples to put in the message and the size of the array
+	// POST: the function sets the internal member KClos with the array, the function does not do any type of checking.
+	void setKClos (Triple clos [K], uint32_t s);
 	
-	// PRE:
-	// POST:
-	void getKClos (Triple clos[K]);
+	// PRE: takes an array of triple to updated by reference.
+	// POST: returns the size of the array and updates the clos array passed by reference
+	uint32_t getKClos (Triple clos[K]);
 
 };
 #endif /* Message_cpp */

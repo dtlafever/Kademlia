@@ -210,17 +210,17 @@ void Node::listenerLoop()
 void Node::UITagResponse(Message & m, uint32_t ip) {
 	MsgType type = m.getMsgType();
 	uint32_t key = stoi(m.toString());
-
+	
 	if (type == STORE) {
 		UDPSocket socket(UDPPORT);
 		
 		Triple clos[K];
-
+		
 		uint32_t size = routingTable.getKClosest(key, clos);
-
+		
 		//TODO: FIND_NODE and get k closest Nodes
 		snap = SnapShot(clos, size, );
-
+		
 		Triple snapTriples[K];
 		snap.getTriples(snapTriples);
 		
@@ -229,14 +229,14 @@ void Node::UITagResponse(Message & m, uint32_t ip) {
 			Message sendMsg(STORE, ID);
 			socket.sendMessage(sendMsg, snapTriples[i].address, UDPPORT);
 		}
-
+		
 		//Send to UI that store suceeded
 		UDPSocket socketUI(UIPORT);
 		Message sendMsgUI(STORERESP, ID);
 		socketUI.sendMessage(sendMsgUI.toString(), ip, UIPORT);
 	}
 	else if (type == FINDVALUE) {
-
+		
 		uint32_t key = stoi(m.toString());
 		
 		//Send a message to the UI client saying we found the value
@@ -310,6 +310,7 @@ void Node::nonUIResponse(Message & m, uint32_t ip) {
 		//      if we iterate through the list and reach a Triple
 		//      that is further than the closest node, stop going
 		//      through the list
+		
 		Triple clos[K];
 		sendMsg.setKClos(clos);
 		UDPSocket socket(UDPPORT);
@@ -349,29 +350,38 @@ void Node::nonUITagResponse (Message m)
 {
 	UDPSocket sock(UIPORT);
 	Message msg;
-
+	
 	if( m.getMsgType()==FVRESP) // The message returned indicates that FindValue response.
 	{
 		m.setType(FVRESPP);
 		sock.sendMessage(m.toString(), "localhost", UIPORT);
 		
-		//////// Clear the snapshot
+		// Clear the snapshot
+		snap.clear();
 		
 	}
 	else if( m.getMsgType() == KCLOSEST) // The message is an answer to a store or findvalue and contains the k closest nodes.
 	{
-		snap.addClosest(m);
-		if(snap.nextExists()) // Check if there are unqueried nodes
+		Triple clos [5]; int size= 0;
+		size= m.getKClos(clos);
+		
+		snap.addClosest(clos, size);
+		
+		// Check if there are unqueried nodes & send a max of alpha
+		for(int i=0; i<ALPHA && snap.nextExists(); ++i)
 		{
-			///////// TODO: send to alpha.
-			Triple next = snap.getNext();
-			sock.sendMessage(curRequest.toString(), next.address, UDPPORT);
 			
+			Triple next;
+			snap.getNext(next); // check if there is a next triple, if yes if will update the Triple.
+			sock.sendMessage(curRequest.toString(), next.address, UDPPORT);
+	
+		}
+		
 		}
 		else // The process is finished no more nodes to query.
 		{
 			// Send back a response to the UI
-			///////// Clear the Snapshot
+			snap.clear();
 			if(curRequest.getMsgType()== STORE)
 				msg.setType(STORERESP);
 			
