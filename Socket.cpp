@@ -199,6 +199,34 @@ bool Socket::sendTo(const std::string s, std::string host, const int port) {
 	}
 }
 
+//PRE: the message we want to send, the host ip address, and the port 
+//     number of that host
+//POST: sends a message to the a given host and port number. Returns true if 
+//      the send succeeds, false otherwise
+bool sendTo(const std::string s, const int host,
+	const int port) {
+	//create address to send our message to
+	struct sockaddr_in remaddr;
+	memset((char *)&remaddr, 0, sizeof(remaddr));
+	int slen = sizeof(remaddr);
+	remaddr.sin_family = AF_INET;
+	remaddr.sin_port = htons(port);
+
+	&remaddr.sin_addr = host;
+
+	//send the message
+	int status = ::sendto(m_sock, s.c_str(), s.size(), MSG_NOSIGNAL,
+		(struct sockaddr *)&remaddr, slen);
+	if (status == -1)
+	{
+		return false;
+	}
+	else
+	{
+		return true;
+	}
+}
+
 //PRE: a string buffer to hold our message. Assumes we have a connection
 //POST: uses sys/socket.h to recv a message from the paired socket. If
 //      the recv succeeds, string s will hold the message, else it will return the status code

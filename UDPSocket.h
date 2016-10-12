@@ -19,6 +19,12 @@ public:
 	void sendMessage(const std::string s, const std::string host,
 						const uint32_t port);
 
+	//PRE: a message, host ip, and the port
+	//POST: sends the message to that host and then closes the connection.
+	//      throws error if couldn't send
+	void sendMessage(const std::string s, const std::uint32_t host,
+		const uint32_t port);
+
 	//PRE: the buffer we want to store the message in
 	//POST: store the message in the string and return the size of that junk
 	int recvMessage(std::string& s);

@@ -79,19 +79,9 @@ public:
 	//POST: responds to other nodes asking for things like findNode and findValue. This thread
 	//      will spawn sendMessage and recieveMessage threads
 	static void listenerLoop(Node * node);
-	
-	/*
-	 PRE: Assumes that the Node has been initialized properly. It takes a pointer to a boolean which is assumed to be set to true only when the program should exit. The msgType will enable the function to decide what type of message to create. IP is the IP address of the Node we want to contact. ID is the file or Node ID that we are looking for.
-	 
-	 ****I am not sure yet what parameters it should take
-	 
-	 POST: This function is called when spawning a thread to send a message to another node. This function creates the message depending on the parameters passed to it. Creates a connection to the destination node. sends the message to the node and waits for the response which will be in the form of a kBucket.
-	 */
-	
-	static void sendMessage (Node * node, bool * exit, MsgType msgType, int IP, int ID  = -1);
-	
+		
 	//PRE:
 	//POST: recieves messages thread
-	static void receiveMessage_T(Node * node);
+	static void handler_T(Node * node);
 }
 #endif // !INCLUDE_NODE

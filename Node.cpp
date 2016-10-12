@@ -1,5 +1,6 @@
 #include "Node.h"
 #include "UDPSocket.h"
+#include "Message.h"
 
 //---------------------------------------------------------------------------------
 //            PRIVATE FUNCTIONS
@@ -81,7 +82,12 @@ Node::Node(uint32_t nodeID, uint32_t contactID, uint32_t contactIP,
 	ID = nodeID;
 	exit = false;
 	routingTable.addNode(contactID, contactIP);
-	//TODO: find_node to the contact node
+	
+	//find_node to the contact node
+	UDPSocket socket(UDPPORT);
+	MsgType t = FINDNODE;
+	Message msg(t, nodeID);
+	socket.sendMessage(msg.toString(), contactIP, contactPort);
 }
 
 //---------------------------------------------------------------------------------
@@ -121,13 +127,7 @@ void Node::listenerLoop() {
 }
 
 //PRE: 
-//POST: responds to messages thread
-void Node::sendMessage_T(Node * node) {
-
-}
-
-//PRE: 
 //POST: recieves messages thread
-void Node::receiveMessage_T(Node * node) {
+void Node::handler_T(Node * node) {
 
 }
