@@ -181,7 +181,7 @@ void Node :: sendPing (bool & done, uint32_t numReq, int & i, int &j)
 			{
 				Triple temp = routingTable[i][j];
 				socket.sendMessage(msg.toString(), temp.address, UDPPORT);
-				refreshIP.push_back(temp.address);
+				refreshIP.push_back(temp);
 			}
 			else
 			{
@@ -216,48 +216,48 @@ void Node::listenerLoop()
 		UDPSocket socketUI(UIPORT);
 		
 		for (;;)
-		  {
-		    //Listening on UI socket
-		    recvlenUI = socketUI.recvMessage(msgUI);
-		    if (recvlenUI > 0) {
-		      //Update the ip for the UI
-		      ipUI = socketUI.getRemoteIP();
-		      
-		      //Handler
-		      if(canSpawn()){
-			future<void> Handler = async(&Node::handler_T, msgUI, ipUI, this);
-			currentThreads.push_back(Handler);
-			threadCount = threadCount + 1;
-		      }
-		      
-		    }
-		    
-		    //Listening on the UDP socket
-		    recvlenUDP = socketUDP.recvMessage(msgUDP);
-		    if (recvlenUDP > 0){
-		      
-			//TODO: the handing of messages and spawning of threads
-			//ASSERT: we definitely got a message from someone
-			int sendTo = socketUDP.getRemoteIP(); // getting the ip of who
-			// sent the message to us
-			// so we can respond to the
-			// message
-			//send to the heavy lifting thread sendTo, msg
+		{
+			//Listening on UI socket
+			recvlenUI = socketUI.recvMessage(msgUI);
+			if (recvlenUI > 0) {
+				//Update the ip for the UI
+				ipUI = socketUI.getRemoteIP();
+				
+				//Handler
+				if(canSpawn()){
+					future<void> Handler = async(Node::handler_T, this, msgUI, ipUI);
+					currentThreads.push_back(Handler);
+					threadCount = threadCount + 1;
+				}
+				
+			}
 			
-			if(canSpawn()){
-			  future<void> Handler = async(&Node::handler_T, msgUDP, sendTo, this);
+			//Listening on the UDP socket
+			recvlenUDP = socketUDP.recvMessage(msgUDP);
+			if (recvlenUDP > 0){
+				
+				//TODO: the handing of messages and spawning of threads
+				//ASSERT: we definitely got a message from someone
+				int sendTo = socketUDP.getRemoteIP(); // getting the ip of who
+																							// sent the message to us
+																							// so we can respond to the
+																							// message
+																							//send to the heavy lifting thread sendTo, msg
+				
+				if(canSpawn()){
+			  future<void> Handler = async(Node::handler_T, this, msgUDP, sendTo);
 			  currentThreads.push_back(Handler);
 			  threadCount = threadCount + 1;
 			  
+				}
+				
 			}
 			
-		    }
-		    
-		    
-		  }
+			
+		}
 	}
 	catch (SocketException & e) {
-	  printf("ERROR: %s\n", ((char *)(e.description().c_str())));
+		printf("ERROR: %s\n", ((char *)(e.description().c_str())));
 	}
 	
 	//TODO: Iterate through current open threads and check if done
@@ -293,7 +293,7 @@ void Node::UITagResponse(Message m, uint32_t ip) {
 	UDPSocket socket(UDPPORT);
 	Triple clos[K];
 	Triple temp;
-
+	
 	if (type == STORE)
 	{
 		size = routingTable.getKClosetNodes(key, clos); // retrieves k closest and actual size
@@ -338,7 +338,7 @@ void Node::UITagResponse(Message m, uint32_t ip) {
 			snap.clear();
 			snap.addClosest(clos, size);
 			snap.setCompareID(key);
-
+			
 			///Send the FindValue request to Alpha nodes to the k closest nodes
 			for (int i = 0; (i < ALPHA) && snap.nextExist(); i++)
 			{
@@ -375,18 +375,15 @@ void Node::nonUIResponse(Message & m, uint32_t ip)
 			if(refreshIP[i].address == ip)
 			{
 				found = true;
-				// TODO: We need a function to update  node in the K-bucket that responded
-				// void RoutingTable::refreshNode (Triple & newTriple);
-				// The function will move it to the tail or the most recently used spot.
 				routingTable.updateTable(refreshIP[i].node);
-					cout << "Error Finding Node to refresh "<<endl;
-					
+				cout << "Error Finding Node to refresh "<<endl;
+				
 				refreshIP.erase(refreshIP.begin()+i);
 			}
 		}
 		
 		if(!found) cout << "Invalid PING response" << endl;
-	
+		
 	}
 	else if (type == FINDVALUE)
 	{
@@ -430,22 +427,22 @@ void Node::nonUIResponse(Message & m, uint32_t ip)
 
 //PRE: Takes the message received and the incoming IP from the Listener.
 //POST: This thread does most of the work and ensures that the protocol steps are fulfilled. If the message is faulty and parsed to NONE, the function should end and discard the message.
-void Node::handler_T( string msg, uint32_t ip)
+void Node::handler_T(Node * obj, string msg, uint32_t ip)
 {
 	Message m(msg);
 	if (m.getUI())
 	{
-		UITagResponse(m, ip);
+		obj->UITagResponse(m, ip);
 	}
 	else
 	{
 		if(m.getMsgType() == KCLOSEST || m.getMsgType() == FVRESP)
 		{
-			nonUITagResponse(m);
+			obj->nonUITagResponse(m);
 		}
 		else
 		{
-			nonUIResponse(m, ip);
+			obj->nonUIResponse(m, ip);
 		}
 	}
 }
@@ -480,7 +477,7 @@ void Node::nonUITagResponse (Message m)
 		snap.addClosest(clos, size);
 		
 		if(!snap.nextExist())// Check if there are unqueried nodes & send a max of alpha
-
+			
 		{
 			for(int i=0; i<ALPHA && snap.nextExist(); ++i)
 			{
