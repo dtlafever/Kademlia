@@ -286,28 +286,31 @@ void Node::listenerLoop()
 void Node::UITagResponse(Message & m, uint32_t ip) {
 	MsgType type = m.getMsgType();
 	uint32_t key = atoi(m.toString().c_str());
+	uint32_t key = m.getID();
+	uint32_t size=0;
 	
-	if (type == STORE) {
+	if (type == STORE)
+	{
 		UDPSocket socket(UDPPORT);
 		
 		Triple clos[K];
+		size = routingTable.getKClosetNodes(key, clos); // retrieves k closest and actual size
 		
-		uint32_t size = routingTable.getKClosest(key, clos);
+		snap.setCompareID(key);
 		
-		//TODO: FIND_NODE and get k closest Nodes
+		// What I did : I got the Kclosest from the Routing Table, I get the ID we are checking for from the message because it's a STORE. I set the key of the snapshot.
+		
 		snap.clear();
 		snap.addClosest(clos, size);
 		snap.setCompareID(key);
-
 		
 		//Send store to the k closest nodes
-		bool isNext = snap.nextExist();
-		for (int i = 0; (i < ALPHA) && isNext; i++) {
+		for (int i = 0; (i < ALPHA) && snap.nextExist(); i++)
+		{
 			Message sendMsg(STORE, key);
 			Triple temp;
 			snap.getNext(temp);
 			socket.sendMessage(sendMsg.toString(), temp.address, UDPPORT);
-			isNext = snap.nextExist();
 		}
 		
 		//TODO: we meed to move this to KClosest to check if
@@ -351,15 +354,19 @@ void Node::UITagResponse(Message & m, uint32_t ip) {
 
 //PRE: the message we want to read and the UDP IP address
 //POST:
-void Node::nonUIResponse(Message & m, uint32_t ip) {
+void Node::nonUIResponse(Message & m, uint32_t ip)
+{
 	MsgType type = m.getMsgType();
-	if (type == STORE) {
+	if (type == STORE)
+	{
 		keys.push_back(stoi(m.toString()));
 	}
-	else if (type == PINGRESP) {
+	else if (type == PINGRESP)
+	{
 		//TODO: update K-bucket with this node being most recently used
 		Triple pingedTriple;
-		for (int i = 0; i < refreshIP; i++) {
+		for (int i = 0; i < refreshIP; i++)
+		{
 			//TODO: MAKE IS HAPPEN
 		}
 		routingTable.updateTable();
@@ -408,20 +415,22 @@ void Node::nonUIResponse(Message & m, uint32_t ip) {
 
 //PRE:
 //POST: recieves messages thread
-void Node::handler_T( string * msg, uint32_t ip){
-	Message m(*msg);
+void Node::handler_T( string msg, uint32_t ip)
+{
+	Message m(msg);
 	if (m.getUI())
 	{
-		UITagResponse();
+		UITagResponse(m, ip);
 	}
-	else {
+	else
+	{
 		if(m.getMsgType() == KCLOSEST || m.getMsgType() == FVRESP)
 		{
 			nonUITagResponse(m);
 		}
 		else
 		{
-			nonUIResponse(m, *ip);
+			nonUIResponse(m, ip);
 		}
 	}
 }
@@ -455,31 +464,32 @@ void Node::nonUITagResponse (Message m)
 		
 		snap.addClosest(clos, size);
 		
-		// Check if there are unqueried nodes & send a max of alpha
-		for(int i=0; i<ALPHA && snap.nextExists(); ++i)
+		if(!snap.nextExist())// Check if there are unqueried nodes & send a max of alpha
+
 		{
+			for(int i=0; i<ALPHA && snap.nextExist(); ++i)
+			{
+				Triple next;
+				snap.getNext(next); // check if there is a next triple, if yes if will update the Triple.
+				
+				/// TODO: Check the case where store actually sends findnode...
+				sock.sendMessage(curRequest.toString(), next.address, UDPPORT);
+			}
+		}
+		else // The process is finished no more nodes to query.
+		{
+			// Send back a response to the UI
+			snap.clear();
+			if(curRequest.getMsgType()== STORE)
+				msg.setType(STORERESP);
 			
-			Triple next;
-			snap.getNext(next); // check if there is a next triple, if yes if will update the Triple.
-			sock.sendMessage(curRequest.toString(), next.address, UDPPORT);
+			else if(curRequest.getMsgType() == FINDVALUE)
+				msg.setType(FVRESPN);
+			
+			// Respond directly to UI
+			sock.sendMessage(msg.toString(), "localhost", UIPORT);
 			
 		}
-		
-		/// TODO: Check this part again.
-		if(!snap.nextExist()) // The process is finished no more nodes to query.
-			{
-				// Send back a response to the UI
-				snap.clear();
-				if(curRequest.getMsgType()== STORE)
-					msg.setType(STORERESP);
-				
-				else if(curRequest.getMsgType() == FINDVALUE)
-					msg.setType(FVRESPN);
-				
-				// Respond directly to UI
-				sock.sendMessage(msg, "localhost", UIPORT);
-				
-			}
 		
 	}
 	else printf("Error in response format or parsing \n");

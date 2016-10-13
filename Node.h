@@ -109,8 +109,7 @@ public:
 		
 	//PRE:
 	//POST: recieves messages thread
-	void handler_T( std::string * msg, uint32_t ip);
-
+	void handler_T( string msg, uint32_t ip);
 	//PRE: the message we want to read and the UI IP address
 	//POST: Handle the messages send directly from the UI client
 	//      STORE:
