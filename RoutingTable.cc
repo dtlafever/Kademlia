@@ -123,6 +123,7 @@ void RoutingTable::updateTable(uint32_t nodeID) {
 
 //Pre: 0 <= index < NUMBITS
 //Post: RV = meBuckets[index]
-KBucket RoutingTable::operator [] (int index) {
-  return meBuckets[i];
+KBucket RoutingTable::operator [] (int index)
+{
+  return meBuckets[index];
 }
