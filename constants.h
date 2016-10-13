@@ -12,9 +12,11 @@
 #define NUMBITS 32
 #define ALPHA 3
 #define RESPONDTIME 2000 //in milliseconds, the time to wait before
-												 //moving on for an operation (such as findNode)
+
+//moving on for an operation (such as findNode)
 #define PINGTIME 3600000 //in milliseconds, the time to wait before
-												 //pinging a node
+
+//pinging a node
 #define MAXRECV 500
 
 struct Triple {
