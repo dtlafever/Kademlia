@@ -13,6 +13,9 @@ class UserInterface{
   bool isRunning;
   //ASSERT: isRunning is a boolean that is a flag for the running
   //        of the User Interface. When false, the UI has stopped.
+
+  string IPaddress;
+  //ASSERT: IPaddress is the IP of the node we want to connect to.
   
  public:
 

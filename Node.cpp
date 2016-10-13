@@ -41,6 +41,7 @@ Node::Node(uint32_t nodeID, uint32_t contactID, uint32_t contactIP,
   exit = false;
   routingTable.addNode(contactID, contactIP);
 	
+<<<<<<< HEAD
   //TODO: FIX WHAT WE WANT TO DO WITH THIS
   //find_node to the contact node
   UDPSocket socket(UDPPORT);
@@ -49,6 +50,22 @@ Node::Node(uint32_t nodeID, uint32_t contactID, uint32_t contactIP,
   socket.sendMessage(msg.toString(), contactIP, contactPort);
 	
   threadCount = 0;
+=======
+
+	//find_node to the contact node
+	UDPSocket socket(UDPPORT);
+	Message msg(FINDNODE, nodeID);
+	socket.sendMessage(msg.toString(), contactIP, contactPort);
+	
+	//TODO: Add this message to timeouts. + check if fails 
+	
+	threadCount = 0;
+>>>>>>> b3a98096fa7b5d8fc454ab4ceb43f0fa86fb1a54
+	
+}
+
+void Node::joinNetwork(Triple &contact)
+{
 	
 }
 

@@ -7,13 +7,14 @@
 #include "KBucket.h"
 #include "constants.h"
 #include <stdint.h>
+#include <mutex>
 
 class RoutingTable {
 
  private:
   
   uint32_t myId;
-  KBucket meBuckets[NUMBITS];
+  KBucket table[NUMBITS];
 
   //Pre: id1 and id2 are two identifiers
   //Post: RV = id1 XOR id2
@@ -31,9 +32,14 @@ class RoutingTable {
  public:
   
   //Pre: id refers to a valid node object
-  //Post: meBuckets is an array of K kBuckets, that are each empty
+  //Post: table is an array of K kBuckets, that are each empty
   RoutingTable(uint32_t id);
 
+  //Pre: The RoutingTable exists
+  //Post: RV = true if no Triples exists in the kBuckets
+  //      False otherwise
+  bool isEmpty();
+  
   //Pre: target is some id, closeNodes is an array Triples with node = -1
   //Post: closeNodes = array of the K closest nodes to the target
   //      Less than K are returned iff less than K nodes are in the table
@@ -62,10 +68,9 @@ class RoutingTable {
   void printTable();
 	
   //Pre: 0 <= index < NUMBITS
-  //Post: RV = meBuckets[index]
+  //Post: RV = table[index]
   KBucket operator [] (int index);
 
-	
 };
 
 #endif

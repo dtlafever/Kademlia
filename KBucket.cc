@@ -7,6 +7,11 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <iostream>
+#include <mutex>
+
+#include <thread> //Testing the mutex
+#include <chrono>
+
 using namespace std;
 
 //Pre: routing table is initalized
@@ -14,17 +19,33 @@ using namespace std;
 //      and myTriples is an array of size k of triples
 //      numTriples = 0
 KBucket::KBucket() {
-  printf("KBucket Constructor \n");
   numTriples = 0;
   for (int index = 0; (index < K); index++) {
     bucket[index] = NULL;
   }
 }
 
+//Pre: This bucket is empty, it is unlocked
+//Post: This bucket is a deep copy of bucket
+KBucket::KBucket(KBucket& otherBucket) {
+  lockBucket();
+  otherBucket.lockBucket();
+  numTriples = otherBucket.numTriples;
+  for (int index = 0; (index < numTriples); index++) {
+    Triple* tripleCopy = new Triple;
+    Triple original = otherBucket[index];
+    tripleCopy->node = original.node;
+    tripleCopy->address = original.address;
+    tripleCopy->port = original.port;
+    bucket[index] = tripleCopy;
+  }
+  unlockBucket();
+  otherBucket.unlockBucket();
+}
+
 //Pre: the respected routing table is being deleted
 //Post: bucket is destroyed
 KBucket::~KBucket() {
-  printf("KBucket Destructor called \n");
   for (int index = 0; (index < numTriples); index++) {
     delete bucket[index];
     bucket[index] = NULL;
@@ -32,13 +53,38 @@ KBucket::~KBucket() {
   numTriples = 0;
 }
 
+//Pre: lock is currently unlocked
+//Post: lock is locked
+void KBucket::lockBucket() {
+  lock.lock();
+}
+
+//Pre: lock is currently locked
+//Post: lock is unlocked
+void KBucket::unlockBucket() {
+  lock.unlock();
+}
+
+//Pre: The Bucket exists
+//Post: RV = true if no triples exists in bucket
+//      otherwise false
+bool KBucket::isEmpty() {
+  bool empty = false;
+  if (numTriples == 0) {
+    bool empty = true;
+  }
+  return (empty);
+}
+
 //Pre: N/A
 //Post: Prints the contents of the Routing Table
 void KBucket::printBucket() {
   printf("numTriples: %d \n \n", numTriples);
+  lockBucket();
   for (int index = 0; (index < numTriples); index++) {
     printf("index: %d nodeId: %u \n", index, bucket[index]->node);
   }
+  unlockBucket();
   printf("\n");
 }
 
@@ -64,9 +110,16 @@ uint32_t KBucket::findDist(uint32_t id1, uint32_t id2) {
 //Post: node is placed at the tail of bucket
 //      numTriples = numTriples + 1
 void KBucket::addNode(Triple* node) {
+  //  printf("inside of addNode, before lock \n");
+  lockBucket();
+  /*
+  printf("inside of addNode, just locked \n");
+  this_thread::sleep_for(chrono::seconds(20));  //For testing the mutex lock
+  */
   bucket[numTriples] = node;
   //In this regard, the tail is where the 1st NULL is at
   numTriples++;
+  unlockBucket();
 }
 
 //Pre: nodes is in smallest distance order, currNode has a home in nodes
@@ -95,6 +148,7 @@ void KBucket::insertNode(Triple* nodes, int insertDex,
 //Post: nodeHolder contains the closet nodes in this bucket ordered by
 //      distance
 void KBucket::getKClosestNodes(uint32_t target, Triple* nodeHolder, int& size) {
+  lockBucket();
   bool inserted = false;
   for (int index = 0; (index < numTriples); index++) {
     Triple* currTriple = bucket[index];
@@ -122,12 +176,14 @@ void KBucket::getKClosestNodes(uint32_t target, Triple* nodeHolder, int& size) {
       insertNode(nodeHolder, insertDex, currTriple, size);
     }
   }
+  unlockBucket();
 }
   
 //Pre: node exists within bucket
 //Post: triple containing the node is moved to the tail of bucket
 //      adjust triples to the left as necessary
 void KBucket::adjustNode(uint32_t nodeID) {
+  lockBucket();
   int index = 0;
   Triple* currTriple;
   uint32_t currID;
@@ -146,6 +202,7 @@ void KBucket::adjustNode(uint32_t nodeID) {
     bucket[otherDex] = bucket[otherDex + 1];
   } 
   bucket[numTriples - 1] = currTriple;
+  unlockBucket();
 }
 
 //Pre: node exists within bucket
@@ -154,7 +211,7 @@ void KBucket::adjustNode(uint32_t nodeID) {
 void KBucket::deleteNode(uint32_t nodeID) {
   //Regardless if we know what the triple is beforehand, we still don;t
   //know where it is. And having the ID is more readily available
-  
+  lockBucket();
   int index = 0;
   bool found = false;
   Triple* toDie;
@@ -173,46 +230,33 @@ void KBucket::deleteNode(uint32_t nodeID) {
   }
   bucket[numTriples - 1] = NULL;
   numTriples--;
+  unlockBucket();
 }
 
-/*
-//Pre: The current object exists
-//Post: The current object is deleted and becomes a deep copy of other
-KBucket KBucket::operator= (const KBucket& other) {
+//Pre: 0 <= index < numTriples
+//Post: RV = a deep copy of bucket[index]
+Triple KBucket::operator[] (int index) {
+  Triple myCopy;
+  myCopy.node = bucket[index]->node;
+  myCopy.address = bucket[index]->address;
+  myCopy.port = bucket[index]->port;
+  return (myCopy);
+}
 
-  printf("KBucket Assignment Operator entered \n");
-  
+//Pre: This bucket is empty, it is unlocked
+//Post: This bucket is a deep copy of bucket
+void KBucket::operator= (KBucket& otherBucket) {
+  lockBucket();
+  otherBucket.lockBucket();
+  numTriples = otherBucket.numTriples;
   for (int index = 0; (index < numTriples); index++) {
-    delete bucket[index];
+    Triple* tripleCopy = new Triple;
+    Triple original = otherBucket[index];
+    tripleCopy->node = original.node;
+    tripleCopy->address = original.address;
+    tripleCopy->port = original.port;
+    bucket[index] = tripleCopy;
   }
-  for (int index = 0; (index < other.numTriples); index++) {
-    Triple* toCopy = other.bucket[index];
-    Triple* newTriple = new Triple;
-    newTriple->node = toCopy->node;
-    newTriple->address = toCopy->address;
-    newTriple->port = toCopy->port;
-    bucket[index] = newTriple;    
-    /*
-          Triple* toCopy = other.bucket[index];
-	  bucket[index] = new Triple;
-	  bucket[index]->node = toCopy->node;
-	  bucket[index]->address = toCopy->address;
-	  bucket[index]->port = toCopy->port;
-     
-  }
-  return (*this);
-
-  } */
-
-Triple KBucket::operator[](int i)
-{
-	Triple temp;
-	temp.node = -1;
-	temp.port= -1;
-	temp.address = -1;
-	
-	if(i<numTriples)
-		return *(bucket[i]);
-	else return temp;
+  unlockBucket();
+  otherBucket.unlockBucket();
 }
-

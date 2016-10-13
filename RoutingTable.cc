@@ -11,9 +11,22 @@
 using namespace std;
 
 //Pre: id refers to a valid node object
-//Post: meBuckets is an array of K kBuckets, that are each empty
+//Post: table is an array of K kBuckets, that are each empty
 RoutingTable::RoutingTable(uint32_t id) {
   myId = id;
+}
+
+//Pre: The RoutingTable exists
+//Post: RV = true if no Triples exists in the kBuckets
+//      False otherwise
+bool RoutingTable::isEmpty() {
+  bool empty = true;
+  int index = 0;
+  while (empty) {
+    empty = table[index].isEmpty();
+    index++;
+  }
+  return (empty);
 }
 
 //Pre: N/A
@@ -22,7 +35,7 @@ void RoutingTable::printTable() {
   printf("Routing Table \n \n");
   for (int index = 0; (index < NUMBITS); index++) {
     printf("nthBucket: %d \n", index);
-    meBuckets[index].printBucket();
+    table[index].printBucket();
   }
 }
 
@@ -56,7 +69,7 @@ int RoutingTable::findKBucket(uint32_t id) {
 int RoutingTable::getKClosetNodes(uint32_t target, Triple* closeNodes) {
   int size = 0;
   for (int index = 0; (index < NUMBITS); index++) {
-    meBuckets[index].getKClosestNodes(target, closeNodes, size);
+    table[index].getKClosestNodes(target, closeNodes, size);
   }
   return (size);
 }
@@ -77,7 +90,7 @@ Triple* RoutingTable::createTriple(uint32_t id, uint32_t address) {
 //           false otherwise
 bool RoutingTable::addNode(uint32_t node, uint32_t address) {
   int nthBucket = findKBucket(node);
-  KBucket* currBucket = &(meBuckets[nthBucket]);
+  KBucket* currBucket = &(table[nthBucket]);
   Triple* currTriple = currBucket->getHead();
   bool added = false;
   Triple* newTriple = createTriple(node, address);
@@ -97,19 +110,20 @@ bool RoutingTable::addNode(uint32_t node, uint32_t address) {
 //Post: Removes the respected Triple from the table
 void RoutingTable::deleteNode(uint32_t nodeID) {
   int nthBucket = findKBucket(nodeID);
-  meBuckets[nthBucket].deleteNode(nodeID);
+  table[nthBucket].deleteNode(nodeID);
 }
   
-//Pre: myNode exists inside meBuckets
+//Pre: myNode exists inside table
 //Post: myNode is placed at the tail of its respected kBucket
 //      the other triples are left shifted as needed
 void RoutingTable::updateTable(uint32_t nodeID) {
-  int myKBucket = findKBucket(nodeID);
-  meBuckets[myKBucket].adjustNode(nodeID);
+  int nthBucket = findKBucket(nodeID);
+  table[nthBucket].adjustNode(nodeID);
 }
 
 //Pre: 0 <= index < NUMBITS
-//Post: RV = meBuckets[index]
+//Post: RV =  a deep copy of table[index]
 KBucket RoutingTable::operator [] (int index) {
-  return (meBuckets[i]);
+  KBucket copy = table[index];
+  return (copy);
 }
