@@ -12,26 +12,26 @@
 
 Message::Message (std::string msg) : msgType(NONE), msg(msg)
 {
-	initializeKClos();
+	size= 0;
 	parse(msg);
 }
 
 Message::Message(MsgType type, uint32_t ID, bool UI): msgType(type), ID(ID), isUI(UI)
 {
-	initializeKClos();
+	size= 0;
 	toString(type, ID, UI);
 }
 
 Message::Message(const Message & rhs) : msg(rhs.msg), msgType(rhs.msgType), ID(rhs.ID), isUI(rhs.isUI)
 {
-	initializeKClos();
+	size=0;
 	for (int i =0; i<K; ++i)
 		this->kclos[i] = rhs.kclos[i];
 }
 
 Message::Message(): msgType(NONE)
 {
-	initializeKClos();
+	size = 0;
 }
 
 Message::~Message(){}
@@ -46,6 +46,7 @@ void Message::parse (std::string message)
 	int index = -1;
 	
 	msgType = NONE;
+	msg ="";
 	
 	if ((index=message.find("UI")!= -1))
 	{
@@ -56,7 +57,7 @@ void Message::parse (std::string message)
 	if(msg == "")
 		Message::msg = message;
 	
-	else if (message.find(msgStrings[PING]) != -1)
+	if (message.find(msgStrings[PING]) != -1)
 	{
 		msgType = PING;
 	}
@@ -89,6 +90,7 @@ void Message::parse (std::string message)
 	}
 	else if (message.find(msgStrings[KCLOSEST])!= -1)
 	{
+		msgType = KCLOSEST;
 		message.erase(message.begin(), message.begin()+msgStrings[KCLOSEST].size());
 
 		// "Retrieving the size from the message
@@ -150,14 +152,6 @@ void Message::parse (std::string message)
 	{
 		msgType = PINGRESP;
 	}
-	else if(message.find(msgStrings[FVRESP]) != -1)
-	{
-		msgType = FVRESP;
-	}
-	else if(message.find(msgStrings[STORERESP]) != -1)
-	{
-		msgType = STORERESP;
-	}
 	else if (message.find(msgStrings[FVRESPP])!= -1)
 	{
 		msgType = FVRESPP;
@@ -166,6 +160,15 @@ void Message::parse (std::string message)
 	{
 		msgType = FVRESPN;
 	}
+	else if(message.find(msgStrings[FVRESP]) != -1)
+	{
+		msgType = FVRESP;
+	}
+	else if(message.find(msgStrings[STORERESP]) != -1)
+	{
+		msgType = STORERESP;
+	}
+
 	
 	if(msgType == NONE)
 		msg = "";
@@ -221,22 +224,24 @@ std::string Message::toString(MsgType type, uint32_t ID, bool UI)
 			/// One line is of the form :
 			/// IP   UDPPort   NodeID
 			
-			for (Triple i : kclos)
+			for (int i =0; i<size; ++i)
 			{
 				msg += "\n";
 				
 				// Adding the IP
 				char temp [32];
-				sprintf(temp, "%d", i.address); // convert to string
-				msg += " ";
+				sprintf(temp, "%d", kclos[i].address); // convert to string
+				msg += std::string (temp) + " ";
 				
 				// Adding the UDP Port
-				sprintf(temp, "%d", i.port); // convert to string
-				msg += " ";
+				sprintf(temp, "%d", kclos[i].port); // convert to string
+				msg += std::string (temp)+" ";
 				
 				// Adding the Node ID
-				sprintf(temp, "%d", i.node); // convert to string
+				sprintf(temp, "%d", kclos[i].node); // convert to string
+				msg += std::string (temp);
 			}
+			msg += "\n";
 			
 			break;
 			
@@ -249,7 +254,7 @@ std::string Message::toString(MsgType type, uint32_t ID, bool UI)
 			break;
 			
 		case STORERESP:
-			msg = msgStrings[FINDVALUE];
+			msg = msgStrings[STORERESP];
 			break;
 			
 		case FVRESPP:
@@ -257,7 +262,11 @@ std::string Message::toString(MsgType type, uint32_t ID, bool UI)
 			break;
 			
 		case FVRESPN:
-			msg = msgStrings[FINDVALUE];
+			msg = msgStrings[FVRESPN];
+			break;
+		
+		case NONE:
+			msg="";
 			break;
 			
 		default:
@@ -286,17 +295,6 @@ uint32_t Message::getID()
 	return ID;
 }
 
-void Message::initializeKClos ()
-{
-	for (Triple & i : kclos)
-	{
-		i.port= -1;
-		i.node = -1;
-		i.address = -1;
-	}
-}
-
-
 void Message::setType(MsgType type)
 {
 	this->msgType = type;
@@ -314,6 +312,7 @@ void Message::setUI(bool UI)
 
 void Message::setKClos ( Triple clos [K], uint32_t s)
 {
+	size = s;
 	for (int i =0; i<s; ++i)
 		
 	{

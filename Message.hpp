@@ -27,6 +27,8 @@
 // ========================================================
 enum MsgType { PING, STORE, FINDNODE, FINDVALUE, KCLOSEST, PINGRESP, FVRESP, STORERESP, FVRESPP, FVRESPN, NONE};
 
+// IMPORTANT: This class assumes that anything passed to it is valid. It will not check if the contents in the array are garbage or not, if the size is wrong there is no garantee how the program is going to react.
+
 class Message
 {
 	//Contents of the message
@@ -49,9 +51,7 @@ class Message
 	
 	// This array stores the names of the different types to simplify the parsing
 	const std::string msgStrings [11] = {"PING ", "STORE ", "FINDNODE ", "FINDVALUE ", "KCLOSEST ", "PINGRESP", "FVRESP", "STORERESP", "FVRESPP", "FVRESPN",  "NONE "};
-	
-	void initializeKClos ();
-	
+		
 public:
 	
 	// Default constructor
