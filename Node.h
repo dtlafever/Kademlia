@@ -20,11 +20,11 @@ private:
 	//        MEMBER DATA
 	//---------------------------------------------------------
 
-	uint32_t ID;				//The ID of this computer
+        uint32_t ID;			//The ID of this computer
 	vector<uint32_t> keys;		//The keys of the files stored on this pc
 	RoutingTable routingTable;	//The K-Buckets
- 	bool exit;					//the bool to keep listener ging
-	mutex mut;					//The mutex lock for threads
+ 	bool exit;			//the bool to keep listener ging
+	mutex mut;			//The mutex lock for threads
 	vector<Triple> refreshIP;   // This keeps track of the IPs the refresher is pinging
 	
 	Message curRequest;         // Keeps track of the last request sent by the UI.
@@ -58,14 +58,16 @@ private:
 	
 	//PRE: the node ID we are looking for in our network
 	//POST: Starts by picking ALPHA nodes from the closest non-empty bucket. Then call findNode
-	//      on each of those nodes asyncronously. Nodes that fail to respond quickly (TIME_TO_RESPOND)
-	//      are removed from consideration until and unless they do respond. If these nodes fail to return
-	//      nodes that are closer than the closest we have already seen, resend findNode to another ALPHA number
+	//      on each of those nodes asyncronously. Nodes that fail to respond quickly
+	//      (TIME_TO_RESPOND)  are removed from consideration until and unless they do
+	//      respond. If these nodes fail to return nodes that are closer than the closest we
+	//      have already seen, resend findNode to another ALPHA number
 	//      of nodes from our list up until k times.
 	void nodeLookup(uint32_t nodeID);
 	
 	//PRE: the key of the file we want to lookup
-	//POST: acts the same as the nodeLookup, but now we return true if we can find the key, false otherwise.
+	//POST: acts the same as the nodeLookup, but now we return true if we can find the
+	//      key, false otherwise.
 	bool valueLookup(uint32_t keyID);
 	
 	//PRE: a node ID we want to find in the network
@@ -82,7 +84,7 @@ private:
 	//NOTE: by return we mean sending a message
 	void findValue(uint32_t key);
 	
-public:
+ public:
 	//PRE:
 	//POST: lets create a new network and init this node with 32 empty k buckets and a given id
 	Node(uint32_t nodeID);
@@ -108,7 +110,8 @@ public:
 	bool canSpawn();
 	
 	//PRE:
-	//POST: the thread that handles pinging every node in our k buckets every TIME_TO_PING amount of time
+	//POST: the thread that handles pinging every node in our k buckets every
+	//      TIME_TO_PING amount of time
 	 void refresher_T();
 
 	//PRE:
