@@ -365,7 +365,17 @@ void Node::UITagResponse(Message m, uint32_t ip) {
 //        - we have recieved a ping response from IP
 //        - find where in the routing table this ping request
 //          came from.
-//        - 
+//        - remove that ip from our refreshIP vector
+//        - update the node in the routing table
+//      FINDVALUE:
+//        - check if we have the key and if so, send UI success
+//        - if not, find the kclosest to the node ID
+//        - send the kClosest to the asker
+//      PING:
+//        - send pingResp to the asker
+//      FINDNODE:
+//        - find kclosest to the node ID
+//        - send the kClosest to the asker
 void Node::nonUIResponse(Message & m, uint32_t ip)
 {
 	UDPSocket socket(UDPPORT);
