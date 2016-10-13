@@ -5,6 +5,9 @@
 #define INCLUDE_KBucket
 
 #include "constants.h"
+#include <mutex>
+
+using namespace std;
 
 class KBucket {
 
@@ -12,7 +15,7 @@ class KBucket {
   
   int numTriples;
   Triple* bucket[K];     //each bucket has k triples in it
-                            //ease of moving triples around
+  mutex lock;
 
   //bucket is organized by time last seen, head is least recently, tail is most
 
@@ -28,6 +31,23 @@ class KBucket {
   //Post: bucket is destroyed
   ~KBucket();
 
+  //Pre: This bucket is empty, it is unlocked
+  //Post: This bucket is a deep copy of bucket
+  KBucket(KBucket& otherBucket);
+
+  //Pre: lock is currently unlocked
+  //Post: lock is locked
+  void lockBucket();
+
+  //Pre: lock is currently locked
+  //Post: lock is unlocked
+  void unlockBucket();
+
+  //Pre: The Bucket exists
+  //Post: RV = true if no triples exists in bucket
+  //      otherwise false
+  bool isEmpty();
+  
   //Pre: N/A
   //Post: Prints the contents of the Routing Table
   void printBucket();
@@ -71,15 +91,13 @@ class KBucket {
   //Post: RV = id1 XOR id2
   uint32_t findDist(uint32_t id1, uint32_t id2);
 
-  /*
-  //Pre: The current object exists
-  //Post: The current object is deleted and becomes a deep copy of other
-  KBucket operator= (const KBucket& other);
-  */
-	
-	// PRE:
-	// POST:
-	Triple operator [] (int i);
+  //Pre: 0 <= index < numTriples
+  //Post: RV = a deep copy of bucket[index]
+  Triple operator[] (int index);
+
+  //Pre: This bucket is empty, it is unlocked
+  //Post: This bucket is a deep copy of bucket
+  void operator= (KBucket& otherBucket);
   
 };
 
