@@ -16,7 +16,7 @@ bool sortByDistance(const Quint &lhs,
 
 //PRE: the nodeID we want to set our member data compareID
 //POST: changes the quint.compareID to nodeID
-SnapShot::setCompareID(uint32_t nodeID) {
+void SnapShot::setCompareID(uint32_t nodeID) {
 	compareID = nodeID;
 	for (int i = 0; i < size; i++) {
 		closest[i].compareID = nodeID;
