@@ -20,7 +20,7 @@ private:
 	//        MEMBER DATA
 	//---------------------------------------------------------
 
-        uint32_t ID;			//The ID of this computer
+	uint32_t ID;							//The ID of this computer
 	vector<uint32_t> keys;		//The keys of the files stored on this pc
 	RoutingTable routingTable;	//The K-Buckets
  	bool exit;			//the bool to keep listener ging
@@ -42,6 +42,8 @@ private:
 	//a time_point for waiting until we try and join threads
 	
 	uint32_t getMyID();
+	
+	void joinNetwork(Triple & contact);
 	
  public:
 	//PRE:
