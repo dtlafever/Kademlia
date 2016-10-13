@@ -285,7 +285,7 @@ void Node::listenerLoop()
 //          no more closest. If no more closest, send fail message to UI
 void Node::UITagResponse(Message & m, uint32_t ip) {
 	MsgType type = m.getMsgType();
-	uint32_t key = stoi(m.toString());
+	uint32_t key = atoi(m.toString().c_str());
 	
 	if (type == STORE) {
 		UDPSocket socket(UDPPORT);
@@ -296,21 +296,27 @@ void Node::UITagResponse(Message & m, uint32_t ip) {
 		
 		//TODO: FIND_NODE and get k closest Nodes
 		snap.clear();
-		snap.addClosest(clos, size, key);
+		snap.addClosest(clos, size);
+		snap.setCompareID(key);
 
 		
 		//Send store to the k closest nodes
 		bool isNext = snap.nextExist();
 		for (int i = 0; (i < ALPHA) && isNext; i++) {
 			Message sendMsg(STORE, key);
-			socket.sendMessage(sendMsg, snap.getNext(), UDPPORT);
-			isNext = snap.nextExist(); //TODO: finish this
+			Triple temp;
+			snap.getNext(temp);
+			socket.sendMessage(sendMsg.toString(), temp.address, UDPPORT);
+			isNext = snap.nextExist();
 		}
 		
+		//TODO: we meed to move this to KClosest to check if
+		//      we are done with STORE from UI so we can send
+		//      store to the K closest nodes
 		//Send to UI that store suceeded
-		UDPSocket socketUI(UIPORT);
-		Message sendMsgUI(STORERESP, ID);
-		socketUI.sendMessage(sendMsgUI.toString(), ip, UIPORT);
+		//UDPSocket socketUI(UIPORT);
+		//Message sendMsgUI(STORERESP, ID);
+		//socketUI.sendMessage(sendMsgUI.toString(), ip, UIPORT);
 	}
 	else if (type == FINDVALUE) {
 		
