@@ -59,7 +59,7 @@ class SnapShot{
 	//     as well as its size (not greater than K)
 	//POST: add to the snapshot any items that are closer
 	//      then what we already know, if any
-  void addClosest(Triple * kClos, uint32_t kClosSize);
+  void addClosest(Triple * kClos, uint32_t kClosSize, uint32_t nodeID);
 
 	//PRE: Object defined
 	//POST: set the next closest Triple that doesn't have to our t.

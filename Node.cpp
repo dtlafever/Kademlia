@@ -232,9 +232,6 @@ void Node::listenerLoop()
 //        - if they respond yes, we will send a message to the UI,
 //        - otherwise we will update our k closest until there is
 //          no more closest. If no more closest, send fail message to UI
-
-//POST:
-
 void Node::UITagResponse(Message & m, uint32_t ip) {
 	MsgType type = m.getMsgType();
 	uint32_t key = stoi(m.toString());

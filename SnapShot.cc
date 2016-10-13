@@ -31,13 +31,15 @@ SnapShot::SnapShot(Triple nodes[], uint32_t nodesSize, uint32_t NodeID){
 //     as well as its size (not greater than K)
 //POST: add to the snapshot any items that are closer
 //      then what we already know, if any
-void SnapShot::addClosest(Triple * kClos, uint32_t kClosSize) {
+void SnapShot::addClosest(Triple * kClos, uint32_t kClosSize, 
+	uint32_t nodeID){
   int curKClosIndex = 0;
   //ASSERT: we need to just add to the closest because
   //        we don't have k closest yet in the snapshot
   while ((size < K) && (curKClosIndex < kClosSize)) {
     copyQuintFromTriple(closest[size], kClos[curKClosIndex]);
     closest[size].queried = false;
+		closest[size].compareID = nodeID;
     size++;
     curKClosIndex++;
   }
@@ -54,7 +56,7 @@ void SnapShot::addClosest(Triple * kClos, uint32_t kClosSize) {
       
       copyQuintFromTriple(closest[size - 1], kClos[curKClosIndex]);
       closest[size - 1].queried = false;
-
+			closest[size - 1].compareID = nodeID;
       sort(closest, closest + size, sortByDistance);
     }
     curKClosIndex++;
