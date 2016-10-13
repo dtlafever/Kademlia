@@ -142,6 +142,8 @@ void Node::refresher_T()
 	// i is the Kbucket and j is the element in the k bucket
 	int j=0,i=0;
 	
+	KBucket curKB;
+	
 	// This boolean is set to true once we've traversed the whole routing table.
 	bool done = false;
 	
@@ -150,7 +152,7 @@ void Node::refresher_T()
 		
 		std::this_thread::sleep_for(std::chrono::milliseconds(PINGTIME));
 		
-		sendPing (done, ALPHA, i, j);
+		sendPing (done, ALPHA, curKB, i, j);
 		
 		while (!done)
 		{
@@ -158,7 +160,7 @@ void Node::refresher_T()
 			// check refresh IP to see if some have responded
 			while (refreshIP.size()==ALPHA){};
 			
-			sendPing(done, ALPHA-refreshIP.size(), i ,j);
+			sendPing(done, ALPHA-refreshIP.size(), curKB, i ,j);
 		}
 		
 		j=i=0;
@@ -167,7 +169,7 @@ void Node::refresher_T()
 	
 }
 
-void Node :: sendPing (bool & done, uint32_t numReq, int & i, int &j)
+void Node :: sendPing (bool & done, uint32_t numReq, KBucket & curKB, int & i, int &j)
 {
 	UDPSocket socket(UDPPORT);
 	Message msg (PING);
@@ -177,15 +179,19 @@ void Node :: sendPing (bool & done, uint32_t numReq, int & i, int &j)
 		toSend ="";
 		if(i<NUMBITS)
 		{
-			if(j<routingTable[i].getNumTriples()) // still some triples
+			if(j<curKB.getNumTriples()) // still some triples
 			{
-				Triple temp = routingTable[i][j];
+				Triple temp = curKB[j];
 				socket.sendMessage(msg.toString(), temp.address, UDPPORT);
 				refreshIP.push_back(temp);
+				j++;
 			}
 			else
 			{
 				i++; // we are done with this bucket.
+				j=0;
+				///TODO: Figure out how to copy the KBucket to curKB
+				curKB = routingTable[i];
 				ind --;
 			}
 		}
@@ -293,6 +299,7 @@ void Node::UITagResponse(Message m, uint32_t ip) {
 	UDPSocket socket(UDPPORT);
 	Triple clos[K];
 	Triple temp;
+	curRequest.parse(m.toString()); // TODO: maybe add an assignment operator for Message
 	
 	if (type == STORE)
 	{

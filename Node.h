@@ -143,7 +143,7 @@ private:
 	
 	void nonUITagResponse (Message m);
 	
-	void sendPing (bool & done, uint32_t numReq, int & i, int &j);
+	void  sendPing (bool & done, uint32_t numReq, KBucket & curKB, int & i, int &j);
 
 };
 #endif // !INCLUDE_NODE
