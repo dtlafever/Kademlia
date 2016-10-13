@@ -1,28 +1,51 @@
 #ifndef included_SnapShot
 #define included_SnapShot
 
-#include "Message.hpp"
 #include <utility>
 #include <algorithm>
+#include "constants.h"
+
+struct Quint{
+  uint32_t node;
+  uint32_t address;
+  uint32_t port;
+  uint32_t compareID;
+  bool     queried;
+Quint() : node(-1), address(0), port(0), compareID(0), queried(true) {}
+};
+
+//DEEP copy of from onto to
+static void copyQuint(Quint & to, Quint & from){
+  to.node = from.node;
+  to.address = from.address;
+  to.port = from.port;
+  to.compareID = from.compareID;
+  to.queried = from.queried;
+}
+
+//DEEP copy from Triple onto to Quint
+static void copyQuintFromTriple(Quint & to, Triple & from){
+  to.node = from.node;
+  to.address = from.address;
+  to.port = from.port;
+}
+
+//DEEP copy from Quint onto to Triple
+static void copyTripleFromQuint(Triple & to, Quint & from){
+  to.node = from.node;
+  to.address = from.address;
+  to.port = from.port;
+}
 
 using namespace std;
+
 class SnapShot{
 
  private:
 
-  pair<Triple, bool> closest [K];
+  Quint closest [K];
 
   int size;
-  uint32_t compareID;
-
-	//PRE: two Pair objects we want to compare distances
-	//POST: returns whether lhs's distance is closer than rhs
-	bool sortByDistance(const Pair<Triple, bool> &lhs, 
-											const Pair<Triple, bool> &rhs);
-
-	//PRE: a key we want to find the distance from compareID
-	//POST: returns the bitwise XOR distance from compareID to key
-	uint32_t getDistance(uint32_t key);
   
  public:
 
@@ -52,7 +75,8 @@ class SnapShot{
 	//POST: will set all triples to 0's and all bools to trues
 	void clear();
 	
-
+	void print();
+	
 };
 
 
