@@ -351,7 +351,14 @@ void Node::UITagResponse(Message m, uint32_t ip) {
 }
 
 //PRE: the message we want to read and the UDP IP address
-//POST:
+//POST: Handle the message sent from other nodes
+//      STORE:
+//        - take the key and store it in our keys vector
+//      PINGRESP:
+//        - we have recieved a ping response from IP
+//        - find where in the routing table this ping request
+//          came from.
+//        - 
 void Node::nonUIResponse(Message & m, uint32_t ip)
 {
 	UDPSocket socket(UDPPORT);
@@ -360,7 +367,7 @@ void Node::nonUIResponse(Message & m, uint32_t ip)
 	
 	if (type == STORE) // Store request from another node so we added to out keys.
 	{
-		keys.push_back(stoi(m.toString()));
+		keys.push_back(atoi(m.toString().c_str()));
 	}
 	else if (type == PINGRESP) // Here someone is responding to the Refresher
 	{
@@ -471,10 +478,12 @@ void Node::nonUITagResponse (Message m)
 		snap.clear();
 		
 	}
-	else if( m.getMsgType() == KCLOSEST) // The message is an answer to a store or findvalue and contains the k closest nodes.
+	// The message is an answer to a store or findvalue and contains the k closest nodes.
+	else if( m.getMsgType() == KCLOSEST) 
 	{
-		Triple clos [5]; int size= 0;
-		size= m.getKClos(clos);
+		Triple clos [K]; 
+		int size= 0;
+		size = m.getKClos(clos);
 		
 		snap.addClosest(clos, size);
 		
@@ -485,9 +494,16 @@ void Node::nonUITagResponse (Message m)
 			{
 				Triple next;
 				snap.getNext(next); // check if there is a next triple, if yes if will update the Triple.
-				
-				/// TODO: Check the case where store actually sends findnode...
-				sock.sendMessage(curRequest.toString(), next.address, UDPPORT);
+		
+				//Special case: we are dealing with STORE and we need
+				//              to keep calling FIND_NODE
+				if (curRequest.getMsgType() == STORE) {
+					msg.toString(FINDNODE, curRequest.getID());
+					sock.sendMessage(msg.toString(), next.address, UDPPORT);
+				}
+				else {
+					sock.sendMessage(curRequest.toString(), next.address, UDPPORT);
+				}
 			}
 		}
 		else // The process is finished no more nodes to query.

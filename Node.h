@@ -121,7 +121,7 @@ public:
 	void handler_T( string msg, uint32_t ip);
 
 	//PRE: the message we want to read and the UI IP address
-	//POST: Handle the messages send directly from the UI client
+	//POST: Handle the messages sent directly from the UI client
 	//      STORE:
 	//        - Call find node to find the k closest nodes
 	//          to the key value we want to store
@@ -136,10 +136,16 @@ public:
 	//          no more closest. If no more closest, send fail message to UI
 	void UITagResponse(Message  m, uint32_t ip);
 
+	//PRE:
+	//POST:
 	void nonUIResponse(Message & m, uint32_t ip);
 	
+	//PRE:
+	//POST:
 	void nonUITagResponse (Message m);
 	
+	//PRE:
+	//POST:
 	void sendPing (bool & done, uint32_t numReq, int & i, int &j);
 
 };

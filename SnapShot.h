@@ -44,7 +44,7 @@ class SnapShot{
  private:
 
   Quint closest [K];
-	uint32_t compareID;
+  int32_t compareID;
   int size;
   
  public:
