@@ -14,32 +14,44 @@ bool sortByDistance(const Quint &lhs,
   return (getDistance(lhs.compareID, lhs.node) < getDistance(rhs.compareID, rhs.node));
 }
 
+//PRE: the nodeID we want to set our member data compareID
+//POST: changes the quint.compareID to nodeID
+SnapShot::setCompareID(uint32_t nodeID) {
+	compareID = nodeID;
+	for (int i = 0; i < size; i++) {
+		closest[i].compareID = nodeID;
+	}
+}
+
 //PRE: an array of triples up to nodeSize.
 //     We are assuming the nodes array is sorted
 //POST: Triples from node placed into pair array
-SnapShot::SnapShot(Triple nodes[], uint32_t nodesSize, uint32_t NodeID){
+SnapShot::SnapShot(Triple nodes[], uint32_t nodesSize, uint32_t nodeID){
+	compareID = nodeID;
   for(int i = 0; i < nodesSize; i++){
     copyQuintFromTriple(closest[i], nodes[i]);
     closest[i].queried = false;
-    closest[i].compareID = NodeID;
+    closest[i].compareID = nodeID;
     size++;
   }
 }
 
+SnapShot::SnapShot(uint32_t nodeID) {
+	compareID = nodeID;
+}
 
 //PRE: a k closest array already in closest to least closest order,
 //     as well as its size (not greater than K)
 //POST: add to the snapshot any items that are closer
 //      then what we already know, if any
-void SnapShot::addClosest(Triple * kClos, uint32_t kClosSize, 
-	uint32_t nodeID){
+void SnapShot::addClosest(Triple * kClos, uint32_t kClosSize){
   int curKClosIndex = 0;
   //ASSERT: we need to just add to the closest because
   //        we don't have k closest yet in the snapshot
   while ((size < K) && (curKClosIndex < kClosSize)) {
     copyQuintFromTriple(closest[size], kClos[curKClosIndex]);
     closest[size].queried = false;
-		closest[size].compareID = nodeID;
+		closest[size].compareID = compareID;
     size++;
     curKClosIndex++;
   }
@@ -56,7 +68,7 @@ void SnapShot::addClosest(Triple * kClos, uint32_t kClosSize,
       
       copyQuintFromTriple(closest[size - 1], kClos[curKClosIndex]);
       closest[size - 1].queried = false;
-			closest[size - 1].compareID = nodeID;
+			closest[size - 1].compareID = compareID;
       sort(closest, closest + size, sortByDistance);
     }
     curKClosIndex++;

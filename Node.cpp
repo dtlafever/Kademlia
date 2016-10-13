@@ -244,15 +244,16 @@ void Node::UITagResponse(Message & m, uint32_t ip) {
 		uint32_t size = routingTable.getKClosest(key, clos);
 		
 		//TODO: FIND_NODE and get k closest Nodes
-		snap = SnapShot(clos, size, );
-		
-		Triple snapTriples[K];
-		snap.getTriples(snapTriples);
+		snap.clear();
+		snap.addClosest(clos, size, key);
+
 		
 		//Send store to the k closest nodes
-		for (int i = 0; i < K; i++) {
-			Message sendMsg(STORE, ID);
-			socket.sendMessage(sendMsg, snapTriples[i].address, UDPPORT);
+		bool isNext = snap.nextExist();
+		for (int i = 0; (i < ALPHA) && isNext; i++) {
+			Message sendMsg(STORE, key);
+			socket.sendMessage(sendMsg, snap.getNext(), UDPPORT);
+			isNext = snap.nextExist(); //TODO: finish this
 		}
 		
 		//Send to UI that store suceeded
@@ -300,6 +301,11 @@ void Node::nonUIResponse(Message & m, uint32_t ip) {
 	}
 	else if (type == PINGRESP) {
 		//TODO: update K-bucket with this node being most recently used
+		Triple pingedTriple;
+		for (int i = 0; i < refreshIP; i++) {
+			//TODO: MAKE IS HAPPEN
+		}
+		routingTable.updateTable();
 	}
 	else if (type == FINDVALUE) {
 		uint32_t key = stoi(m.toString());
