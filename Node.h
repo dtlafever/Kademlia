@@ -7,7 +7,7 @@
 #include "Message.hpp"
 #include <mutex>
 #include "SnapShot.h"
-#include <thread>
+#include <future>
 
 
 using namespace std;
@@ -26,7 +26,7 @@ private:
 	SnapShot snap;
 
 	int threadCount; //number of threads owned
-	vector<thread> currentThreads; //a vector to hold all current open threads
+	vector<future<void> > currentThreads; //a vector to hold all current open threads
 	
 	uint32_t getMyID();
 	

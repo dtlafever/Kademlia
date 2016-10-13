@@ -131,63 +131,62 @@ void Node::refresher_T() {
 //      threads
 void Node::listenerLoop()
 {
-	std::string msgUDP;
-	std::string msgUI;
-	
-	uint32_t recvlenUDP;
-	uint32_t recvlenUI;
-	
-	uint32_t ipUI = 0;
-	
-	try
+  std::string msgUDP;
+  std::string msgUI;
+  
+  uint32_t recvlenUDP;
+  uint32_t recvlenUI;
+  
+  uint32_t ipUI = 0;
+  
+  try
+    {
+      UDPSocket socketUDP(UDPPORT);
+      UDPSocket socketUI(UIPORT);
+      
+      for (;;)
 	{
-		UDPSocket socketUDP(UDPPORT);
-		UDPSocket socketUI(UIPORT);
-		
-		for (;;)
-		{
-			//Listening on UI socket
-			recvlenUI = socketUI.recvMessage(msgUI);
-			if (recvlenUI > 0) {
-				//Update the ip for the UI
-				ipUI = socketUI.getRemoteIP();
-
-				//Handler
-				if(canSpawn()){
-				  thread Handler(&Node::handler_T, msgUI, ipUI, this);
-				  currentThreads.push_back(Handler);
-				  threadCount = threadCount + 1;
-				  
-				}				
-			}
-			
-			//Listening on the UDP socket
-			recvlenUDP = socketUDP.recvMessage(msgUDP);
-			if (recvlenUDP > 0)
-			{
-				//TODO: the handing of messages and spawning of threads
-				//ASSERT: we definitely got a message from someone
-				int sendTo = socketUDP.getRemoteIP(); // getting the ip of who
-				// sent the message to us
-				// so we can respond to the
-				// message
-				//send to the heavy lifting thread sendTo, msg
-
-				if(canSpawn()){
-				  thread Handler(&Node::handler_T, msgUDP, sendTo, this);
-				  currentThreads.push_back(Handler);
-				  threadCount = threadCount + 1;
-				  
-				}
-						
-			}
-
-			
-		}
+	  //Listening on UI socket
+	  recvlenUI = socketUI.recvMessage(msgUI);
+	  if (recvlenUI > 0) {
+	    //Update the ip for the UI
+	    ipUI = socketUI.getRemoteIP();
+	    
+	    //Handler
+	    if(canSpawn()){
+	      future<void> Handler = async(&Node::handler_T, msgUI, ipUI, this);
+	      currentThreads.push_back(Handler);
+	      threadCount = threadCount + 1;
+	    }
+	    
+	  }
+	  
+	  //Listening on the UDP socket
+	  recvlenUDP = socketUDP.recvMessage(msgUDP);
+	  if (recvlenUDP > 0)
+	    {
+	      //TODO: the handing of messages and spawning of threads
+	      //ASSERT: we definitely got a message from someone
+	      int sendTo = socketUDP.getRemoteIP(); // getting the ip of who
+	      // sent the message to us
+	      // so we can respond to the
+	      // message
+	      //send to the heavy lifting thread sendTo, msg
+	      
+	      if(canSpawn()){		
+		future<void> Handler = async(&Node::handler_T, msgUDP, sendTo, this);
+		currentThreads.push_back(Handler);
+		threadCount = threadCount + 1;		
+	      }
+	      
+	    }
+	  
+	  
 	}
-	catch (SocketException & e) {
-		printf("ERROR: %s\n", ((char *)(e.description().c_str())));
-	}
+    }
+  catch (SocketException & e) {
+    printf("ERROR: %s\n", ((char *)(e.description().c_str())));
+  }
 }
 
 //PRE: the message we want to read and the UI IP address
