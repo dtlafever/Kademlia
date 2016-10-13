@@ -357,6 +357,9 @@ void Node::nonUIResponse(Message & m, uint32_t ip)
 	UDPSocket socket(UDPPORT);
 	MsgType type = m.getMsgType();
 	Message sendMsg;
+	uint32_t key = m.getID();
+	uint32_t size = 0;
+	Triple clos[K];
 	
 	if (type == STORE) // Store request from another node so we added to out keys.
 	{
@@ -387,42 +390,40 @@ void Node::nonUIResponse(Message & m, uint32_t ip)
 	}
 	else if (type == FINDVALUE)
 	{
-		uint32_t key = atoi(m.toString().c_str());
 		
 		//Send a message to the UI client saying we found the value
 		if (std::find(keys.begin(), keys.end(), key) != keys.end())
 		{
-			Message sendMsg(FVRESP, ID);
+			sendMsg.setType(FVRESP);
 			socket.sendMessage(sendMsg.toString(), ip, UDPPORT);
 		}
-		else {
-			//Send a message to the node asking us for find value
-			Message sendMsg(KCLOSEST, ID);
-			//TODO: send snapshot/K closest of K-closest nodes
-			//NOTE: snapshot because it will be sorted by distance,
-			//      if we iterate through the list and reach a Triple
-			//      that is further than the closest node, stop going
-			//      through the list
-			Triple clos[K];
-			sendMsg.setKClos(clos);
+		else // We don't have the value so we need to return the k closest
+		{
+			
+			// Prepare Message by setting the type to KCLOSEST and set the elements
+			sendMsg.setType(KCLOSEST);
+			
+			// retrieves k closest and actual size
+			size = routingTable.getKClosetNodes(key, clos);
+			sendMsg.setKClos(clos, size);
+			
 			socket.sendMessage(sendMsg.toString(), ip, UDPPORT);
 		}
 	}
-	else if (type == PING) {
-		Message sendMsg(PINGRESP);
+	else if (type == PING) // Someone is checking we are alive
+	{
+		sendMsg.setType(PINGRESP);
 		socket.sendMessage(sendMsg.toString(), ip, UDPPORT);
 	}
-	else if (type == FINDNODE) {
-		Message sendMsg(KCLOSEST, ID);
-		//TODO: send snapshot/K closest of K-closest nodes
-		//NOTE: snapshot because it will be sorted by distance,
-		//      if we iterate through the list and reach a Triple
-		//      that is further than the closest node, stop going
-		//      through the list
+	else if (type == FINDNODE)
+	{
+		// Prepare Message by setting the type to KCLOSEST and set the elements
+		sendMsg.setType(KCLOSEST);
 		
-		Triple clos[K];
-		sendMsg.setKClos(clos);
-		UDPSocket socket(UDPPORT);
+		// retrieves k closest and actual size
+		size = routingTable.getKClosetNodes(key, clos);
+		sendMsg.setKClos(clos, size);
+		
 		socket.sendMessage(sendMsg.toString(), ip, UDPPORT);
 	}
 }
