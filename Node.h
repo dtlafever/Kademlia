@@ -16,18 +16,27 @@ using namespace std;
 class Node{
 	
 private:
+	//---------------------------------------------------------
+	//        MEMBER DATA
+	//---------------------------------------------------------
+
 	uint32_t ID;				//The ID of this computer
 	vector<uint32_t> keys;		//The keys of the files stored on this pc
 	RoutingTable routingTable;	//The K-Buckets
- 	bool exit;
+ 	bool exit;					//the bool to keep listener ging
 	mutex mut;					//The mutex lock for threads
-	vector<Triple> refreshIP; // This keeps track of the IPs the refresher is pinging
+	vector<Triple> refreshIP;   // This keeps track of the IPs the refresher is pinging
 	
-	Message curRequest; // Keeps track of the last request sent by the UI.
+	Message curRequest;         // Keeps track of the last request sent by the UI.
 	
-	SnapShot snap;
+	SnapShot snap;	            // Keeps track of k closest for UI requests.
 
-	int threadCount; //number of threads owned
+	int threadCount;            //number of threads owned
+
+	//---------------------------------------------------------
+	//        PRIVATE FUNCTIONS
+	//---------------------------------------------------------
+
 	vector<future<void> > currentThreads; //a vector to hold all current open threads
 	chrono::system_clock::time_point waitFor;
 	//a time_point for waiting until we try and join threads
@@ -110,6 +119,7 @@ public:
 	//PRE:
 	//POST: recieves messages thread
 	void handler_T( string msg, uint32_t ip);
+
 	//PRE: the message we want to read and the UI IP address
 	//POST: Handle the messages send directly from the UI client
 	//      STORE:
