@@ -205,6 +205,17 @@ void Node::listenerLoop()
   catch (SocketException & e) {
     printf("ERROR: %s\n", ((char *)(e.description().c_str())));
   }
+
+  //TODO: Iterate through current open threads and check if done
+  //Maybe while loop instead?
+  //
+  // for(int i = 0; i < threadCount+1; i++){
+  //   resetTimePoint(); 
+  //   if(future_status::ready == currentThreads[i].wait_until(waitFor)){
+  //     currentThreads[i].get();
+  //   }
+  // }
+
 }
 
 //PRE: the message we want to read and the UI IP address
