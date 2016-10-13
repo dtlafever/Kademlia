@@ -26,8 +26,8 @@ UImain.o: UImain.cc
 test.o: test.cc
 	$(GCC) -c test.cc
 
-test: test.o UDPSocket.o Socket.o
-	$(GCC) test.o UDPSocket.o Socket.o -o test
+test: test.o UDPSocket.o Socket.o Message.o 
+	$(GCC) test.o UDPSocket.o Socket.o Message.o -o test
 
 clean:
 	$(RM) UIerror.o UserInterface.o UImain.o Message.o Socket.o UDPSocket.o UI test.o test

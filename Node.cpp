@@ -213,54 +213,54 @@ void Node::listenerLoop()
 		UDPSocket socketUI(UIPORT);
 		
 		for (;;)
-		{
-	  //Listening on UI socket
-	  recvlenUI = socketUI.recvMessage(msgUI);
-	  if (recvlenUI > 0) {
-			//Update the ip for the UI
-			ipUI = socketUI.getRemoteIP();
-			
-			//Handler
-			if(canSpawn()){
-				future<void> Handler = async(&Node::handler_T, msgUI, ipUI, this);
-				currentThreads.push_back(Handler);
-				threadCount = threadCount + 1;
-			}
-			
-		}
-	  
-	  //Listening on the UDP socket
-	  recvlenUDP = socketUDP.recvMessage(msgUDP);
-	  if (recvlenUDP > 0)
-		{
+		  {
+		    //Listening on UI socket
+		    recvlenUI = socketUI.recvMessage(msgUI);
+		    if (recvlenUI > 0) {
+		      //Update the ip for the UI
+		      ipUI = socketUI.getRemoteIP();
+		      
+		      //Handler
+		      if(canSpawn()){
+			future<void> Handler = async(&Node::handler_T, msgUI, ipUI, this);
+			currentThreads.push_back(Handler);
+			threadCount = threadCount + 1;
+		      }
+		      
+		    }
+		    
+		    //Listening on the UDP socket
+		    recvlenUDP = socketUDP.recvMessage(msgUDP);
+		    if (recvlenUDP > 0){
+		      
 			//TODO: the handing of messages and spawning of threads
 			//ASSERT: we definitely got a message from someone
 			int sendTo = socketUDP.getRemoteIP(); // getting the ip of who
-																						// sent the message to us
-																						// so we can respond to the
-																						// message
-																						//send to the heavy lifting thread sendTo, msg
+			// sent the message to us
+			// so we can respond to the
+			// message
+			//send to the heavy lifting thread sendTo, msg
 			
 			if(canSpawn()){
-				future<void> Handler = async(&Node::handler_T, msgUDP, sendTo, this);
-				currentThreads.push_back(Handler);
-				threadCount = threadCount + 1;
-				
+			  future<void> Handler = async(&Node::handler_T, msgUDP, sendTo, this);
+			  currentThreads.push_back(Handler);
+			  threadCount = threadCount + 1;
+			  
 			}
 			
-		}
-	  
-	  
-		}
+		    }
+		    
+		    
+		  }
 	}
 	catch (SocketException & e) {
-		printf("ERROR: %s\n", ((char *)(e.description().c_str())));
+	  printf("ERROR: %s\n", ((char *)(e.description().c_str())));
 	}
 	
 	//TODO: Iterate through current open threads and check if done
 	//Maybe while loop instead?
 	//
-	// for(int i = 0; i < threadCount+1; i++){
+	// for(int i = 0; i < threadCount; i++){
 	//   resetTimePoint();
 	//   if(future_status::ready == currentThreads[i].wait_until(waitFor)){
 	//     currentThreads[i].get();

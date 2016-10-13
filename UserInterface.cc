@@ -53,7 +53,7 @@ void UserInterface::runUI(){
 	  recNum = UIsocket.recvMessage(receivedMessage);
 	}
 
-	//handleMessage(receivedMessage);
+	handleMessage(receivedMessage);
       }
 
       
@@ -167,6 +167,9 @@ string UserInterface::findKey(uint32_t ID){
 //      or failure.
 void UserInterface::handleMessage(string newMsg){
   Message receivedMsg(newMsg);
+  string rec = receivedMsg.toString();
+  cout << "rec: " << rec << endl;
+  
   if(receivedMsg.getMsgType() == STORERESP){
     //ASSERT: Store was successful
     cout << "Success!" << endl;
