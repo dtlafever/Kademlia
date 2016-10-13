@@ -77,26 +77,13 @@ Triple* RoutingTable::createTriple(uint32_t id, uint32_t address) {
 //           false otherwise
 bool RoutingTable::addNode(uint32_t node, uint32_t address) {
   int nthBucket = findKBucket(node);
-
-  //Is there a better way to do this
   KBucket* currBucket = &(meBuckets[nthBucket]);
-
   Triple* currTriple = currBucket->getHead();
   bool added = false;
   Triple* newTriple = createTriple(node, address);
   if (currBucket->getNumTriples() == K) {  //the bucket is full
     printf("Rout addNode: bucketOverFlow \n");
-    // bool dead = ping(curTriple.address);
-    //    bool dead = true;
-    bool dead = false;
-    if (dead) {
-      currBucket->deleteNode(currTriple->node);
-      currBucket->addNode(newTriple);
-      added = true;
-    }
-    else { //Move the alive node to the tail of the bucket
-      currBucket->adjustNode(currTriple->node);
-    }
+    currBucket->deleteNode(currTriple->node);
   }
   else {
     printf("Rout addNode: bucket not full \n");
@@ -123,7 +110,6 @@ void RoutingTable::updateTable(uint32_t nodeID) {
 
 //Pre: 0 <= index < NUMBITS
 //Post: RV = meBuckets[index]
-KBucket RoutingTable::operator [] (int index)
-{
-  return meBuckets[index];
+KBucket RoutingTable::operator [] (int index) {
+  return (meBuckets[i]);
 }
