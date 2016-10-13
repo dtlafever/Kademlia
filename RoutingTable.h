@@ -12,8 +12,8 @@ class RoutingTable {
 
  private:
   
-  uint32_t myId;	
-  KBucket meBuckets[K];
+  uint32_t myId;
+  KBucket meBuckets[NUMBITS];
 
   //Pre: id1 and id2 are two identifiers
   //Post: RV = id1 XOR id2
@@ -34,17 +34,12 @@ class RoutingTable {
   //Post: meBuckets is an array of K kBuckets, that are each empty
   RoutingTable(uint32_t id);
 
-  /*
-  //Pre: The respected node is going poof
-  //Post: deletes each kBucket
-  ~RoutingTable();
-  */
-	
-  //Pre: target is some id, closeNodes is an array of K -1's
-  //Post: RV = array of the K closest nodes to the target
+  //Pre: target is some id, closeNodes is an array Triples with node = -1
+  //Post: closeNodes = array of the K closest nodes to the target
   //      Less than K are returned iff less than K nodes are in the table
   //      The list is ordered by distance, that is, the closest node is
   //      at the head
+  //      RV = number nodes in closeNodes
   int getKClosetNodes(uint32_t target, Triple* closeNodes);
 
   //Pre: nodeID exists in the table, and is known to be dead
@@ -66,8 +61,9 @@ class RoutingTable {
   //Post: Prints the contents of the Routing Table
   void printTable();
 	
-	// Takes the index to
-	KBucket operator [] (int i);
+  //Pre: 0 <= index < NUMBITS
+  //Post: RV = meBuckets[index]
+  KBucket operator [] (int index);
 	
 };
 

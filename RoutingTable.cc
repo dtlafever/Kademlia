@@ -20,7 +20,7 @@ RoutingTable::RoutingTable(uint32_t id) {
 //Post: Prints the contents of the Routing Table
 void RoutingTable::printTable() {
   printf("Routing Table \n \n");
-  for (int index = 0; (index < K); index++) {
+  for (int index = 0; (index < NUMBITS); index++) {
     printf("nthBucket: %d \n", index);
     meBuckets[index].printBucket();
   }
@@ -55,7 +55,7 @@ int RoutingTable::findKBucket(uint32_t id) {
 //      RV = number nodes in closeNodes
 int RoutingTable::getKClosetNodes(uint32_t target, Triple* closeNodes) {
   int size = 0;
-  for (int index = 0; (index < K); index++) {
+  for (int index = 0; (index < NUMBITS); index++) {
     meBuckets[index].getKClosestNodes(target, closeNodes, size);
   }
   return (size);
@@ -121,8 +121,8 @@ void RoutingTable::updateTable(uint32_t nodeID) {
   meBuckets[myKBucket].adjustNode(nodeID);
 }
 
-
-KBucket RoutingTable::operator [] (int i)
-{
-	return meBuckets[i];
+//Pre: 0 <= index < NUMBITS
+//Post: RV = meBuckets[index]
+KBucket RoutingTable::operator [] (int index) {
+  return meBuckets[i];
 }
