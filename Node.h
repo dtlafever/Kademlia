@@ -29,6 +29,8 @@ private:
 
 	int threadCount; //number of threads owned
 	vector<future<void> > currentThreads; //a vector to hold all current open threads
+	chrono::system_clock::time_point waitFor;
+	//a time_point for waiting until we try and join threads
 	
 	uint32_t getMyID();
 	
@@ -85,6 +87,11 @@ public:
 	//---------------------------------------------------------------------------------
 	//            THREAD FUNCTIONS
 	//---------------------------------------------------------------------------------
+
+	//PRE: duration and now 
+	//POST: given the current time and our duration time, add them
+	//      together to get the new timepoint we wait for.
+	void resetTimePoint();
 
 	//PRE: Object defined. threadCount is member data.
 	//POST: RV is true iff threadCount with the new thread added is less

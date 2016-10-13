@@ -76,6 +76,8 @@ Node::Node(uint32_t nodeID) : routingTable(nodeID)
 {
 	ID = nodeID;
 	exit = false;
+
+	threadCount = 0;
 	
 }
 
@@ -95,12 +97,27 @@ Node::Node(uint32_t nodeID, uint32_t contactID, uint32_t contactIP,
 	MsgType t = FINDNODE;
 	Message msg(t, nodeID);
 	socket.sendMessage(msg.toString(), contactIP, contactPort);
+
+	threadCount = 0;
 	
 }
 
 //---------------------------------------------------------------------------------
 //            THREAD FUNCTIONS
 //---------------------------------------------------------------------------------
+
+
+//PRE: duration and now 
+//POST: given the current time and our duration time, add them
+//      together to get the new timepoint we wait for.
+void Node::resetTimePoint(){
+  chrono::system_clock::time_point currentTime = chrono::system_clock::now();
+  chrono::duration<int, milli>durationTime(20);
+
+  waitFor = currentTime + durationTime;
+
+}
+
 
 //PRE: Object defined. threadCount is member data.
 //POST: RV is true iff threadCount with the new thread added is less
