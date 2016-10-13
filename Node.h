@@ -130,6 +130,8 @@ public:
 	void nonUIResponse(Message & m, uint32_t ip);
 	
 	void nonUITagResponse (Message m);
+	
+	void sendPing (bool & done, uint32_t numReq, int & i, int &j);
 
 };
 #endif // !INCLUDE_NODE
