@@ -203,3 +203,16 @@ KBucket KBucket::operator= (const KBucket& other) {
   return (*this);
 
   } */
+
+Triple KBucket::operator[](int i)
+{
+	Triple temp;
+	temp.node = -1;
+	temp.port= -1;
+	temp.address = -1;
+	
+	if(i<numTriples)
+		return *(bucket[i]);
+	else return temp;
+}
+

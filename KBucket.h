@@ -76,6 +76,10 @@ class KBucket {
   //Post: The current object is deleted and becomes a deep copy of other
   KBucket operator= (const KBucket& other);
   */
+	
+	// PRE:
+	// POST:
+	Triple operator [] (int i);
   
 };
 

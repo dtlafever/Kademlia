@@ -1,8 +1,8 @@
 #include "Node.h"
 #include "UDPSocket.h"
-#include "Message.hpp"
 #include "SocketException.h"
 #include <algorithm>
+#include <chrono>
 
 //---------------------------------------------------------------------------------
 //            PRIVATE FUNCTIONS
@@ -44,7 +44,7 @@ void Node::nodeLookup(uint32_t nodeID) {
 //PRE: the key of the file we want to lookup
 //POST: acts the same as the nodeLookup, but now we return true if we can find the key, false otherwise.
 bool Node::valueLookup(uint32_t keyID) {
-	
+	return 1;
 }
 
 //PRE: a node ID we want to find in the network
@@ -134,12 +134,63 @@ bool Node::canSpawn(){
 //PRE:
 //POST: the thread that handles pinging every node in our k buckets
 //      every TIME_TO_PING amount of time
-void Node::refresher_T() {
+void Node::refresher_T()
+{
+	// i is the Kbucket and j is the element in the k bucket
+	int j=0,i=0;
+	
+	// This boolean is set to true once we've traversed the whole routing table.
+	bool done = false;
+
+	while (true)
+ 	{
+		
+		std::this_thread::sleep_for(std::chrono::milliseconds(PINGTIME));
+		
+		sendPing (done, ALPHA);
+		
+		while (!done)
+		{
+			
+			// check refresh IP to see if some have responded
+			while (refreshIP.size()==ALPHA){};
+			
+			sendPing(done, ALPHA-refreshIP.size());
+		}
+		
+		j=i=0;
+		
+	}
+
+}
+
+void Node :: sendPing (bool & done, uint32_t numReq, int & i, int &j)
+{
 	UDPSocket socket(UDPPORT);
-	
-	mut.lock();
-	
-	mut.unlock();
+	Message msg (PING);
+	string toSend;
+	for (int ind=0; ind<numReq && done; ++ind)
+	{
+		toSend ="";
+		if(i<NUMBITS)
+		{
+			if(j<routingTable[i].getNumTriples()) // still some triples
+			{
+				Triple temp = routingTable[i][j];
+				socket.sendMessage(msg.toString(), temp.address, UDPPORT);
+				refreshIP.push_back(temp.address);
+			}
+			else
+			{
+				i++; // we are done with this bucket.
+				ind --;
+			}
+		}
+		else // no more KBuckets
+		{
+			done = true;
+		}
+	}
 }
 
 //PRE:

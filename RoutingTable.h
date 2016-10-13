@@ -66,6 +66,9 @@ class RoutingTable {
   //Post: Prints the contents of the Routing Table
   void printTable();
 	
+	// Takes the index to
+	KBucket operator [] (int i);
+	
 };
 
 #endif

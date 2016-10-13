@@ -21,7 +21,7 @@ private:
 	RoutingTable routingTable;	//The K-Buckets
  	bool exit;
 	mutex mut;					//The mutex lock for threads
-	vector<int> refreshIP; // This keeps track of the IPs the refresher is pinging
+	vector<uint32_t> refreshIP; // This keeps track of the IPs the refresher is pinging
 	
 	Message curRequest; // Keeps track of the last request sent by the UI.
 	
