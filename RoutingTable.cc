@@ -120,3 +120,9 @@ void RoutingTable::updateTable(uint32_t nodeID) {
   int myKBucket = findKBucket(nodeID);
   meBuckets[myKBucket].adjustNode(nodeID);
 }
+
+
+KBucket RoutingTable::operator [] (int i)
+{
+	return meBuckets[i];
+}

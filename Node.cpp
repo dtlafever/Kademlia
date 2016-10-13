@@ -1,8 +1,8 @@
 #include "Node.h"
 #include "UDPSocket.h"
-#include "Message.hpp"
 #include "SocketException.h"
 #include <algorithm>
+#include <chrono>
 
 //---------------------------------------------------------------------------------
 //            PRIVATE FUNCTIONS
@@ -44,7 +44,7 @@ void Node::nodeLookup(uint32_t nodeID) {
 //PRE: the key of the file we want to lookup
 //POST: acts the same as the nodeLookup, but now we return true if we can find the key, false otherwise.
 bool Node::valueLookup(uint32_t keyID) {
-	
+	return 1;
 }
 
 //PRE: a node ID we want to find in the network
@@ -72,11 +72,11 @@ void Node::findValue(uint32_t key) {
 //PRE:
 //POST: lets create a new network and init this node with 32 empty k buckets and a given id
 
-Node::Node(uint32_t nodeID) : routingTable(nodeID)
+Node::Node(uint32_t nodeID) : routingTable(nodeID), snap(nodeID)
 {
 	ID = nodeID;
 	exit = false;
-
+	
 	threadCount = 0;
 	
 }
@@ -85,7 +85,7 @@ Node::Node(uint32_t nodeID) : routingTable(nodeID)
 //POST: create a given id that is unique in this network, create our 32 k buckets that
 //      correspond to the network
 Node::Node(uint32_t nodeID, uint32_t contactID, uint32_t contactIP,
-					 uint32_t contactPort) : routingTable(nodeID)
+					 uint32_t contactPort) : routingTable(nodeID), snap(nodeID)
 {
 	ID = nodeID;
 	exit = false;
@@ -97,7 +97,7 @@ Node::Node(uint32_t nodeID, uint32_t contactID, uint32_t contactIP,
 	MsgType t = FINDNODE;
 	Message msg(t, nodeID);
 	socket.sendMessage(msg.toString(), contactIP, contactPort);
-
+	
 	threadCount = 0;
 	
 }
@@ -107,15 +107,15 @@ Node::Node(uint32_t nodeID, uint32_t contactID, uint32_t contactIP,
 //---------------------------------------------------------------------------------
 
 
-//PRE: duration and now 
+//PRE: duration and now
 //POST: given the current time and our duration time, add them
 //      together to get the new timepoint we wait for.
 void Node::resetTimePoint(){
-  chrono::system_clock::time_point currentTime = chrono::system_clock::now();
-  chrono::duration<int, milli>durationTime(20);
-
-  waitFor = currentTime + durationTime;
-
+	chrono::system_clock::time_point currentTime = chrono::system_clock::now();
+	chrono::duration<int, milli>durationTime(20);
+	
+	waitFor = currentTime + durationTime;
+	
 }
 
 
@@ -123,23 +123,74 @@ void Node::resetTimePoint(){
 //POST: RV is true iff threadCount with the new thread added is less
 //      than MAXTHREADS. Otherwise, RV is false.
 bool Node::canSpawn(){
-  bool allowed = false;
-  if( (threadCount + 1) < MAXTHREADS){
-    allowed = true;
-  }
-  return(allowed);
+	bool allowed = false;
+	if( (threadCount + 1) < MAXTHREADS){
+		allowed = true;
+	}
+	return(allowed);
 }
 
 
 //PRE:
 //POST: the thread that handles pinging every node in our k buckets
 //      every TIME_TO_PING amount of time
-void Node::refresher_T() {
+void Node::refresher_T()
+{
+	// i is the Kbucket and j is the element in the k bucket
+	int j=0,i=0;
+	
+	// This boolean is set to true once we've traversed the whole routing table.
+	bool done = false;
+	
+	while (true)
+	{
+		
+		std::this_thread::sleep_for(std::chrono::milliseconds(PINGTIME));
+		
+		sendPing (done, ALPHA, i, j);
+		
+		while (!done)
+		{
+			
+			// check refresh IP to see if some have responded
+			while (refreshIP.size()==ALPHA){};
+			
+			sendPing(done, ALPHA-refreshIP.size(), i ,j);
+		}
+		
+		j=i=0;
+		
+	}
+	
+}
+
+void Node :: sendPing (bool & done, uint32_t numReq, int & i, int &j)
+{
 	UDPSocket socket(UDPPORT);
-	
-	mut.lock();
-	
-	mut.unlock();
+	Message msg (PING);
+	string toSend;
+	for (int ind=0; ind<numReq && done; ++ind)
+	{
+		toSend ="";
+		if(i<NUMBITS)
+		{
+			if(j<routingTable[i].getNumTriples()) // still some triples
+			{
+				Triple temp = routingTable[i][j];
+				socket.sendMessage(msg.toString(), temp.address, UDPPORT);
+				refreshIP.push_back(temp.address);
+			}
+			else
+			{
+				i++; // we are done with this bucket.
+				ind --;
+			}
+		}
+		else // no more KBuckets
+		{
+			done = true;
+		}
+	}
 }
 
 //PRE:
@@ -148,74 +199,74 @@ void Node::refresher_T() {
 //      threads
 void Node::listenerLoop()
 {
-  std::string msgUDP;
-  std::string msgUI;
-  
-  uint32_t recvlenUDP;
-  uint32_t recvlenUI;
-  
-  uint32_t ipUI = 0;
-  
-  try
-    {
-      UDPSocket socketUDP(UDPPORT);
-      UDPSocket socketUI(UIPORT);
-      
-      for (;;)
+	std::string msgUDP;
+	std::string msgUI;
+	
+	uint32_t recvlenUDP;
+	uint32_t recvlenUI;
+	
+	uint32_t ipUI = 0;
+	
+	try
 	{
+		UDPSocket socketUDP(UDPPORT);
+		UDPSocket socketUI(UIPORT);
+		
+		for (;;)
+		{
 	  //Listening on UI socket
 	  recvlenUI = socketUI.recvMessage(msgUI);
 	  if (recvlenUI > 0) {
-	    //Update the ip for the UI
-	    ipUI = socketUI.getRemoteIP();
-	    
-	    //Handler
-	    if(canSpawn()){
-	      future<void> Handler = async(&Node::handler_T, msgUI, ipUI, this);
-	      currentThreads.push_back(Handler);
-	      threadCount = threadCount + 1;
-	    }
-	    
-	  }
+			//Update the ip for the UI
+			ipUI = socketUI.getRemoteIP();
+			
+			//Handler
+			if(canSpawn()){
+				future<void> Handler = async(&Node::handler_T, msgUI, ipUI, this);
+				currentThreads.push_back(Handler);
+				threadCount = threadCount + 1;
+			}
+			
+		}
 	  
 	  //Listening on the UDP socket
 	  recvlenUDP = socketUDP.recvMessage(msgUDP);
 	  if (recvlenUDP > 0)
-	    {
-	      //TODO: the handing of messages and spawning of threads
-	      //ASSERT: we definitely got a message from someone
-	      int sendTo = socketUDP.getRemoteIP(); // getting the ip of who
-	      // sent the message to us
-	      // so we can respond to the
-	      // message
-	      //send to the heavy lifting thread sendTo, msg
-	      
-	      if(canSpawn()){		
-		future<void> Handler = async(&Node::handler_T, msgUDP, sendTo, this);
-		currentThreads.push_back(Handler);
-		threadCount = threadCount + 1;
-		
-	      }
-	      
-	    }
+		{
+			//TODO: the handing of messages and spawning of threads
+			//ASSERT: we definitely got a message from someone
+			int sendTo = socketUDP.getRemoteIP(); // getting the ip of who
+																						// sent the message to us
+																						// so we can respond to the
+																						// message
+																						//send to the heavy lifting thread sendTo, msg
+			
+			if(canSpawn()){
+				future<void> Handler = async(&Node::handler_T, msgUDP, sendTo, this);
+				currentThreads.push_back(Handler);
+				threadCount = threadCount + 1;
+				
+			}
+			
+		}
 	  
 	  
+		}
 	}
-    }
-  catch (SocketException & e) {
-    printf("ERROR: %s\n", ((char *)(e.description().c_str())));
-  }
-
-  //TODO: Iterate through current open threads and check if done
-  //Maybe while loop instead?
-  //
-  // for(int i = 0; i < threadCount+1; i++){
-  //   resetTimePoint(); 
-  //   if(future_status::ready == currentThreads[i].wait_until(waitFor)){
-  //     currentThreads[i].get();
-  //   }
-  // }
-
+	catch (SocketException & e) {
+		printf("ERROR: %s\n", ((char *)(e.description().c_str())));
+	}
+	
+	//TODO: Iterate through current open threads and check if done
+	//Maybe while loop instead?
+	//
+	// for(int i = 0; i < threadCount+1; i++){
+	//   resetTimePoint();
+	//   if(future_status::ready == currentThreads[i].wait_until(waitFor)){
+	//     currentThreads[i].get();
+	//   }
+	// }
+	
 }
 
 //PRE: the message we want to read and the UI IP address
@@ -405,24 +456,25 @@ void Node::nonUITagResponse (Message m)
 			Triple next;
 			snap.getNext(next); // check if there is a next triple, if yes if will update the Triple.
 			sock.sendMessage(curRequest.toString(), next.address, UDPPORT);
-	
+			
 		}
 		
-		}
-		else // The process is finished no more nodes to query.
-		{
-			// Send back a response to the UI
-			snap.clear();
-			if(curRequest.getMsgType()== STORE)
-				msg.setType(STORERESP);
-			
-			else if(curRequest.getMsgType() == FINDVALUE)
-				msg.setType(FVRESPN);
-			
-			// Respond directly to UI
-			sock.sendMessage(msg, "localhost", UIPORT);
-			
-		}
+		/// TODO: Check this part again.
+		if(!snap.nextExist()) // The process is finished no more nodes to query.
+			{
+				// Send back a response to the UI
+				snap.clear();
+				if(curRequest.getMsgType()== STORE)
+					msg.setType(STORERESP);
+				
+				else if(curRequest.getMsgType() == FINDVALUE)
+					msg.setType(FVRESPN);
+				
+				// Respond directly to UI
+				sock.sendMessage(msg, "localhost", UIPORT);
+				
+			}
+		
 	}
 	else printf("Error in response format or parsing \n");
 }

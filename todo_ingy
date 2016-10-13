@@ -10,7 +10,7 @@ Todo:
 
 - Finish nonUITagResponse
 - Update comments in Message.cpp
-- K closest message type should only include valid triples.
+- Update comments in Node.h, Node.cpp, RoutingTable.h, .cpp, KBucket.h, .cpp
 
 
 Notes:
