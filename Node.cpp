@@ -117,10 +117,12 @@ bool Node::canSpawn(){
 //PRE:
 //POST: the thread that handles pinging every node in our k buckets
 //      every TIME_TO_PING amount of time
-void Node::refresher_T()
-{
+void Node::refresher_T() {
 	UDPSocket socket(UDPPORT);
 	
+	mut.lock();
+	
+	mut.unlock();
 }
 
 //PRE:
@@ -174,7 +176,8 @@ void Node::listenerLoop()
 	      if(canSpawn()){		
 		future<void> Handler = async(&Node::handler_T, msgUDP, sendTo, this);
 		currentThreads.push_back(Handler);
-		threadCount = threadCount + 1;		
+		threadCount = threadCount + 1;
+		
 	      }
 	      
 	    }
