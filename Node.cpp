@@ -3,6 +3,8 @@
 #include "SocketException.h"
 #include <algorithm>
 #include <chrono>
+#include <stdlib.h>
+#include <iostream>
 
 //---------------------------------------------------------------------------------
 //            PRIVATE FUNCTIONS
@@ -136,6 +138,7 @@ bool Node::canSpawn(){
 //      every TIME_TO_PING amount of time
 void Node::refresher_T()
 {
+	// TODO: We need to keep timers for all messages sent
 	// i is the Kbucket and j is the element in the k bucket
 	int j=0,i=0;
 	
@@ -283,20 +286,17 @@ void Node::listenerLoop()
 //        - if they respond yes, we will send a message to the UI,
 //        - otherwise we will update our k closest until there is
 //          no more closest. If no more closest, send fail message to UI
-void Node::UITagResponse(Message & m, uint32_t ip) {
+void Node::UITagResponse(Message m, uint32_t ip) {
 	MsgType type = m.getMsgType();
-	uint32_t key = atoi(m.toString().c_str());
 	uint32_t key = m.getID();
 	uint32_t size=0;
-	
+	UDPSocket socket(UDPPORT);
+	Triple clos[K];
+	Triple temp;
+
 	if (type == STORE)
 	{
-		UDPSocket socket(UDPPORT);
-		
-		Triple clos[K];
 		size = routingTable.getKClosetNodes(key, clos); // retrieves k closest and actual size
-		
-		snap.setCompareID(key);
 		
 		// What I did : I got the Kclosest from the Routing Table, I get the ID we are checking for from the message because it's a STORE. I set the key of the snapshot.
 		
@@ -308,7 +308,6 @@ void Node::UITagResponse(Message & m, uint32_t ip) {
 		for (int i = 0; (i < ALPHA) && snap.nextExist(); i++)
 		{
 			Message sendMsg(STORE, key);
-			Triple temp;
 			snap.getNext(temp);
 			socket.sendMessage(sendMsg.toString(), temp.address, UDPPORT);
 		}
@@ -321,33 +320,32 @@ void Node::UITagResponse(Message & m, uint32_t ip) {
 		//Message sendMsgUI(STORERESP, ID);
 		//socketUI.sendMessage(sendMsgUI.toString(), ip, UIPORT);
 	}
-	else if (type == FINDVALUE) {
-		
-		uint32_t key = stoi(m.toString());
+	else if (type == FINDVALUE)
+	{
 		
 		//Send a message to the UI client saying we found the value
-		if (std::find(keys.begin(), keys.end(), key) != keys.end()) {
+		if (std::find(keys.begin(), keys.end(), key) != keys.end())
+		{
 			Message sendMsg(FVRESPP, ID);
 			UDPSocket socket(UIPORT);
 			socket.sendMessage(sendMsg.toString(), ip, UDPPORT);
 		}
-		else { //Send a message to the node asking us for find value
-			Message sendMsg(KCLOSEST, ID);
-			//TODO: send snapshot/K closest of K-closest nodes
-			//NOTE: snapshot because it will be sorted by distance,
-			//      if we iterate through the list and reach a Triple
-			//      that is further than the closest node, stop going
-			//      through the list
-			Triple clos[K];
-			//TODO: do alpha at a time for this thingy
-			/*sendMsg.setKClos(clos);
-			 UDPSocket socket(UDPPORT);
-			 socket.sendMessage(sendMsg.toString(), ip, UDPPORT);*/
+		else //Send a message to the node asking us for find value
+		{
 			
-			//We get to the end, no one has value
-			Message sendMsgUI(FVRESPN, ID);
-			UDPSocket socket(UIPORT);
-			socket.sendMessage(sendMsg.toString(), ip, UDPPORT);
+			/// Initializing snapshot
+			size = routingTable.getKClosetNodes(key, clos); // retrieves k closest and actual size
+			snap.clear();
+			snap.addClosest(clos, size);
+			snap.setCompareID(key);
+
+			///Send the FindValue request to Alpha nodes to the k closest nodes
+			for (int i = 0; (i < ALPHA) && snap.nextExist(); i++)
+			{
+				snap.getNext(temp);
+				socket.sendMessage(m.toString(), temp.address, UDPPORT);
+			}
+			
 		}
 	}
 }
@@ -356,31 +354,49 @@ void Node::UITagResponse(Message & m, uint32_t ip) {
 //POST:
 void Node::nonUIResponse(Message & m, uint32_t ip)
 {
+	UDPSocket socket(UDPPORT);
 	MsgType type = m.getMsgType();
-	if (type == STORE)
+	Message sendMsg;
+	
+	if (type == STORE) // Store request from another node so we added to out keys.
 	{
 		keys.push_back(stoi(m.toString()));
 	}
-	else if (type == PINGRESP)
+	else if (type == PINGRESP) // Here someone is responding to the Refresher
 	{
-		//TODO: update K-bucket with this node being most recently used
-		Triple pingedTriple;
-		for (int i = 0; i < refreshIP; i++)
+		bool found = false;
+		
+		// Find from which node the response came
+		for (int i = 0; i < refreshIP.size() && !found; i++)
 		{
-			//TODO: MAKE IS HAPPEN
+			if(refreshIP[i].address == ip)
+			{
+				found = true;
+				// TODO: We need a function to update  node in the K-bucket that responded
+				// void RoutingTable::refreshNode (Triple & newTriple);
+				// The function will move it to the tail or the most recently used spot.
+				routingTable.updateTable(refreshIP[i].node);
+					cout << "Error Finding Node to refresh "<<endl;
+					
+				refreshIP.erase(refreshIP.begin()+i);
+			}
 		}
-		routingTable.updateTable();
+		
+		if(!found) cout << "Invalid PING response" << endl;
+	
 	}
-	else if (type == FINDVALUE) {
-		uint32_t key = stoi(m.toString());
+	else if (type == FINDVALUE)
+	{
+		uint32_t key = atoi(m.toString().c_str());
 		
 		//Send a message to the UI client saying we found the value
-		if (std::find(keys.begin(), keys.end(), key) != keys.end()) {
+		if (std::find(keys.begin(), keys.end(), key) != keys.end())
+		{
 			Message sendMsg(FVRESP, ID);
-			UDPSocket socket(UDPPORT);
 			socket.sendMessage(sendMsg.toString(), ip, UDPPORT);
 		}
-		else { //Send a message to the node asking us for find value
+		else {
+			//Send a message to the node asking us for find value
 			Message sendMsg(KCLOSEST, ID);
 			//TODO: send snapshot/K closest of K-closest nodes
 			//NOTE: snapshot because it will be sorted by distance,
@@ -389,13 +405,11 @@ void Node::nonUIResponse(Message & m, uint32_t ip)
 			//      through the list
 			Triple clos[K];
 			sendMsg.setKClos(clos);
-			UDPSocket socket(UDPPORT);
 			socket.sendMessage(sendMsg.toString(), ip, UDPPORT);
 		}
 	}
 	else if (type == PING) {
-		Message sendMsg(PINGRESP, ID);
-		UDPSocket socket(UDPPORT);
+		Message sendMsg(PINGRESP);
 		socket.sendMessage(sendMsg.toString(), ip, UDPPORT);
 	}
 	else if (type == FINDNODE) {
@@ -413,8 +427,8 @@ void Node::nonUIResponse(Message & m, uint32_t ip)
 	}
 }
 
-//PRE:
-//POST: recieves messages thread
+//PRE: Takes the message received and the incoming IP from the Listener.
+//POST: This thread does most of the work and ensures that the protocol steps are fulfilled. If the message is faulty and parsed to NONE, the function should end and discard the message.
 void Node::handler_T( string msg, uint32_t ip)
 {
 	Message m(msg);

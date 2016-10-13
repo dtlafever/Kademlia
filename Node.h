@@ -21,7 +21,7 @@ private:
 	RoutingTable routingTable;	//The K-Buckets
  	bool exit;
 	mutex mut;					//The mutex lock for threads
-	vector<uint32_t> refreshIP; // This keeps track of the IPs the refresher is pinging
+	vector<Triple> refreshIP; // This keeps track of the IPs the refresher is pinging
 	
 	Message curRequest; // Keeps track of the last request sent by the UI.
 	
@@ -124,7 +124,7 @@ public:
 	//        - if they respond yes, we will send a message to the UI,
 	//        - otherwise we will update our k closest until there is
 	//          no more closest. If no more closest, send fail message to UI
-	void UITagResponse(Message & m, uint32_t ip);
+	void UITagResponse(Message  m, uint32_t ip);
 
 	void nonUIResponse(Message & m, uint32_t ip);
 	
