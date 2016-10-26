@@ -1,4 +1,4 @@
-#define PORT 6666
+
 
 class Node{
 
@@ -7,7 +7,8 @@ class Node{
   vector<int> keys();
   int ID;
   bool inNetwork;
-  
+  vector<Triple> refresherVector;
+
  public:
 
   Node(int id);
@@ -18,4 +19,6 @@ class Node{
 
   void startListener();
   
+  void startRefresher();
+  void startUIListener();
 };

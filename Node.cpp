@@ -134,3 +134,14 @@ void Node::startListener(){
     printf("ERROR: %s\n", ((char *)(e.description().c_str())));
   }
 }
+
+void startRefresher() {
+
+
+}
+
+
+void startUIListener() {
+	SnapShot snapSnot;
+	
+}
