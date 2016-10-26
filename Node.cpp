@@ -41,17 +41,6 @@ Node::Node(uint32_t nodeID, uint32_t contactID, uint32_t contactIP,
   exit = false;
   routingTable.addNode(contactID, contactIP);
 	
-<<<<<<< HEAD
-  //TODO: FIX WHAT WE WANT TO DO WITH THIS
-  //find_node to the contact node
-  UDPSocket socket(UDPPORT);
-  MsgType t = FINDNODE;
-  Message msg(t, nodeID);
-  socket.sendMessage(msg.toString(), contactIP, contactPort);
-	
-  threadCount = 0;
-=======
-
 	//find_node to the contact node
 	UDPSocket socket(UDPPORT);
 	Message msg(FINDNODE, nodeID);
@@ -60,7 +49,6 @@ Node::Node(uint32_t nodeID, uint32_t contactID, uint32_t contactIP,
 	//TODO: Add this message to timeouts. + check if fails 
 	
 	threadCount = 0;
->>>>>>> b3a98096fa7b5d8fc454ab4ceb43f0fa86fb1a54
 	
 }
 
@@ -78,8 +66,8 @@ void Node::joinNetwork(Triple &contact)
 //POST: given the current time and our duration time, add them
 //      together to get the new timepoint we wait for.
 void Node::resetTimePoint(){
-  chrono::system_clock::time_point currentTime = chrono::system_clock::now();
-  chrono::duration<int, milli>durationTime(20);
+	TIME::time_point currentTime = TIME::now();
+	chrono::duration<int, milli>durationTime(20);
 	
   waitFor = currentTime + durationTime;
 	
@@ -162,7 +150,32 @@ void Node :: sendPing (bool & done, uint32_t numReq, KBucket & curKB, int & i, i
 	}
       else // no more KBuckets
 	{
-	  done = true;
+		toSend ="";
+		if(i<NUMBITS)
+		{
+			if(j<curKB.getNumTriples()) // still some triples
+			{
+				Triple temp = curKB[j];
+				socket.sendMessage(msg.toString(), temp.address, UDPPORT);
+				pair<Triple, TIME::time_point> tempTime(temp, TIME::now());
+				messageTimeouts.push_back(tempTime);
+				message
+				refreshIP.push_back(temp);
+				j++;
+			}
+			else
+			{
+				i++; // we are done with this bucket.
+				j=0;
+				///TODO: Figure out how to copy the KBucket to curKB
+				curKB = routingTable[i];
+				ind --;
+			}
+		}
+		else // no more KBuckets
+		{
+			done = true;
+		}
 	}
     }
 }
@@ -278,34 +291,26 @@ void Node::UITagResponse(Message m, uint32_t ip) {
       snap.addClosest(clos, size);
       snap.setCompareID(key);
 		
-      //Send store to the k closest nodes
-      for (int i = 0; (i < ALPHA) && snap.nextExist(); i++)
-	{
-	  Message sendMsg(STORE, key);
-	  snap.getNext(temp);
-	  socket.sendMessage(sendMsg.toString(), temp.address, UDPPORT);
-	}
+		//Send store to the k closest nodes
+		for (int i = 0; (i < ALPHA) && snap.nextExist(); i++)
+		{
+			Message sendMsg(STORE, key);
+			snap.getNext(temp);
+			socket.sendMessage(sendMsg.toString(), temp.address, UDPPORT);
+			pair<Triple, TIME::time_point> tempTime(temp, TIME::now());
+			messageTimeouts.push_back(tempTime);
+		}
 		
-      //TODO: we meed to move this to KClosest to check if
-      //      we are done with STORE from UI so we can send
-      //      store to the K closest nodes
-      //Send to UI that store suceeded
-      //UDPSocket socketUI(UIPORT);
-      //Message sendMsgUI(STORERESP, ID);
-      //socketUI.sendMessage(sendMsgUI.toString(), ip, UIPORT);
-    }
-  else if (type == FINDVALUE)
-    {
 		
-      //Send a message to the UI client saying we found the value
-      if (std::find(keys.begin(), keys.end(), key) != keys.end())
-	{
-	  Message sendMsg(FVRESPP, ID);
-	  UDPSocket socket(UIPORT);
-	  socket.sendMessage(sendMsg.toString(), ip, UDPPORT);
-	}
-      else //Send a message to the node asking us for find value
-	{
+		//Send a message to the UI client saying we found the value
+		if (std::find(keys.begin(), keys.end(), key) != keys.end())
+		{
+			Message sendMsg(FVRESPP, ID);
+			UDPSocket socket(UIPORT);
+			socket.sendMessage(sendMsg.toString(), ip, UIPORT);
+		}
+		else //Send a message to the node asking us for find value
+		{
 			
 	  /// Initializing snapshot
 	  size = routingTable.getKClosetNodes(key, clos); // retrieves k closest and actual size
@@ -313,12 +318,14 @@ void Node::UITagResponse(Message m, uint32_t ip) {
 	  snap.addClosest(clos, size);
 	  snap.setCompareID(key);
 			
-	  ///Send the FindValue request to Alpha nodes to the k closest nodes
-	  for (int i = 0; (i < ALPHA) && snap.nextExist(); i++)
-	    {
-	      snap.getNext(temp);
-	      socket.sendMessage(m.toString(), temp.address, UDPPORT);
-	    }
+			///Send the FindValue request to Alpha nodes to the k closest nodes
+			for (int i = 0; (i < ALPHA) && snap.nextExist(); i++)
+			{
+				snap.getNext(temp);
+				socket.sendMessage(m.toString(), temp.address, UDPPORT);
+				pair<Triple, TIME::time_point> tempTime(temp, TIME::now());
+				messageTimeouts.push_back(tempTime);
+			}
 			
 	}
     }
@@ -387,7 +394,19 @@ void Node::nonUIResponse(Message & m, uint32_t ip)
 	}
       else // We don't have the value so we need to return the k closest
 	{
-			
+		
+		//Send a message to the UI client saying we found the value
+		if (std::find(keys.begin(), keys.end(), key) != keys.end())
+		{
+			temp.//TODO
+			sendMsg.setType(FVRESP);
+			socket.sendMessage(sendMsg.toString(), ip, UDPPORT);
+			pair<Triple, TIME::time_point> tempTime(temp, TIME::now());
+			tempTime = tempTime + DELAY_DURATION;
+			messageTimeouts.push_back(tempTime);
+		}
+		else // We don't have the value so we need to return the k closest
+		{
 	  // Prepare Message by setting the type to KCLOSEST and set the elements
 	  sendMsg.setType(KCLOSEST);
 			
@@ -395,7 +414,6 @@ void Node::nonUIResponse(Message & m, uint32_t ip)
 	  size = routingTable.getKClosetNodes(key, clos);
 	  sendMsg.setKClos(clos, size);
 			
-	  socket.sendMessage(sendMsg.toString(), ip, UDPPORT);
 	}
     }
   else if (type == PING) // Someone is checking we are alive
@@ -445,7 +463,6 @@ void Node::handler_T(string msg, uint32_t ip)
 //     - Check if there are more node to query in the snapshot. **Snapshot should update automatically.
 //     - If there are send messages to the alpha next nodes.
 //     - Else the process of the current is finished, either it's a Findvalue and it failed or the store is finished.
-/// Case when you put STORE in the currequest but actually get answer to a findnode. ????
 void Node::nonUITagResponse (Message m)
 {
   UDPSocket sock(UIPORT);

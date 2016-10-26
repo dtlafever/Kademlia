@@ -13,6 +13,11 @@ public:
 	UDPSocket() {};
 	virtual ~UDPSocket();
 
+	//PRE: the port we want to open on
+	//POST: closes the socket, then creates and binds on specified port.
+	//      throws error if could not create or bind
+	void open(uint32_t port);
+
 	//PRE: a message, host ip, and the port
 	//POST: sends the message to that host and then closes the connection.
 	//      throws error if couldn't send

@@ -12,12 +12,16 @@
 #define NUMBITS 32
 #define ALPHA 3
 #define RESPONDTIME 2000 //in milliseconds, the time to wait before
+#define DELAY_DURATION chrono::duration<int, std::milli> delay(RESPONDTIME)
 
 //moving on for an operation (such as findNode)
 #define PINGTIME 3600000 //in milliseconds, the time to wait before
 
 //pinging a node
 #define MAXRECV 500
+
+//lets make chrono shorter
+#define TIME chrono::system_clock
 
 struct Triple {
 	//a myTriples represents a node who does not own this routing table
