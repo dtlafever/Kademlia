@@ -18,4 +18,6 @@ class Node{
 
   void startListener();
   
+  void startRefresher();
+  void startUIListener();
 };
