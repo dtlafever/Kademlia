@@ -16,7 +16,7 @@ Node::Node(int id, int contactID, int contactIP) : RT(id){
 
   UDPSocket socket(PORT);
 
-  socket.sendMessage(FIND_NODE ID, contactIP, PORT);
+  socket.sendMessage(uint32_t ID, contactIP, PORT);
   TV.push_back(contactID);
 
   StupidQueueObject queue();
@@ -31,8 +31,8 @@ Node::Node(int id, int contactID, int contactIP) : RT(id){
   while(inNetwork){
     if (socket.recieved()){
       Message msg = socket.getMessage();
-      if (msg == KCLOS){
-	RT.updateTable(msg.getID(), msg.getIP(), PORT);
+      if (msg.getMsgType() == KCLOSEST){
+	RT.updateTable(msg.getID(), contactIP, PORT);
 	if(RT.full()){ //TODO: routing table is full function
 	  //ASSERT: the routing table is full,
 	  //        stop trying to add to the network
@@ -68,22 +68,33 @@ Node::Node(int id, int contactID, int contactIP) : RT(id){
 
 }
 
+//Handles messages from other Nodes.
+//Everything is constant time
+//MAIN: port 6666
+//      READS:  STORE, FIND_NODE, FIND_VALUE
+//      SENDS:  K_CLOS, FIND_VALUE_RESP
 void Node::startListener(){
-  //Handles messages from other Nodes.
-  //Everything is constant time
-  //MAIN: port 6666
-  //      READS: PING, STORE, FIND_NODE, FIND_VALUE
-  //      SENDS: PING_RESP, K_CLOS, FIND_VALUE_RESP_TRUE
 
-  //Handles all UI
-  //Variable Time
-  //L1  : port 6667
-  //      READS: FIND_VALUE_UI, STORE_UI, KCLOS
-  //      SENDS: FIND_VALUE, FIND_NODE, STORE
 
-  //Refresher/ Update Table
-  //Possibly Variable Time
-  //L2  : port 6668
-  //      READS: PING_RESP
-  //      SENDS: PING
+
 }
+
+//Handles all UI
+//Variable Time
+//L1  : port 6667
+//      READS: FIND_VALUE_UI, STORE_UI, KCLOS, FIND_VALUE_RESP
+//      SENDS: FIND_VALUE, FIND_NODE, STORE
+//			TO UI: FIND_VALUE_RESP_POSITIVE, FIND_VALUE_RESP_NEGATIVE, STORE_RESP
+
+
+//Refresher/ Update Table
+//Possibly Variable Time
+//L2  : port 6668
+//      READS: PING_RESP, PING
+//      SENDS: PING, PING_RESP
+void Node::startRefresher()
+{
+	
+}
+
+
