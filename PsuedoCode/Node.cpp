@@ -76,13 +76,19 @@ Node::Node(int id, int contactID, int contactIP) : RT(id){
 
 void Node::startListener(){
 
+  //NOTES: Timeout?
+  //       When we send a message, make sure we've got
+  //       6666 included so people know to respond to the
+  //       right one.
+  
   //Handles messages from other Nodes.
   //Everything is constant time
   //MAIN: port 6666
   //      READS: PING, STORE, FIND_NODE, FIND_VALUE
   //      SENDS: PING_RESP, K_CLOS, FIND_VALUE_RESP_TRUE
 
-   
+  std::string newMSG;
+  uint32_t recNum;
 
   try{
      UDPSocket socket(MAINPORT);
@@ -93,6 +99,40 @@ void Node::startListener(){
      //ASSERT: Create the two threads for handling Pings and
      //        for handling UIs
 
+     while(listening){
+       recNum = socket.recvMessage(newMSG);
+
+       if(recNum > 0){
+	 Message newMessage(newMSG);
+
+	 if(newMSG.getMSGType() == PING){
+	   //give back ping response
+	   //add sender to refresh queue
+	 }
+	 else if(newMSG.getMSGType() == STORE){
+	   //push key to our key list
+	   //add sender to refresh queue
+	 }
+	 else if(newMSG.getMSGType() == KCLOS){
+	   //give back kclos
+	   //add sender to refresh queue
+	 }
+	 else if(new.getMSGType() == FIND_VALUE){
+	   //check for value
+	   // if(we have value){
+	   //   send back FIND_VALUE_RESP_TRUE;
+	   // }
+	   // else{
+	   //   send KCLOS;
+	   // }
+
+	   //add sender to refresh queue
+	 }
+
+       }
+       
+
+     }
      
      
   }
