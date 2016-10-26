@@ -20,7 +20,7 @@ private:
 	//        MEMBER DATA
 	//---------------------------------------------------------
 
-        uint32_t ID;			//The ID of this computer
+	uint32_t ID;							//The ID of this computer
 	vector<uint32_t> keys;		//The keys of the files stored on this pc
 	RoutingTable routingTable;	//The K-Buckets
  	bool exit;			//the bool to keep listener ging
@@ -43,6 +43,8 @@ private:
 	//---------------------------------------------------------
 	
 	uint32_t getMyID();
+	
+	void joinNetwork(Triple & contact);
 	
  public:
 	//PRE:
@@ -81,7 +83,7 @@ private:
 		
 	//PRE:
 	//POST: recieves messages thread
-	static void handler_T(Node * obj, string msg, uint32_t ip);
+	void handler_T(string msg, uint32_t ip);
 
 	//PRE: the message we want to read and the UI IP address
 	//POST: Handle the messages send directly from the UI client

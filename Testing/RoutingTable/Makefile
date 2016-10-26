@@ -1,9 +1,13 @@
 GCC = g++ -std=c++11
 
-RoutingTableTest: RoutingTable.o KBucket.o main.o
-	$(GCC) RoutingTable.o KBucket.o main.o -o RoutingTableTest
+RoutingTableTest: RoutingTable.o KBucket.o main2.o
+	$(GCC) RoutingTable.o KBucket.o main2.o -pthread -o RoutingTableTest
 main.o: main.cc RoutingTable.h
 	$(GCC) -c main.cc
+
+main2.o: main2.cc RoutingTable.h
+	$(GCC) -c main2.cc
+
 RoutingTable.o: KBucket.h constants.h RoutingTable.h RoutingTable.cc
 	$(GCC) -c RoutingTable.cc
 KBucket.o: KBucket.h KBucket.cc constants.h
