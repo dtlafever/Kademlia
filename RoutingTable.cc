@@ -10,10 +10,34 @@
 
 using namespace std;
 
-//Pre: id refers to a valid node object
+//Tags: Creatation, Check and Find, Modifying, Getting Stuff, Print Table
+
+//-----------------------Creatation---------------------------------
+
+//Pre: id is the nodeID who owns this RoutingTable
 //Post: table is an array of K kBuckets, that are each empty
 RoutingTable::RoutingTable(uint32_t id) {
   myId = id;
+}
+
+//Pre: id and address represents a new node not seen before
+//Post: RV = Triple object representing this new node
+Triple* RoutingTable::createTriple(uint32_t id, uint32_t address) {
+  Triple* newTriple = new Triple;
+  newTriple->address = address;
+  newTriple->node = id;
+  newTriple->port = UDPPORT;
+  return (newTriple);
+}
+
+//----------------------Check and Find----------------------------------
+
+//Pre: id is a valid id
+//Post: RV = true if id is in the table, otherwise false
+bool RoutingTable::isNodeInTable(uint32_t id) {
+  int nthBucket = findKBucket(id);
+  bool inTable = table[nthBucket].isNodeInBucket(id);
+  return (inTable);
 }
 
 //Pre: The RoutingTable exists
@@ -27,22 +51,6 @@ bool RoutingTable::isEmpty() {
     index++;
   }
   return (empty);
-}
-
-//Pre: N/A
-//Post: Prints the contents of the Routing Table
-void RoutingTable::printTable() {
-  printf("Routing Table \n \n");
-  for (int index = 0; (index < NUMBITS); index++) {
-    printf("nthBucket: %d \n", index);
-    table[index].printBucket();
-  }
-}
-
-//Pre: id1 and id2 are two identifiers
-//Post: RV = id1 XOR id2
-uint32_t RoutingTable::findDist(uint32_t id1, uint32_t id2) {
-  return (id1 ^ id2);
 }
 
 //Pre: id is some valid node or key
@@ -60,29 +68,20 @@ int RoutingTable::findKBucket(uint32_t id) {
   return (twoPower);
 }
 
-//Pre: target is some id, closeNodes is an array Triples with node = -1
-//Post: closeNodes = array of the K closest nodes to the target
-//      Less than K are returned iff less than K nodes are in the table
-//      The list is ordered by distance, that is, the closest node is
-//      at the head
-//      RV = number nodes in closeNodes
-int RoutingTable::getKClosetNodes(uint32_t target, Triple* closeNodes) {
-  int size = 0;
-  for (int index = 0; (index < NUMBITS); index++) {
-    table[index].getKClosestNodes(target, closeNodes, size);
-  }
-  return (size);
+//Pre: id1 and id2 are two identifiers
+//Post: RV = id1 XOR id2
+uint32_t RoutingTable::findDist(uint32_t id1, uint32_t id2) {
+  return (id1 ^ id2);
 }
 
-//Pre: id and address represents a new node not seen before
-//Post: RV = Triple object representing this new node
-Triple* RoutingTable::createTriple(uint32_t id, uint32_t address) {
-  Triple* newTriple = new Triple;
-  newTriple->address = address;
-  newTriple->node = id;
-  newTriple->port = UDPPORT;
-  return (newTriple);
+//Pre: 0 <= index < NUMBITS
+//Post: RV =  a deep copy of table[index]
+KBucket RoutingTable::operator [] (int index) {
+  KBucket copy = table[index];
+  return (copy);
 }
+
+//-----------------------Modifying Table-----------------------------------
 
 //Pre: node is a valid node object not in the routing table (id)
 //     address correlates to where node is from
@@ -112,18 +111,61 @@ void RoutingTable::deleteNode(uint32_t nodeID) {
   int nthBucket = findKBucket(nodeID);
   table[nthBucket].deleteNode(nodeID);
 }
-  
-//Pre: myNode exists inside table
+
+//Pre: nodeID is a valid id, address is where nodeID is from
 //Post: myNode is placed at the tail of its respected kBucket
 //      the other triples are left shifted as needed
-void RoutingTable::updateTable(uint32_t nodeID) {
+//      RV = true if success, false otherwise
+bool RoutingTable::updateTable(uint32_t nodeID, uint32_t address) {
   int nthBucket = findKBucket(nodeID);
-  table[nthBucket].adjustNode(nodeID);
+  bool inTable = isNodeInTable(nodeID);
+  bool success;
+  if (inTable) {
+    table[nthBucket].adjustNode(nodeID);
+    success = true;
+  }
+  else {
+    success = addNode(nodeID, address);
+  }
+  return (success);
 }
 
-//Pre: 0 <= index < NUMBITS
-//Post: RV =  a deep copy of table[index]
-KBucket RoutingTable::operator [] (int index) {
-  KBucket copy = table[index];
+//----------------------Getting Stuff--------------------------------
+
+//Pre: target is some id, closeNodes is an array Triples with node = -1
+//Post: closeNodes = array of the K closest nodes to the target
+//      Less than K are returned iff less than K nodes are in the table
+//      The list is ordered by distance, that is, the closest node is
+//      at the head
+//      RV = number nodes in closeNodes
+int RoutingTable::getKClosetNodes(uint32_t target, Triple* closeNodes) {
+  int size = 0;
+  for (int index = 0; (index < NUMBITS); index++) {
+    table[index].getKClosestNodes(target, closeNodes, size);
+  }
+  return (size);
+}
+
+//Pre: id is some node that belongs to a KBucket k
+//Post: RV = a copy of the oldest node in k
+Triple RoutingTable::getOldestNode(uint32_t id) {
+  int nthBucket = findKBucket(id);
+  Triple* leastRecentNode = table[nthBucket].getHead();
+  Triple copy;
+  copy.node = leastRecentNode->node;
+  copy.address = leastRecentNode->address;
+  copy.port = leastRecentNode->port;
   return (copy);
+}
+
+//----------------------Print Table------------------------------
+
+//Pre: N/A
+//Post: Prints the contents of the Routing Table
+void RoutingTable::printTable() {
+  printf("Routing Table \n \n");
+  for (int index = 0; (index < NUMBITS); index++) {
+    printf("nthBucket: %d \n", index);
+    table[index].printBucket();
+  }
 }
