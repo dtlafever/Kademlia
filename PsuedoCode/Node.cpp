@@ -1,3 +1,5 @@
+#include "Node.h"
+
 Node::Node(int id) : RT(id){
   ID = id;
   inNetwork = true;
@@ -11,9 +13,9 @@ Node::Node(int id, int contactID, int contactIP) : RT(id){
   //ASSERT: contact is in our routing table
 
   vector<Timeout> TV();
-  
+
   UDPSocket socket(PORT);
-  
+
   socket.sendMessage(FIND_NODE ID, contactIP, PORT);
   TV.push_back(contactID);
 
@@ -22,7 +24,7 @@ Node::Node(int id, int contactID, int contactIP) : RT(id){
   //       - inserting will not add duplicates
   //       - each element has a bool queried
   //       - each element is a Triple
-  
+
   //LOOP
   //TODO: stop when our KBuckets are full or when our
   //      query has all elements are queried
@@ -50,7 +52,7 @@ Node::Node(int id, int contactID, int contactIP) : RT(id){
 	}
       }
     }
-    
+
     for (int i=0; i < TV.size(); i++){
       if (TV[i].timedOut()){
 	TV.erase(i);
@@ -63,7 +65,7 @@ Node::Node(int id, int contactID, int contactIP) : RT(id){
       inNetwork = false;
     }
   }
-    
+
 }
 
 void Node::startListener(){
