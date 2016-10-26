@@ -1,4 +1,7 @@
 #include "Node.h"
+#include "constants.h"
+
+#include <thread>
 
 Node::Node(int id) : RT(id){
   ID = id;
@@ -6,6 +9,9 @@ Node::Node(int id) : RT(id){
 }
 
 Node::Node(int id, int contactID, int contactIP) : RT(id){
+
+  //TODO: RefresherQueue as member data
+  
   ID = id;
   Triple contact(contactID, contactIP, PORT);
   RT.updateTable(contact);
@@ -69,21 +75,45 @@ Node::Node(int id, int contactID, int contactIP) : RT(id){
 }
 
 void Node::startListener(){
+
   //Handles messages from other Nodes.
   //Everything is constant time
   //MAIN: port 6666
   //      READS: PING, STORE, FIND_NODE, FIND_VALUE
   //      SENDS: PING_RESP, K_CLOS, FIND_VALUE_RESP_TRUE
 
-  //Handles all UI
-  //Variable Time
-  //L1  : port 6667
-  //      READS: FIND_VALUE_UI, STORE_UI, KCLOS
-  //      SENDS: FIND_VALUE, FIND_NODE, STORE
+   
 
+  try{
+     UDPSocket socket(MAINPORT);
+     //ASSERT: connect socket to our main port
+
+     thread PingThread = thread(startPingListener);
+     thread UIThread = thread(startUIListener);
+     //ASSERT: Create the two threads for handling Pings and
+     //        for handling UIs
+
+     
+     
+  }
+  catch (SocketException & e) {
+    printf("ERROR: %s\n", ((char *)(e.description().c_str())));
+  }
+
+
+}
+
+
+  //thread PingThread = thread(startPingListener);
   //Refresher/ Update Table
   //Possibly Variable Time
   //L2  : port 6668
   //      READS: PING_RESP
   //      SENDS: PING
-}
+
+  //thread UIThread = thread(startUIListener);  
+  //Handles all UI
+  //Variable Time
+  //L1  : port 6667
+  //      READS: FIND_VALUE_UI, STORE_UI, KCLOS
+  //      SENDS: FIND_VALUE, FIND_NODE, STORE

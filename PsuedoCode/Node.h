@@ -1,8 +1,12 @@
-#define PORT 6666
+#ifndef INCLUDED_Node
+#define INDLUDED_Node
+
 
 class Node{
 
  private:
+  //TODO: RefresherQueue as member data
+  
   RoutingTable RT;
   vector<int> keys();
   int ID;
@@ -19,3 +23,6 @@ class Node{
   void startListener();
   
 };
+
+
+#endif
