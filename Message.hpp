@@ -25,7 +25,7 @@
 // FVRESPP	: Positive response to the UI for a FINDVALUE request.
 // FVRESPN	: Negative response to the UI for a FINDVALUE request.
 // ========================================================
-enum MsgType { PING, STORE, FINDNODE, FINDVALUE, KCLOSEST, PINGRESP, FVRESP, STORERESP, FVRESPP, FVRESPN, NONE};
+enum MsgType { PING, FINDNODE, FINDVALUE, STORE, KCLOSEST, PINGRESP, FVRESP, STORERESP, FVRESPP, FVRESPN, NONE};
 
 // IMPORTANT: This class assumes that anything passed to it is valid. It will not check if the contents in the array are garbage or not, if the size is wrong there is no garantee how the program is going to react.
 
