@@ -1,9 +1,8 @@
 #include "UserInterface.h"
-#include "UIconstants.h"
+#include "../constants.h"
 #include "UIerror.h"
-#include "Message.hpp"
-#include "UDPSocket.h"
-#include "constants.h"
+#include "../Message.hpp"
+#include "../UDPSocket.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -64,11 +63,10 @@ void UserInterface::runUI(){
 	  if(checkTimeout()){
 	    //ASSERT: the Listener did not respond to us so we end
 	    //        the process
-	    UIsocket.close();
 
 	    cout << "Error: Request timed out. Please re-enter an IP: ";
 	    getline(cin, IPaddress);
-	    UIsocket.open();
+	    UIsocket.open(UDPPORT);
        
 	  }
 	  else{
