@@ -140,6 +140,8 @@ void startRefresher() {
 
 }
 
-void startUIListener() {
 
+void startUIListener() {
+	SnapShot snapSnot;
+	
 }
