@@ -94,7 +94,7 @@ void Node::startListener(){
      UDPSocket socket(MAINPORT);
      //ASSERT: connect socket to our main port
 
-     thread PingThread = thread(startPingListener);
+     thread PingThread = thread(startRefresher);
      thread UIThread = thread(startUIListener);
      //ASSERT: Create the two threads for handling Pings and
      //        for handling UIs
