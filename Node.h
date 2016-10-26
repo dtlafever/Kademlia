@@ -1,14 +1,25 @@
 #define PORT 6666
 #include "Message.hpp"
+#include <vector>
+#include "RoutingTable.h"
+#include "MsgTimer.h"
+
+#define UI_TIMEOUT 0
+#define PINGER_TIMEOUT 1
+
+using namespace std;
+
 
 class Node
 {
 
  private:
   RoutingTable RT;
-  vector<int> keys();
+  vector<int> keys;
   int ID;
   bool inNetwork;
+	
+	vector<MsgTimer> timeouts[2];
   
  public:
 
@@ -29,9 +40,17 @@ class Node
 	
 	//Refresher/ Update Table
 	//Possibly Variable Time
-	//L2  : port 6668
+	//      port 6668
 	//      READS: PING_RESP, PING
 	//      SENDS: PING, PING_RESP
+	
+	/* Responsibilities:
+			- Refreshing the table using elements in the RefreshQueue
+			- Answer PING request
+			- PING every nodes in the routing table every hour.
+			- Keep track of PING Timeouts
+	 */
+
 	void startRefresher();
 	
 	//Handles all UI
@@ -40,5 +59,10 @@ class Node
 	//      READS: FIND_VALUE_UI, STORE_UI, KCLOS, FIND_VALUE_RESP
 	//      SENDS: FIND_VALUE, FIND_NODE, STORE
 	//			TO UI: FIND_VALUE_RESP_POSITIVE, FIND_VALUE_RESP_NEGATIVE, STORE_RESP
+	
+	/* Responsibilities:
+   		- Handles one request at a time
+	 	 	- Handles its own requests.
+	 */
 	
 };

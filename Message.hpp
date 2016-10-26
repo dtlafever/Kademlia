@@ -78,7 +78,7 @@ public:
 	// POST: This function parses the message and updates the appropriate private members. This function alters the string and
 	void parse (std::string );
 	
-	// PRE: takes a MsgType object and an ID which is the NodeID
+	// PRE: takes a MsgType object and an ID which depends on the type of the message
 	// POST: Creates a message to be able to send it in the appropriate format.
 	std::string toString (MsgType type, uint32_t ID = -1, bool UI=false);
 	

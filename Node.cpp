@@ -92,9 +92,62 @@ void Node::startListener(){
 //L2  : port 6668
 //      READS: PING_RESP, PING
 //      SENDS: PING, PING_RESP
+
+
 void Node::startRefresher()
 {
+	// Refreshing the whole table boolean
+	bool refresh = false;
 	
+	// last time refresh was finished
+	time_t last_refresh;
+	
+	// Current bucket we are checking.
+	KBucket curKBucket;
+	
+	// indices used to access elements of the routing table.
+	int i =j =0;
+	
+	while (!exit)
+	{
+		// Check for new message
+		 if (PING is received)
+			 Respond to request
+			if PINGRESP was received
+				check timeouts & clear timeouts using IP.
+			if(refresh)
+			{
+				check if we can send more PINGs////TODO
+				if(can send)
+				{
+					send more messages such that a max of alpha are sent.
+					get next element in curKBucket
+					
+					if(no more elements)
+					{
+						i++;
+						j =0;
+						curKBucket= RT[i];
+					}
+					
+					if(no more KBuckets)
+					{
+						i=j=0;
+						reset last_refresh
+						refresh = false;
+					}
+				}
+				
+			}
+			if(!refresh && time to refresh)
+			{
+				refresh = true;
+				i=j=0;
+				retrieve KBucket=RT[0];
+				sendAlpha PINGs
+				refresh = true;
+			}
+	}
 }
 
 
