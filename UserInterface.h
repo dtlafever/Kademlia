@@ -1,4 +1,5 @@
 #include <string>
+#include <chrono>
 #include "UIconstants.h"
 
 #ifndef include_UserInterface
@@ -16,6 +17,10 @@ class UserInterface{
 
   string IPaddress;
   //ASSERT: IPaddress is the IP of the node we want to connect to.
+
+  chrono::system_clock::time_point timeStamp;
+  //ASSERT: timeStamp is the point in time when a request is
+  //        generated and sent
   
  public:
 
@@ -65,7 +70,12 @@ class UserInterface{
   //      or failure.  
   void handleMessage(string newMsg);
 
-
+  //PRE: Object defined
+  //POST: Computes the point in time where the message we send
+  //      will time out. The current point in time is compared to
+  //      the timeout stamp. If current < timeout, RV is false.
+  //      Else RV is true.
+  bool checkTimeout();
 };
 
 #endif

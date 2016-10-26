@@ -37,30 +37,44 @@ void UserInterface::runUI(){
   string input;
 
   cout << "Enter an IP: ";
-  cin >> IPaddress;
-  cout.flush();
+  getline(cin, IPaddress);
   
   while(isRunning){
+    receivedMessage = "";
+    //ASSERT: clear the message each time
     try{
-      
+     
       cout << "> ";
       getline(cin, input);
       strcpy(command, input.c_str());
+      //ASSERT: get the input and place in char
       
       newMessage = parseInput(command);
-      cout << "sendMessage: " << newMessage << endl;
-
+      
       if(isRunning){
+
+	timeStamp = chrono::system_clock::now();
+	//ASSERT: we're sending a new message so we reset the timeStamp
+	
 	UIsocket.sendMessage(newMessage, IPaddress, UDPPORT);
+	//ASSERT: send the message to the node we are connecting to
 	
 	recNum = -1;
-	while(recNum < 0){
-	  recNum = UIsocket.recvMessage(receivedMessage);
+	while(recNum < 0 && isRunning){
+	  if(checkTimeout()){
+	    //ASSERT: the Listener did not respond to us so we end
+	    //        the process
+	    cout << "Error: Request timed out. Please reconnect." << endl;
+	    isRunning = false;
+	  }
+	  else{
+	    //ASSERT: Keep attempting to listen as we haven't timed out yet
+	    recNum = UIsocket.recvMessage(receivedMessage);
+	  }
 	}
-
 	handleMessage(receivedMessage);
+	//ASSERT: send our message over to parse through
       }
-
       
     }
     catch(UIerror & error){
@@ -95,7 +109,6 @@ string UserInterface::parseInput(char command[]){
   char inputWords[MAXARGUMENTS][MAXCHAR];
   int numArguments = 0;
   getTokens(command, inputWords, numArguments);
-
   string finalRequest;
   try{
     if(numArguments == MAXARGUMENTS){
@@ -115,7 +128,6 @@ string UserInterface::parseInput(char command[]){
     else if(numArguments == MINARGUMENTS){
       //ASSERT: user entered one argument
       if (strcmp(inputWords[COMMANDPOS], allCommands[EXITPOS]) == 0){
-	cout << "exit" << endl;
 	exit();
       }
       else{
@@ -131,7 +143,6 @@ string UserInterface::parseInput(char command[]){
   catch (UIerror & error){
     throw(error);
   }
-  
   return(finalRequest);
 }
 
@@ -185,4 +196,24 @@ void UserInterface::handleMessage(string newMsg){
     //ASSERT: Key was not found
     cout << "Failure." << endl;
   }
+}
+
+
+//PRE: Object defined
+//POST: Computes the point in time where the message we send
+//      will time out. The current point in time is compared to
+//      the timeout stamp. If current < timeout, RV is false.
+//      Else RV is true.
+bool UserInterface::checkTimeout(){
+  bool timedOut = false;
+  
+  chrono::duration<int, milli> respondTime(8000);
+  chrono::system_clock::time_point timeOut = timeStamp + respondTime;
+  if(chrono::system_clock::now() < timeOut){
+    timedOut = false;
+  }
+  else{
+    timedOut = true;
+  }
+  return(timedOut);
 }

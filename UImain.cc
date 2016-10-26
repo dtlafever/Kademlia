@@ -11,9 +11,6 @@ using namespace std;
 //      The UI object will be created and a UDP socket will be
 //      connected to the given IP address. 
 int main(){
-
-  string givenIP;
-  //ASSERT: IP for the node we want to talk to
   
   UserInterface UI = UserInterface();
   //ASSERT: create a UserInterface object for the user
