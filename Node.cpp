@@ -61,7 +61,7 @@ Node::Node(uint32_t nodeID, uint32_t contactID, uint32_t contactIP,
 //POST: given the current time and our duration time, add them
 //      together to get the new timepoint we wait for.
 void Node::resetTimePoint(){
-	chrono::system_clock::time_point currentTime = chrono::system_clock::now();
+	TIME::time_point currentTime = TIME::now();
 	chrono::duration<int, milli>durationTime(20);
 	
 	waitFor = currentTime + durationTime;
@@ -131,6 +131,9 @@ void Node :: sendPing (bool & done, uint32_t numReq, KBucket & curKB, int & i, i
 			{
 				Triple temp = curKB[j];
 				socket.sendMessage(msg.toString(), temp.address, UDPPORT);
+				pair<Triple, TIME::time_point> tempTime(temp, TIME::now());
+				messageTimeouts.push_back(tempTime);
+				message
 				refreshIP.push_back(temp);
 				j++;
 			}
@@ -265,15 +268,10 @@ void Node::UITagResponse(Message m, uint32_t ip) {
 			Message sendMsg(STORE, key);
 			snap.getNext(temp);
 			socket.sendMessage(sendMsg.toString(), temp.address, UDPPORT);
+			pair<Triple, TIME::time_point> tempTime(temp, TIME::now());
+			messageTimeouts.push_back(tempTime);
 		}
 		
-		//TODO: we meed to move this to KClosest to check if
-		//      we are done with STORE from UI so we can send
-		//      store to the K closest nodes
-		//Send to UI that store suceeded
-		//UDPSocket socketUI(UIPORT);
-		//Message sendMsgUI(STORERESP, ID);
-		//socketUI.sendMessage(sendMsgUI.toString(), ip, UIPORT);
 	}
 	else if (type == FINDVALUE)
 	{
@@ -283,7 +281,7 @@ void Node::UITagResponse(Message m, uint32_t ip) {
 		{
 			Message sendMsg(FVRESPP, ID);
 			UDPSocket socket(UIPORT);
-			socket.sendMessage(sendMsg.toString(), ip, UDPPORT);
+			socket.sendMessage(sendMsg.toString(), ip, UIPORT);
 		}
 		else //Send a message to the node asking us for find value
 		{
@@ -299,6 +297,8 @@ void Node::UITagResponse(Message m, uint32_t ip) {
 			{
 				snap.getNext(temp);
 				socket.sendMessage(m.toString(), temp.address, UDPPORT);
+				pair<Triple, TIME::time_point> tempTime(temp, TIME::now());
+				messageTimeouts.push_back(tempTime);
 			}
 			
 		}
@@ -363,8 +363,12 @@ void Node::nonUIResponse(Message & m, uint32_t ip)
 		//Send a message to the UI client saying we found the value
 		if (std::find(keys.begin(), keys.end(), key) != keys.end())
 		{
+			temp.//TODO
 			sendMsg.setType(FVRESP);
 			socket.sendMessage(sendMsg.toString(), ip, UDPPORT);
+			pair<Triple, TIME::time_point> tempTime(temp, TIME::now());
+			tempTime = tempTime + DELAY_DURATION;
+			messageTimeouts.push_back(tempTime);
 		}
 		else // We don't have the value so we need to return the k closest
 		{
@@ -376,13 +380,20 @@ void Node::nonUIResponse(Message & m, uint32_t ip)
 			size = routingTable.getKClosetNodes(key, clos);
 			sendMsg.setKClos(clos, size);
 			
+			temp.//TODO
 			socket.sendMessage(sendMsg.toString(), ip, UDPPORT);
+			pair<Triple, TIME::time_point> tempTime(temp, TIME::now());
+			tempTime = tempTime + DELAY_DURATION;
+			messageTimeouts.push_back(tempTime);
 		}
 	}
 	else if (type == PING) // Someone is checking we are alive
 	{
 		sendMsg.setType(PINGRESP);
 		socket.sendMessage(sendMsg.toString(), ip, UDPPORT);
+		pair<Triple, TIME::time_point> tempTime(temp, TIME::now());
+		tempTime = tempTime + DELAY_DURATION;
+		messageTimeouts.push_back(tempTime);
 	}
 	else if (type == FINDNODE)
 	{
@@ -426,7 +437,6 @@ void Node::handler_T(Node * obj, string msg, uint32_t ip)
 //     - Check if there are more node to query in the snapshot. **Snapshot should update automatically.
 //     - If there are send messages to the alpha next nodes.
 //     - Else the process of the current is finished, either it's a Findvalue and it failed or the store is finished.
-/// Case when you put STORE in the currequest but actually get answer to a findnode. ????
 void Node::nonUITagResponse (Message m)
 {
 	UDPSocket sock(UIPORT);

@@ -9,7 +9,7 @@
 #include "SnapShot.h"
 #include <future>
 #include <chrono>
-
+#include <utility>
 
 using namespace std;
 
@@ -33,13 +33,14 @@ private:
 
 	int threadCount;            //number of threads owned
 
+	vector<pair<Triple, TIME::time_point>> messageTimeouts;
+	//TODO: figure out if this vector is going to HUGE
+
+	vector<future<void> > currentThreads; //a vector to hold all current open threads
+	
 	//---------------------------------------------------------
 	//        PRIVATE FUNCTIONS
 	//---------------------------------------------------------
-
-	vector<future<void> > currentThreads; //a vector to hold all current open threads
-	chrono::system_clock::time_point waitFor;
-	//a time_point for waiting until we try and join threads
 	
 	uint32_t getMyID();
 	
@@ -55,7 +56,7 @@ private:
 		uint32_t contactPort);
 	
 	//---------------------------------------------------------------------------------
-	//            THREAD FUNCTIONS
+	//            PUBLIC FUNCTIONS
 	//---------------------------------------------------------------------------------
 
 	//PRE: duration and now 
@@ -83,7 +84,7 @@ private:
 	static void handler_T(Node * obj, string msg, uint32_t ip);
 
 	//PRE: the message we want to read and the UI IP address
-	//POST: Handle the messages sent directly from the UI client
+	//POST: Handle the messages send directly from the UI client
 	//      STORE:
 	//        - Call find node to find the k closest nodes
 	//          to the key value we want to store
@@ -98,12 +99,34 @@ private:
 	//          no more closest. If no more closest, send fail message to UI
 	void UITagResponse(Message  m, uint32_t ip);
 
-	//PRE:
-	//POST:
+	//PRE: the message we want to read and the UDP IP address
+	//POST: Handle the message sent from other nodes
+	//      STORE:
+	//        - take the key and store it in our keys vector
+	//      PINGRESP:
+	//        - we have recieved a ping response from IP
+	//        - find where in the routing table this ping request
+	//          came from.
+	//        - remove that ip from our refreshIP vector
+	//        - update the node in the routing table
+	//      FINDVALUE:
+	//        - check if we have the key and if so, send UI success
+	//        - if not, find the kclosest to the node ID
+	//        - send the kClosest to the asker
+	//      PING:
+	//        - send pingResp to the asker
+	//      FINDNODE:
+	//        - find kclosest to the node ID
+	//        - send the kClosest to the asker
 	void nonUIResponse(Message & m, uint32_t ip);
 	
-	//PRE:
-	//POST:
+	// PRE: Takes the message that was received
+	// POST: This function is to be used when the current node receives a response to UI request sent earlier which can be checked through the type of the message, it must be KCLOSEST or FVRESP.
+
+	// KCLOSEST:
+	//     - Check if there are more node to query in the snapshot. **Snapshot should update automatically.
+	//     - If there are send messages to the alpha next nodes.
+	//     - Else the process of the current is finished, either it's a Findvalue and it failed or the store is finished.
 	void nonUITagResponse (Message m);
 	
 	void  sendPing (bool & done, uint32_t numReq, KBucket & curKB, int & i, int &j);
