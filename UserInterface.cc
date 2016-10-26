@@ -29,7 +29,7 @@ void UserInterface::runUI(){
 
   int recNum;
   UDPSocket UIsocket(UIPORT);
-
+  
   string newMessage;
   string receivedMessage;
 
@@ -64,15 +64,24 @@ void UserInterface::runUI(){
 	  if(checkTimeout()){
 	    //ASSERT: the Listener did not respond to us so we end
 	    //        the process
-	    cout << "Error: Request timed out. Please reconnect." << endl;
-	    isRunning = false;
+	    UIsocket.close();
+
+	    cout << "Error: Request timed out. Please re-enter an IP: ";
+	    getline(cin, IPaddress);
+	    UIsocket.open();
+       
 	  }
 	  else{
 	    //ASSERT: Keep attempting to listen as we haven't timed out yet
 	    recNum = UIsocket.recvMessage(receivedMessage);
 	  }
 	}
-	handleMessage(receivedMessage);
+
+	if(IPaddress == UIsocket.getRemoteIP(0)){
+	  //ASSERT: the message we received used the IP address we have
+	  //        been sending to
+	  handleMessage(receivedMessage);
+	}
 	//ASSERT: send our message over to parse through
       }
       

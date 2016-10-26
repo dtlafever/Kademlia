@@ -43,6 +43,20 @@ KBucket::KBucket(KBucket& otherBucket) {
   otherBucket.unlockBucket();
 }
 
+//Pre: id is a valid id
+//Post: RV = true if id is in the bucket, false otherwise
+bool KBucket::isNodeInBucket(uint32_t id) {
+  bool found = false;
+  int index = 0;
+  while ((!found) and (index < numTriples)) {
+    Triple* currTriple = bucket[index];
+    if (currTriple->node == id) {
+      found = true;
+    }
+  }
+  return (found);
+}
+
 //Pre: the respected routing table is being deleted
 //Post: bucket is destroyed
 KBucket::~KBucket() {

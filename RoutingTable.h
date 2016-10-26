@@ -28,6 +28,16 @@ class RoutingTable {
   //Pre: id and address represents a new node not seen before
   //Post: RV = Triple object representing this new node
   Triple* createTriple(uint32_t id, uint32_t address);
+
+  //Pre: id is a valid id
+  //Post: RV = true if id is in the table, otherwise false
+  bool isNodeInTable(uint32_t id);
+
+  //Pre: node is a valid node object not in the routing table (id)
+  //     address correlates to where node is from
+  //Post: RV = true if node was added to the table
+  //           false otherwise
+  bool addNode(uint32_t node, uint32_t address);
   
  public:
   
@@ -39,6 +49,10 @@ class RoutingTable {
   //Post: RV = true if no Triples exists in the kBuckets
   //      False otherwise
   bool isEmpty();
+
+  //Pre: id is some node that belongs to a KBucket k
+  //Post: RV = a copy of the oldest node in k
+  Triple getOldestNode(uint32_t id);
   
   //Pre: target is some id, closeNodes is an array Triples with node = -1
   //Post: closeNodes = array of the K closest nodes to the target
@@ -51,17 +65,12 @@ class RoutingTable {
   //Pre: nodeID exists in the table, and is known to be dead
   //Post: Removes the respected Triple from the table
   void deleteNode(uint32_t nodeID);
-  
-  //Pre: node is a valid node object not in the routing table (id)
-  //     address correlates to where node is from
-  //Post: RV = true if node was added to the table
-  //           false otherwise
-  bool addNode(uint32_t node, uint32_t address);
-	
-  //Pre: myNode is the id of a node inside of RoutingTable
+
+  //Pre: nodeID is a valid id, address is where nodeID is from
   //Post: myNode is placed at the tail of its respected kBucket
   //      the other triples are left shifted as needed
-  void updateTable(uint32_t nodeID);
+  //      RV = true if success, false otherwise
+  bool updateTable(uint32_t nodeID, uint32_t address);
 
   //Pre: N/A
   //Post: Prints the contents of the Routing Table

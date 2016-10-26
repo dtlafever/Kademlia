@@ -17,7 +17,19 @@ class KBucket {
   Triple* bucket[K];     //each bucket has k triples in it
   mutex lock;
 
-  //bucket is organized by time last seen, head is least recently, tail is most
+  //Pre: lock is currently unlocked
+  //Post: lock is locked
+  void lockBucket();
+
+  //Pre: lock is currently locked
+  //Post: lock is unlocked
+  void unlockBucket();
+
+  //Pre: id is a valid id
+  //Post: RV = true if id is in the bucket, false otherwise
+  bool isNodeInBucket(uint32_t id);
+
+  //bucket is organized by time last seen, head is least recent, tail is most
 
  public:
 
@@ -34,14 +46,6 @@ class KBucket {
   //Pre: This bucket is empty, it is unlocked
   //Post: This bucket is a deep copy of bucket
   KBucket(KBucket& otherBucket);
-
-  //Pre: lock is currently unlocked
-  //Post: lock is locked
-  void lockBucket();
-
-  //Pre: lock is currently locked
-  //Post: lock is unlocked
-  void unlockBucket();
 
   //Pre: The Bucket exists
   //Post: RV = true if no triples exists in bucket
