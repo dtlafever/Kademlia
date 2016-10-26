@@ -32,6 +32,11 @@ Socket::~Socket()
     ::close ( m_sock );
 }
 
+void Socket::close() {
+  if (is_valid())
+    ::close(m_sock);
+}
+
 //PRE:
 //POST: create a socket that is either TCP or UDP
 //      Returns false if not a valid socket creation, true otherwise

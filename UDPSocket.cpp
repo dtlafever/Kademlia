@@ -19,6 +19,20 @@ UDPSocket::~UDPSocket()
 {
 }
 
+//PRE: the port we want to open on
+//POST: closes the socket, then creates and binds on specified port.
+//      throws error if could not create or bind
+void UDPSocket::open(uint32_t port) {
+	Socket::close();
+	if (!Socket::create(UDP)) {
+		throw SocketException("Could not create server socket.");
+	}
+
+	if (!Socket::bind(port)) {
+		throw SocketException("Could not bind port.");
+	}
+}
+
 //PRE: a message, host ip, and the port
 //POST: sends the message to that host and then closes the connection.
 //      throws error if couldn't send
