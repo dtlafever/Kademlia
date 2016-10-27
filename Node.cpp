@@ -169,7 +169,7 @@ void Node::startListener(){
 	     socket.sendMessage(sendString, MAINPORT, senderIP);
 	   }
 	   else{
-	     sendMessageOBJ.setMsgType = KCLOSEST;
+3	     sendMessageOBJ.setMsgType = KCLOSEST;
 	     //add k closest nodes to message? 
 	     sendString = sendMessageOBJ.toString();
 	     socket.sendMessage(sendString, MAINPORT, senderIP);
