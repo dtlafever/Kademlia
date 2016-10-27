@@ -1,13 +1,7 @@
 //Kadelima Node Class
 
 #include "Node.h"
-#include "constants.h"
-#include "Message.hpp"
-#include "SnapShot.h"
-#include <vector>
 #include <algorithm>
-#include "JoinNetworkQueue.h"
-#include "MsgTimer.h"
 
 //Pre: id is a valid node id that is not yet taken
 //Post: RT is initalized, ID = id, inNetwork = true
@@ -21,10 +15,10 @@ Node::Node(uint32_t id) : RT(id){
 //Post: the id of the node sending msg is removed from timeOut
 //      if our id is in closest times, return true, false other wise
 void Node::handleKClosMsg(Message msg, vector<MsgTimer>& timeOut,
-													JoinNewtorkQueue& queue) {
+													JoinNetworkQueue& queue) {
 	bool isMyIDInMsg = false;
-	uint32_t senderID = msg.ID();
-	uint32_t senderIP = msg.IP();
+	uint32_t senderID = msg.getID();
+	uint32_t senderIP = msg.get();
 	RT.updateTable(senderID, senderIP, PORT);
 	bool found = false;
 	int index = 0;
@@ -278,30 +272,34 @@ void Node::startRefresher()
 					bool found = false;
 					
 					// Check in timeouts for other threads & refresher
-					for (int i =0; i<timeouts[PINGER_TIMEOUT] && !found; ++i)
+					for (int i =0, int j=0; (i<timeouts[PINGER_TIMEOUT] || j<timeouts[REFRESH_TIMEOUT]) && !found; ++i, ++j)
 					{
 						// Checking in other threads timeouts
-						if(timeouts[PINGER_TIMEOUT][i].getIP() == IP) // If we found a timeout with the same IP
-		    {
-					// erase element in vector
-					timeouts[PINGER_TIMEOUT][i].erase(timeouts[PINGER_TIMEOUT].begin()+i);
-					found = true; // Update flag
-				}
+						if(i<timeouts[PINGER_TIMEOUT] && timeouts[PINGER_TIMEOUT][i].getIP() == IP) // If we found a timeout with the same IP
+						{
+							// erase element in vector
+							timeouts[PINGER_TIMEOUT][i].erase(timeouts[PINGER_TIMEOUT].begin()+i);
+							found = true; // Update flag
+							i--;
+						}
 						
 						// Checking in timeouts for refresher
-						if(timeouts[REFRESH_TIMEOUT][i].getIP() == IP) // If we found a timeout with the same IP
-		    {
-					// erase element in vector
-					timeouts[REFRESH_TIMEOUT][i].erase(timeouts[REFRESH_TIMEOUT].begin()+i);
-					found = true; // Update flag
-				}
+						if(!found && j<timeouts[REFRESH_TIMEOUT] && timeouts[REFRESH_TIMEOUT][j].getIP() == IP) // If we found a timeout with the same IP
+						{
+							// erase element in vector
+							timeouts[REFRESH_TIMEOUT][j].erase(timeouts[REFRESH_TIMEOUT].begin()+j);
+							found = true; // Update flag
+							j--;
+						}
 						
 						/// Refreshing nodes in updateTable if possible
 						RT.updateTable(msg.getNodeID(), IP);
 					}
 					
 					if(!found)
-						cout << "Error PINGRESP does not correspond to any PING request"<<endl;
+					{
+						RT.updateTable(msg.getNodeID(),IP);
+					}
 					break;
 					
 				default:
@@ -312,35 +310,68 @@ void Node::startRefresher()
 		
 		if(refresh) // We are currently refreshing the routingTable
 		{
-	  // check if we can send more PINGs
-	  if(timeouts[REFRESH_TIMEOUT].size()<ALPHA)
-		{
-			// send more messages such that a max of alpha are sent.
-			sendUpToAlphaPing(curKBucket, socket);
-		}
+			// check if we can send more PINGs
+			if(timeouts[REFRESH_TIMEOUT].size()<ALPHA)
+			{
+				// send more messages such that a max of alpha are sent.
+				sendUpToAlphaPing(curKBucket, socket, i, j);
+			}
 			
 		}
 		
 		// Check if we are currently refreshing and if it is time to refresh
 		if(!refresh && lastRefresh.timedOut())
 		{
-	  refresh = true; // start refreshing
-	  i=j=0; // reset indices
+			refresh = true; // start refreshing
+			i=j=0; // reset indices
 			
-	  // Retrieve the first KBucket
-	  curKBucket =RT[i];
+			// Retrieve the first KBucket
+			curKBucket =RT[i];
 			
-	  // Send the first alpha messages
-		///TODO: check this again
-	  sendUpToAlphaPing(curKBucket, socket);
+			// Send the first alpha messages
+			///TODO: check this again
+			sendUpToAlphaPing(curKBucket, socket, i, j);
 			
 		}
 		
-		///TODO: check the refresh queue.
-		if(refresherVector.size() > 0)
+		for (int i=0; refresherVector.size()>0 && i<ALPHA; ++i)
 		{
+			// try to update in table then ping if necessary
+			if (!RT.updateTable(refresherVector[0].node, refresherVector[0].address))
+			{
+				// PING
+				Message msg(PING, ID);
+				socket.sendMessage(msg.toString(), refresherVector[0].address, REFRESHERPORT);
+				
+				// Add to the timeouts
+				MsgTimer timer(RESPONDTIME_PING, refresherVector[0].node, refresherVector[0].address);
+				timeouts[PINGER_TIMEOUT].push_back(timer);
+				
+			}
+			refresherVector.erase(refresherVector.begin()); // Remove from the vector, the node was refreshed
+		}
+		
+		{			
+			// Check in timeouts for other threads & refresher
+			for (int i =0, int j=0; (i<timeouts[PINGER_TIMEOUT] || j<timeouts[REFRESH_TIMEOUT]); ++i, ++j)
+			{
+				// Checking if anything timed out and remove it.
+				if(timeouts[PINGER_TIMEOUT][i].timedOut())
+				{
+					timeouts[PINGER_TIMEOUT].erase(timeouts[PINGER_TIMEOUT].begin()+i);
+					i--;
+				}
+				
+				if (timeouts[REFRESH_TIMEOUT][j].timedOut())
+				{
+					timeouts[REFRESH_TIMEOUT].erase(timeouts[REFRESH_TIMEOUT].begin()+j);
+					j--;
+				}
+
+			}
 			
 		}
+		
 	}
 	
 	socket.close();
@@ -358,7 +389,8 @@ void startUIListener() {
 	MsgType curMsg;
 	vector<Timeout> timeoutVector;
 	
-	std::string msgUI;
+	std::string strUI;
+	Message msgUI;
 	uint32_t recvlenUI;
 	
 	UDPSocket socketUI(UIPORT);
@@ -401,11 +433,25 @@ void startUIListener() {
 				curMsg = msgUI;
 				Triple kClos[K];
 				int size = getKClosetNodes(curMsg.getID(), kClos);
+				if (size == 0) {
+					//ASSERT: We are the only node in the network, store
+					//        inside ourselves
+					keys.push_back(msgUI.);
+				}
 				snapSnot.addClosest(kClos, size);
 				sendUpToAlphaKClos(SnapShot, socketUI);
 			}
 		}
 	}
+}else if (msgUI.getMsgType() == STORE_UI) {
+	curMsg = msgUI;
+	Triple kClos[K];
+	int size = getKClosetNodes(curMsg.getID(), kClos);
+	snapSnot.addClosest(kClos, size);
+	sendUpToAlphaKClos(SnapShot, socketUI);
+}
+}
+}
 }
 
 void Node::sendUpToAlphaKClos(SnapShot & ss, UDPSocket & sock) {
@@ -422,25 +468,25 @@ void Node::sendUpToAlphaKClos(SnapShot & ss, UDPSocket & sock) {
 
 ///TODO: check again
 
-void Node::sendUpToAlphaPing(KBucket &curKBucket, UDPSocket &socket)
+void Node::sendUpToAlphaPing(KBucket &curKBucket, UDPSocket &socket, uint32_t & i, uint32_t & j)
 {
 	while (timeouts[REFRESH_TIMEOUT].size()<ALPHA)
 	{
 		if(j>=curKBucket.getNumTriples()) // Check if we have reached the end of the Kbucket
 		{
-	  i++; // Go to next KBucket
-	  curKBucket= RT[i];
-	  // Start at first element of the KBucket.
-	  j =0;
+			i++; // Go to next KBucket
+			curKBucket= RT[i];
+			// Start at first element of the KBucket.
+			j =0;
 		}
 		
 		if(i>= NUMBITS) // If we did all the KBuckets, reset
 		{
-	  i=j=0; // Reset indices
+			i=j=0; // Reset indices
 			
-	  // seet last refresh timepoint to Now
-	  lastRefresh.reset();
-	  refresh = false;
+			// seet last refresh timepoint to Now
+			lastRefresh.reset();
+			refresh = false;
 		}
 		
 		// get next element in curKBucket and increment j
@@ -451,10 +497,9 @@ void Node::sendUpToAlphaPing(KBucket &curKBucket, UDPSocket &socket)
 		socket.sendMessage (pingr.toString(), curTriple.address, REFRESHERPORT);
 		
 		// Updating timeouts
-		///TODO: Update with respond time for PING
-		MsgTimer timer (RESPONDTIME, curTriple.node, curTriple.address);
+		MsgTimer timer (RESPONDTIME_PING, curTriple.node, curTriple.address);
 		timeouts[REFRESH_TIMEOUT].push_back(timer);
-
+		
 	}
 }
 
