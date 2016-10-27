@@ -44,10 +44,13 @@ class SnapShot{
  private:
 
   Quint closest [K];
-  int32_t compareID;
+  uint32_t compareID;
   int size;
   
  public:
+
+	 uint32_t getSize() const;
+	 Quint getElement(int i) const;
 
 	 void setCompareID(uint32_t nodeID);
 
@@ -62,6 +65,9 @@ class SnapShot{
 
 	//DEFAULT CONSTRUCTOR
 	Snapshot();
+
+	//COPY CONSTRUCTOR
+	SnapShot(SnapShot & ss);
 
 	//PRE: a k closest array already in closest to least closest order,
 	//     as well as its size (not greater than K)
