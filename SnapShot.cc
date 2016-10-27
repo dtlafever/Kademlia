@@ -14,6 +14,13 @@ bool sortByDistance(const Quint &lhs,
   return (getDistance(lhs.compareID, lhs.node) < getDistance(rhs.compareID, rhs.node));
 }
 
+uint32_t SnapShot::getSize() const {
+	return size;
+}
+Quint SnapShot::getElement(int i) const {
+	return closest[i];
+}
+
 //PRE: the nodeID we want to set our member data compareID
 //POST: changes the quint.compareID to nodeID
 void SnapShot::setCompareID(uint32_t nodeID) {
@@ -27,6 +34,11 @@ void SnapShot::setCompareID(uint32_t nodeID) {
 SnapShot::Snapshot() {
 	compareID = 0;
 	size = 0;
+}
+
+//COPY CONSTRUCTOR
+SnapShot::SnapShot(SnapShot & ss) {
+	size = ss.size()
 }
 
 //PRE: an array of triples up to nodeSize.

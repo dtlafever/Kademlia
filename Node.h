@@ -3,6 +3,7 @@
 #include <vector>
 #include "RoutingTable.h"
 #include "MsgTimer.h"
+#include "UDPSocket.h"
 
 #define UI_TIMEOUT 0
 #define PINGER_TIMEOUT 1
@@ -21,8 +22,14 @@ class Node
   uint32_t ID;
   bool inNetwork;
   vector<Triple> refresherVector;
+  bool exit = false;
 
-	bool exit = false;
+  //Pre: msg, queue, and timeOut were declared in the constructor below
+  //Post: the id of the node sending msg is removed from timeOut
+  //      if our id is in closest times, return true, false other wise
+  bool handleKClosMsg(Message msg, vector<MsgTimer>& timeOut,
+			    JoinNewtorkQueue& queue);
+
 	
 	// Index 0 is a vector of MsgTimer to keep track of the timeouts for the UI thread.
 	// Index 1 is reserved for messages that the PINGer sends for other threads.
@@ -30,6 +37,8 @@ class Node
 	vector<MsgTimer> timeouts[3];
 	
 	void sendUpToAlphaPing(KBucket & curKBucket, UDPSocket & sock);
+
+	void sendUpToAlphaKClos(SnapShot & ss, UDPSocket & sock);
   
  public:
 
