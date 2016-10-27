@@ -260,7 +260,7 @@ void Node::startRefresher()
 			switch(msg.getMsgType())
 			{
 				case PING: // We are receiving a ping request
-					Message pingr(PINGRESP);
+					Message pingr(PINGRESP, this->ID);
 					socket.sendMessage (pingr.toString(), IP, REFRESHERPORT);
 					break;
 					
@@ -271,8 +271,6 @@ void Node::startRefresher()
 					
 					bool found = false;
 					
-					/// TODO: check to see order of checking
-					
 					// Check in timeouts for other threads & refresher
 					for (int i =0; i<timeouts[PINGER_TIMEOUT] && !found; ++i)
 					{
@@ -282,8 +280,6 @@ void Node::startRefresher()
 							// erase element in vector
 							timeouts[PINGER_TIMEOUT][i].erase(timeouts[PINGER_TIMEOUT].begin()+i);
 							found = true; // Update flag
-							
-							///TODO: Do something about refreshing the table?
 						}
 						
 						// Checking in timeouts for refresher
@@ -293,6 +289,9 @@ void Node::startRefresher()
 							timeouts[REFRESH_TIMEOUT][i].erase(timeouts[REFRESH_TIMEOUT].begin()+i);
 							found = true; // Update flag
 						}
+						
+						/// Refreshing nodes in updateTable if possible
+						RT.updateTable(msg.getNodeID(), IP);
 					}
 					
 					if(!found)
@@ -307,16 +306,14 @@ void Node::startRefresher()
 		
 		if(refresh) // We are currently refreshing the routingTable
 		{
-			//check if we can send more PINGs
+			// check if we can send more PINGs
 			if(timeouts[REFRESH_TIMEOUT].size()<ALPHA)
 			{
-				//					send more messages such that a max of alpha are sent.
+				// send more messages such that a max of alpha are sent.
 				sendUpToAlphaPing(curKBucket, socket);
 			}
 			
 		}
-		
-		
 		
 		// Check if we are currently refreshing and if it is time to refresh
 		if(!refresh && lastRefresh.timedOut())
@@ -334,6 +331,10 @@ void Node::startRefresher()
 		}
 		
 		///TODO: check the refresh queue.
+		if(refresherVector.size() > 0)
+		{
+			
+		}
 	}
 	
 	socket.close();
