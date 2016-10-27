@@ -124,8 +124,9 @@ void Node::startListener(){
   std::string sendString; //the message we will fill up and send
   std::string receiveString; //the message we will receive
   
-  int senderIP; //the IP of the node we're receiving a msg from
-
+  int senderIP;//the IP of the node we're receiving a msg from
+  uint32_t senderID; //the ID of the node we're receiving a msg from
+  
   uint32_t recNum; 
 
   UDPSocket socket(MAINPORT);
@@ -140,7 +141,10 @@ void Node::startListener(){
     if(recNum > 0){
       Message receivedMessageOBJ(receiveString);
       senderIP = socket.getRemoteIP();
-        
+      senderID = receivedMessageOBJ.getNodeID();
+
+      Triple sendTriple(senderIP, MAINPORT, senderID);
+      	
       if(receivedMessageOBJ.getMSGType() == STORE){
 	uint32_t keyToStore = receivedMessageOBJ.getID();
 	keys.push_back(keyToStore);
@@ -187,6 +191,7 @@ void Node::startListener(){
   //ASSERT: join the threads after we have finished listening
 }
 
+ 
 //Refresher/ Update Table
 //Possibly Variable Time
 //L2  : port 6668
