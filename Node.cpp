@@ -154,7 +154,8 @@ void Node::startListener(){
 	 
 	 if(receivedMessageOBJ.getMSGType() == STORE){
 	   uint32_t keyToStore = receivedMessageOBJ.getID();
-	   //push key to our key list
+	   keys.push_back(keyToStore);
+	   
 	   //add sender to refresh queue
 	 }
 	 else if(receivedMessageOBJ.getMSGType() == KCLOS){
