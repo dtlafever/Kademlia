@@ -8,6 +8,12 @@
 #include <algorithm>
 #include "JoinNetworkQueue.h"
 #include "MsgTimer.h"
+#include "string.h"
+
+//Node Construction, Node Listener,
+//Refresher and Update, User Interface, Sending
+
+//------------------------------Node Construction---------------------------
 
 //Pre: id is a valid node id that is not yet taken
 //Post: RT is initalized, ID = id, inNetwork = true
@@ -51,6 +57,19 @@ void Node::handleKClosMsg(Message msg, vector<MsgTimer>& timeOut,
   }
 }
 
+//Pre: timer is from the constructor
+//Post: Removes elements from timer that have timed out
+Node::clearTimeOut(Vector<MsgTimer>& timer) {
+  int size = timer.size(); //number of elements in timer
+  MsgTimer currTimer;
+  for (int index = 0; (index < size); index++){
+    currTimer = timer[timeOut.begin() + index];
+    if (currTimer.timedOut()) {
+      timeOut.erase(timeOut.begin() + index);
+    }
+  }
+}
+  
 //Pre: id is a valid node id that is not yet taken, contactID and contactIP
 //     belongs to a node already existing in the network
 //Post: ID = id, contact exists within our routing table, as well as
@@ -62,74 +81,28 @@ Node::Node(uint32_t id, uint32_t contactID, uint32_t contactIP) : RT(id) {
   inNetwork = false; //at this point, no other node knows about us
   vector<MsgTimer> timeOut();
   UDPSocket socket(UIPORT);
-  socket.sendMessage(FIND_NODE ID, contactIP, MAINPORT);
+  Message firstMsg(FINDNODE, ID, "FINDNODE", ID);
+  socket.sendMessage(firstMsg, contactIP, MAINPORT);
   timeOut.push_back(MsgTimer(RESPONSETIME, contactID, contactIP));
   Triple contactTriple(contactID, contactIP, MAINPORT);
   JoinNetworkQueue nodesToAsk(contactID, contactIP);
   while (nodesToAsk.hasNext() and !RT.isFull()) {
-    if (socket.recieved()) {
-      Message msg = socket.getMessage();
-      if (msg == KCLOSEST) {
+    string resposne;
+    int msgSize = socket.recvMessage(response);
+    if (msgSize != -1) {
+      Message msg(response);
+      if (msg.getMsgType() == KCLOSEST) {
 	bool myIdInMsg = handleKClosMsg(msg, timeOut, nodesToAsk);
       } //Done Dealing with a received message
     }
     Triple nextToAsk = nodesToAsk.getNext();
-    Message toSend(FINDNODE, "FINDNODE", ID, nextToAsk.id);
+    Message toSend(FINDNODE, ID, "FINDNODE", ID);
     socket.sendMessage(toSend.toString(), nextToAsk.address, nextToAsk.port);
-  }
-  for (int i=0; i < TV.size(); i++){
-    if (TV[i].timedOut()){
-      TV.erase(i);
-      i--;
-			
-			
-    }
-    /*
-    //LOOP
-    //TODO: stop when our KBuckets are full or when our
-    //      query has all elements are queried
-    while(inNetwork){
-    if (socket.recieved()){
-    Message msg = socket.getMessage();
-    if (msg == KCLOS){
-    RT.updateTable(msg.getID(), msg.getIP(), PORT);
-    if(RT.full()){ //TODO: routing table is full function
-    //ASSERT: the routing table is full,
-    //        stop trying to add to the network
-    break;
-    }
-    TV.eraseElement(msg.getID()); //TODO:remove element
-    //     of the msg sender ID
-    if (!msg.includes(ID)){
-    //ASSERT: these kClos should be added to the queue
-    queue.add(msg.getKClos()); //TODO:
-    }
-    if(queue.isNext()){
-    socket.sendMessage(FIND_NODE ID, queue.getNext()); //TODO
-    }else{
-    //ASSERT: nothing left to check
-    break;
-    }
-    }
-    }
-		 
-    for (int i=0; i < TV.size(); i++){
-    if (TV[i].timedOut()){
-    TV.erase(i);
-    i--;
-    socket.sendMessage(FIND_NODE ID, queue.getNext()); //TODO
-    }
-    }
-    if (TV.size() == 0){
-    //ASSERT: We have not joined the network
-    inNetwork = false;
-    }
-    }
-    */
-		
+    clearTimeOut(timeOut);
   }
 }
 
+//--------------------------------Node Listener----------------------------
 
 //Handles messages from other Nodes.
 //Everything is constant time
@@ -239,6 +212,7 @@ void Node::startListener(){
   //ASSERT: join the threads after we have finished listening
 }
 
+//------------------------------Refresher and Update----------------------
 
 //Refresher/ Update Table
 //Possibly Variable Time
@@ -364,6 +338,7 @@ void Node::startRefresher()
   socket.close();
 }
 
+//---------------------------User Interface Related-----------------------
 
 //Handles all UI
 //Variable Time
@@ -374,7 +349,6 @@ void Node::startRefresher()
 void startUIListener() {
   SnapShot snapSnot;
   MsgType curMsg;
-	
   std::string strUI;
   Message msgUI;
   uint32_t recvlenUI;
@@ -387,7 +361,6 @@ void startUIListener() {
       //Update the ip for the UI
       int ipUI = socketUI.getRemoteIP();
       msgUI.parse(strUI);
-
       if (msgUI.getMsgType() == FINDVALUE) {
 	curMsg = msgUI;
 	if (std::find(keys.begin(), keys.end(), curMsg.getID())
