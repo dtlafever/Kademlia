@@ -372,7 +372,6 @@ void startUIListener() {
       int ipUI = socketUI.getRemoteIP();
       msgUI.parse(strUI);
 
-<<<<<<< HEAD
 			if (msgUI.getMsgType() == FINDVALUE) {
 				curMsg = msgUI;
 				if (std::find(keys.begin(), keys.end(), curMsg.getID())
@@ -412,33 +411,6 @@ void startUIListener() {
 				sendUpToAlphaKClos(SnapShot, socketUI);
 			}
 		}
-=======
-      if (msgUI.getMsgType() == FINDVALUE) {
-	curMsg = msgUI;
-	if (std::find(keys.begin(), keys.end(), curMsg.getID())
-	    != keys.end()) {
-	  //ASSERT: we have the value, send confirm message
-	  Message sendMsg(FVRESPP);
-	  socketUI.sendMessage(sendMsg.toString(), ipUI, UIPORT);
-	}
-	else {
-	  //ASSERT: we did not find the value, lets check
-	  //        the rest of the network
-	  Triple kClos[K];
-	  int size = getKClosetNodes(curMsg.getID(), kClos);
-	  //ASSERT: kClos contains the K closest nodes that we
-	  //        know about it.
-	  snapSnot.addClosest(kClos, size);
-	  if (!snapShot.nextExist()) {
-	    //ASSERT: there is no k clos to check,
-	    //        send fail message to UI
-	    Message sendMsg(FVRESPN);
-	    socketUI.sendMessage(sendMsg.toString(), ipUI, UIPORT);
-	  }
-	  else {
-	    sendUpToAlphaKClos(SnapShot, socketUI);
-	  }
->>>>>>> origin/master
 	}
       }else if (msgUI.getMsgType() == STORE_UI) {
 	curMsg = msgUI;
