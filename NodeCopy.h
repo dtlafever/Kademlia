@@ -3,7 +3,6 @@
 #include <vector>
 #include "RoutingTable.h"
 #include "MsgTimer.h"
-#include "UDPSocket.h"
 
 #define UI_TIMEOUT 0
 #define PINGER_TIMEOUT 1
@@ -37,8 +36,6 @@ class Node
 	vector<MsgTimer> timeouts[3];
 	
 	void sendUpToAlphaPing(KBucket & curKBucket, UDPSocket & sock);
-
-	void sendUpToAlphaKClos(SnapShot & ss, UDPSocket & sock);
   
  public:
 
