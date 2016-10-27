@@ -53,6 +53,20 @@ bool RoutingTable::isEmpty() {
   return (empty);
 }
 
+//Pre: The Routing Table exists
+//Post: RV = true if the Routing Table is full, false otherwise
+bool RoutingTable::isFull() {
+  bool full = true;
+  int index = 0;
+  while (full) {
+    KBucket curBucket = table[index];
+    if (curBucket.getNumTriples() != K) {
+      full = false;
+    }
+  }
+  return (full);
+}
+
 //Pre: id is some valid node or key
 //Post: RV = the nth kBucket such that d = findDist(id) where 2^n <= d < 2^n+1
 int RoutingTable::findKBucket(uint32_t id) {
