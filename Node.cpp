@@ -104,16 +104,23 @@ Node::Node(uint32_t id, uint32_t contactID, uint32_t contactIP) : RT(id) {
 //Handles messages from other Nodes.
 //Everything is constant time
 //MAIN: port 6666
-//      READS:  STORE, FIND_NODE, FIND_VALUE
-//      SENDS:  K_CLOS, FIND_VALUE_RESP
+//      READS:  STORE, FINDNODE, FINDVALUE
+//      SENDS:  KCLOSEST, FVRESP
 void Node::startListener(){
-  
-  //NOTES: Timeout?
+ 
   //       When we send a message, make sure we've got
   //       6666 included so people know to respond to the
   //       right one.
   //       WHENEVER WE SEND K CLOSEST, SEND TO 6667
-
+  
+  thread PingThread = thread(startRefresher);
+  thread UIThread = thread(startUIListener);
+  //ASSERT: Create the two threads for handling Pings and
+  //        for handling UIs
+  
+  Message sendMessageOBJ();
+  //ASSERT: empty message object to send later
+  
   std::string sendString; //the message we will fill up and send
   std::string receiveString; //the message we will receive
   
@@ -128,8 +135,6 @@ void Node::startListener(){
   //ASSERT: empty message object to send later
      
   while(listening){
-    //listening on the main socket
-       
     recNum = socket.recvMessage(receiveString);
        
     if(recNum > 0){
@@ -142,36 +147,44 @@ void Node::startListener(){
 	   
 	//add sender to refresh queue
       }
-      else if(receivedMessageOBJ.getMSGType() == KCLOS){
+      else if(receivedMessageOBJ.getMSGType() == FINDNODE){
 	   
 	//access k closest to send over
 	   
-	//give back kclos
-	//add sender to refresh queue
+
 	sendString = sendMessageOBJ.toString();
 	socket.sendMessage(sendString, UIPORT, senderIP);
       }
-      else if(receivedMessageOBJ.getMSGType() == FIND_VALUE){
+      else if(receivedMessageOBJ.getMSGType() == FINDVALUE){
+	//ASSERT: A node is trying to find a key
 	uint32_t theKey = receivedMessageOBJ.getID();
-	   
-	if(KeyFound){
+
+	vector<int>::iterator it;
+	it = find(keys.begin(), keys.end(), theKey);
+	
+      	if(it != keys.end()){
+	  //ASSERT: we found the key
 	  sendMessageOBJ.setMsgType = FVRESP;
 	  sendString = sendMessageOBJ.toString();
 	  socket.sendMessage(sendString, MAINPORT, senderIP);
 	}
 	else{
+	  //ASSERT: we could not find in the key
 	  sendMessageOBJ.setMsgType = KCLOSEST;
-	  //add k closest nodes to message? 
 
-
+	  
 	  sendString = sendMessageOBJ.toString();
 	  socket.sendMessage(sendString, UIPORT, senderIP);
 	}
+
+	//ASSERT: ADD SENDER TO REFRESHER
       }
     }
   }
  
-     
+  PingThread.join();
+  UIThread.join();
+  //ASSERT: join the threads after we have finished listening
 }
 
 //Refresher/ Update Table
