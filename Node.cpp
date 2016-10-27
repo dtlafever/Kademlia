@@ -164,7 +164,12 @@ void Node::startListener(){
 	
   Message sendMessageOBJ();
   //ASSERT: empty message object to send later
-	
+  
+  Triple KClosest[K];
+  int closestSize; //size of nodes after we fill with K closest
+  //ASSERT: Declare a Triple array of size K to send to FINDNODE
+  //        and FINDVALUE requests
+
   while(listening){
     recNum = socket.recvMessage(receiveString);
 	  
@@ -172,46 +177,59 @@ void Node::startListener(){
       Message receivedMessageOBJ(receiveString);
       senderIP = socket.getRemoteIP();
       senderID = receivedMessageOBJ.getNodeID();
-	    
       Triple sendTriple(senderIP, MAINPORT, senderID);
+
+      uint32_t aKey;
+      //ASSERT: to be extracted from each message.
 			
       if(receivedMessageOBJ.getMSGType() == STORE){
-	uint32_t keyToStore = receivedMessageOBJ.getID();
+	//ASSERT: A node wants to store
+	aKey = receivedMessageOBJ.getID();
 	keys.push_back(keyToStore);
-	   
-	//add sender to refresh queue
+	refresherVector.push_back(sendTriple);
       }
       else if(receivedMessageOBJ.getMSGType() == FINDNODE){
-	      
-	//access k closest to send over
-	   
-	      
+	//ASSERT: A node wants k closest nodes
+	aKey = receivedMessageOBJ.getID();
+
+	closestSize = RT.getKClosetNodes(aKey, KClosest);
+	sendMessageOBJ.setKClos(KClosest, closestSize);
+	
+	sendMessageOBJ.setMsgType(KCLOSEST);
+	sendMessageOBJ.setNodeId(ID);
+	
 	sendString = sendMessageOBJ.toString();
 	socket.sendMessage(sendString, UIPORT, senderIP);
+
+	refresherVector.push_back(sendTriple);
       }
       else if(receivedMessageOBJ.getMSGType() == FINDVALUE){
 	//ASSERT: A node is trying to find a key
-	uint32_t theKey = receivedMessageOBJ.getID();
+	aKey = receivedMessageOBJ.getID();
 	      
 	vector<int>::iterator it;
 	it = find(keys.begin(), keys.end(), theKey);
 	      
 	if(it != keys.end()){
 	  //ASSERT: we found the key
-	  sendMessageOBJ.setMsgType = FVRESP;
+	  sendMessageOBJ.setMsgType(FVRESP);
+	  sendMessageOBJ.setNodeId(ID);
 	  sendString = sendMessageOBJ.toString();
 	  socket.sendMessage(sendString, MAINPORT, senderIP);
 	}
 	else{
 	  //ASSERT: we could not find in the key
-	  sendMessageOBJ.setMsgType = KCLOSEST;
-		
-		
+	  closestSize = RT.getKClosetNodes(aKey, KClosest);
+	  sendMessageOBJ.setKClos(KClosest, closestSize);
+	  
+	  sendMessageOBJ.setMsgType(KCLOSEST);
+	  sendMessageOBJ.setNodeId(ID);
+	  
 	  sendString = sendMessageOBJ.toString();
 	  socket.sendMessage(sendString, UIPORT, senderIP);
 	}
 	      
-	//ASSERT: ADD SENDER TO REFRESHER
+	refresherVector.push_back(sendTriple);
       }
     }
   }
