@@ -2,7 +2,7 @@
 #include "SocketException.h"
 #include "constants.h"
 
-//PRE: the port we want to listen and send messages on
+//PRE: the port we want to listen
 //POST: creates the socket and binds to the specified port.
 //      throws error if could not create or bind
 UDPSocket::UDPSocket(uint32_t port) {
@@ -38,6 +38,16 @@ void UDPSocket::open(uint32_t port) {
 //      throws error if couldn't send
 void UDPSocket::sendMessage(const std::string s, const std::string host,
 						const uint32_t port) {
+	if (!Socket::sendTo(s, host, port)) {
+		throw SocketException("Could not send message.");
+	}
+}
+
+//PRE: a message, host ip, and the port
+//POST: sends the message to that host.
+//      throws error if couldn't send
+void UDPSocket::sendMessage(const std::string s, const int host,
+	const uint32_t port) {
 	if (!Socket::sendTo(s, host, port)) {
 		throw SocketException("Could not send message.");
 	}

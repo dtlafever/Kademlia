@@ -7,6 +7,7 @@
 #include "SnapShot.h"
 #include <vector>
 #include <algorithm>
+#include "MsgTimer.h"
 
 
 //Pre: id is a valid node id that is not yet taken
@@ -174,10 +175,11 @@ void startRefresher() {
 
 void startUIListener() {
 	SnapShot snapSnot;
-	MsgType curMsg;
-	vector<Timeout> timeoutVector;
+	Message curMsg;
+	vector<MsgTimer> timeoutVector;
 
-	std::string msgUI;
+	std::string strUI;
+	Message msgUI;
 	uint32_t recvlenUI;
 
 	UDPSocket socketUI(UIPORT);
@@ -186,20 +188,35 @@ void startUIListener() {
 
 	while(listening) {
 		//Listening on UI socket
-		recvlenUI = socketUI.recvMessage(msgUI);
+		recvlenUI = socketUI.recvMessage(strUI);
 		if (recvlenUI > 0) {
 			//Update the ip for the UI
-			ipUI = socketUI.getRemoteIP();
-
-			Message msg(msgUI);
+			int ipUI = socketUI.getRemoteIP();
+			msgUI.parse(strUI);
 			
-			if (msg.getMsgType() == FINDVALUE) {
-				curMsg = msg.getMsgType();
+			if (msgUI.getMsgType() == FINDVALUE) {
+				curMsg = msgUI;
 				if (std::find(keys.begin(), keys.end(), curMsg.getID())
 					!= keys.end()) {
-					//ASSERT: we have the value
-					Message returnMsg(FVRESPP);
-					socketUI.sendMessage(returnMesg);
+					//ASSERT: we have the value, send confirm message
+					Message sendMsg(FVRESPP);
+					socketUI.sendMessage(sendMsg.toString(), ipUI, UIPORT);
+				}else{
+					//ASSERT: we did not find the value, lets check
+					//        the rest of the network
+					Triple kClos[K];
+					int size = getKClosetNodes(curMsg.getID(), kClos);
+					//ASSERT: kClos contains the K closest nodes that we
+					//        know about it.
+					snapSnot.addClosest(kClos, size);
+					Message sendMsg(FINDVALUE);
+					sendMsg.getKClos(kClos, size);
+					for (int i = 0; (i < ALPHA) && (snapSnot.nextExist()); i++) {
+						Triple nextNode;
+						snapSnot.getNext(nextNode);
+						socketUI.sendMessage(sendMsg.toString(), nextNode.address, UDPPORT);
+						
+					}
 				}
 			}
 		}
