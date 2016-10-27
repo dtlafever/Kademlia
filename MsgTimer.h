@@ -11,6 +11,7 @@ private:
   uint32_t nodeID, nodeIP;
   timer::duration<int> wait_for;
   timer_clock::time_point finish_time;
+	
 
 public:
   // PRE: expects an integer, t , of the number of <seconds?> to save the
