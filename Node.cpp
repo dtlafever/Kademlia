@@ -62,9 +62,9 @@ Node::Node(uint32_t id, uint32_t contactID, uint32_t contactIP) : RT(id) {
 	inNetwork = false; //at this point, no other node knows about us
 	vector<MsgTimer> timeOut();
 	UDPSocket socket(UIPORT);
-	socket.sendMessage(FIND_NODE ID, contactIP, UDPPORT);
+	socket.sendMessage(FIND_NODE ID, contactIP, MAINPORT);
 	timeOut.push_back(MsgTimer(RESPONSETIME, contactID, contactIP));
-	Triple contactTriple(contactID, contactIP, UDPPORT);
+	Triple contactTriple(contactID, contactIP, MAINPORT);
 	JoinNetworkQueue nodesToAsk(contactID, contactIP);
 	while (nodesToAsk.hasNext() and !RT.isFull()) {
 		if (socket.recieved()) {
@@ -356,9 +356,9 @@ void Node::startRefresher()
 void startUIListener() {
 	SnapShot snapSnot;
 	MsgType curMsg;
-	vector<Timeout> timeoutVector;
 	
-	std::string msgUI;
+	std::string strUI;
+	Message msgUI;
 	uint32_t recvlenUI;
 	
 	UDPSocket socketUI(UIPORT);
@@ -397,26 +397,44 @@ void startUIListener() {
 						sendUpToAlphaKClos(SnapShot, socketUI);
 					}
 				}
-			}else if (msgUI.getMsgType() == STORE_UI) {
+			}else if (msgUI.getMsgType() == STORE) {
 				curMsg = msgUI;
 				Triple kClos[K];
 				int size = getKClosetNodes(curMsg.getID(), kClos);
-				snapSnot.addClosest(kClos, size);
-				sendUpToAlphaKClos(SnapShot, socketUI);
+				if (size == 0) {
+					//ASSERT: special case where we are the only node in network,
+					//        so we store the key
+					keys.push_back(msgUI.getID());
+					Message sendMsg(STORERESP);
+					socketUI.sendMessage(sendMsg.toString(), ipUI, UIPORT);
+				}
+				else {
+					snapSnot.addClosest(kClos, size);
+					sendUpToAlphaKClos(SnapShot, socketUI);
+				}
+			}else if (msgUI.getMsgType() == KCLOSEST){
+				//ASSERT: this is a response from a node
+				for (int i = 0; i < timeouts[UI_TIMEOUT].size(); i++) {
+					if(timeouts[UI_TIMEOUT][i].getNodeID() == )
+				}
 			}
 		}
 	}
 }
 
+//PRE: the snapshot we are currently using, as well as the socket to 
+//     send messages on.
+//POST: sends up to ALPHA nodes FINDVALUE and then add them to
+//      the timer queue.
 void Node::sendUpToAlphaKClos(SnapShot & ss, UDPSocket & sock) {
 	Message sendMsg(FINDVALUE);
 	sendMsg.getKClos(kClos, size);
 	for (int i = 0; (i < ALPHA) && (snapSnot.nextExist()); i++) {
 		Triple nextNode;
 		snapSnot.getNext(nextNode);
-		socket.sendMessage(sendMsg.toString(), nextNode.address, UDPPORT);
+		socket.sendMessage(sendMsg.toString(), nextNode.address, MAINPORT);
 		MsgTimer timer(RESPONDTIME, nextNode.node, nextNode.address);
-		timeous[UI_TIMEOUT].push_back(timer);
+		timeouts[UI_TIMEOUT].push_back(timer);
 	}
 }
 
