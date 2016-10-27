@@ -21,7 +21,7 @@ Node::Node(uint32_t id) : RT(id){
 //Pre: msg, queue, and timeOut were declared in the constructor below
 //Post: the id of the node sending msg is removed from timeOut
 //      if our id is in closest times, return true, false other wise
-bool Node::handleKClosMsg(Message msg, vector<MsgTimer>& timeOut,
+void Node::handleKClosMsg(Message msg, vector<MsgTimer>& timeOut,
 			  JoinNewtorkQueue& queue) {
   bool isMyIDInMsg = false;
   uint32_t senderID = msg.ID();
@@ -36,18 +36,20 @@ bool Node::handleKClosMsg(Message msg, vector<MsgTimer>& timeOut,
       found = true;
       timeOut.erase(timeOut.begin() + index);
     }
-    if (msg.includes(ID)) {
-      isMyIDInMsg = true;
-    }
-    else {
-      Triple closestK[K];
-      int size = msg.getKClos(closestK);
-      for (int index = 0; (index < size); index) {
-	queue.add(closestK[index]);
-      }
-    }
+    index++;
+  } //the sender node is now removed from the time out vector
+  if (msg.includes(ID)) {  //This node knows us
+    isMyIDInMsg = true;
   }
-  return (isMyIDInMsg);
+  //Continue adding in the nodes we have not asked yet
+  Triple closestK[K];
+  int size = msg.getKClos(closestK);
+  for (int index = 0; (index < size); index) {
+    queue.add(closestK[index]);
+  }
+  if (!inNetwork) { //no need to check if we're already in network
+    inNetwork = myIdInMsg;
+  }
 }
 
 //Pre: id is a valid node id that is not yet taken, contactID and contactIP
@@ -70,13 +72,18 @@ Node::Node(uint32_t id, uint32_t contactID, uint32_t contactIP) : RT(id) {
       Message msg = socket.getMessage();
       if (msg == KCLOSEST) {
 	bool myIdInMsg = handleKClosMsg(msg, timeOut, nodesToAsk);
-	if (!inNetwork) { //no need to check if we're already in network
-	  inNetwork = myIdInMsg;
-	}
-      }
-      Triple nextToAsk = nodesToAsk.getNext();
-      socket.sendMessage(FIND_NODE ID, nextToAsk.address, nextToAsk.port);
-				 
+      } //Done Dealing with a received message
+    } 
+    Triple nextToAsk = nodesToAsk.getNext();
+    Message toSend(FINDNODE, "FINDNODE", ID, nextToAsk.id);
+    socket.sendMessage(toSend.toString(), nextToAsk.address, nextToAsk.port);
+    }
+    for (int i=0; i < TV.size(); i++){
+      if (TV[i].timedOut()){
+	TV.erase(i);
+	i--;
+
+      
     }
     /*
     //LOOP

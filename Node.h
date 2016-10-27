@@ -26,7 +26,7 @@ class Node
   //Pre: msg, queue, and timeOut were declared in the constructor below
   //Post: the id of the node sending msg is removed from timeOut
   //      if our id is in closest times, return true, false other wise
-  bool Node::handleKClosMsg(Message msg, vector<MsgTimer>& timeOut,
+  void Node::handleKClosMsg(Message msg, vector<MsgTimer>& timeOut,
 			    JoinNewtorkQueue& queue);
 
 	
