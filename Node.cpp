@@ -1,6 +1,13 @@
 //Kadelima Node Class
 #include "UDPSocket.h"
 #include "Node.h"
+#include "constants.h"
+#include "Message.hpp"
+#include "UDPSocket.h"
+#include "SnapShot.h"
+#include <vector>
+#include <algorithm>
+
 
 //Pre: id is a valid node id that is not yet taken
 //Post: RT is initalized, ID = id, inNetwork = true
@@ -73,23 +80,6 @@ Node::Node(uint32_t id, uint32_t contactID, uint32_t contactIP) : RT(id){
 	  //ASSERT: nothing left to check
 	  break;
 	}
-      }
-    }
-
-    for (int i=0; i < TV.size(); i++){
-      if (TV[i].timedOut()){
-	TV.erase(i);
-	i--;
-	socket.sendMessage(FIND_NODE ID, queue.getNext()); //TODO
-      }
-    }
-    if (TV.size() == 0){
-      //ASSERT: We have not joined the network
-      inNetwork = false;
-    }
-  }
-  */
-
 }
 
 //Handles messages from other Nodes.
@@ -303,5 +293,6 @@ void Node::startRefresher()
 	}
 	
 }
+
 
 
