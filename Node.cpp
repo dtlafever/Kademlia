@@ -111,13 +111,7 @@ void Node::startListener(){
   //       When we send a message, make sure we've got
   //       6666 included so people know to respond to the
   //       right one.
-
- 
-  //Handles messages from other Nodes.
-  //Everything is constant time
-  //MAIN: port 6666
-  //      READS: PING, STORE, FIND_NODE, FIND_VALUE
-  //      SENDS: PING_RESP, K_CLOS, FIND_VALUE_RESP_TRUE
+  //       WHENEVER WE SEND K CLOSEST, SEND TO 6667
 
   std::string sendString; //the message we will fill up and send
   std::string receiveString; //the message we will receive
@@ -130,14 +124,6 @@ void Node::startListener(){
      UDPSocket socket(MAINPORT);
      //ASSERT: connect socket to our main port
 
-}
-
-//Handles all UI
-//Variable Time
-//L1  : port 6667
-//      READS: FIND_VALUE_UI, STORE_UI, KCLOS, FIND_VALUE_RESP
-//      SENDS: FIND_VALUE, FIND_NODE, STORE
-//			TO UI: FIND_VALUE_RESP_POSITIVE, FIND_VALUE_RESP_NEGATIVE, STORE_RESP
      Message sendMessageOBJ();
      //ASSERT: empty message object to send later
      
@@ -145,7 +131,7 @@ void Node::startListener(){
        //listening on the main socket
        
        recNum = socket.recvMessage(receiveString);
-
+       
        if(recNum > 0){
 	 Message receivedMessageOBJ(receiveString);
 	 senderIP = socket.getRemoteIP();
@@ -181,11 +167,22 @@ void Node::startListener(){
 	     socket.sendMessage(sendString, MAINPORT, senderIP);
 	   }
 	   else{
-3	     sendMessageOBJ.setMsgType = KCLOSEST;
+	     sendMessageOBJ.setMsgType = KCLOSEST;
 	     //add k closest nodes to message? 
 	     sendString = sendMessageOBJ.toString();
 	     socket.sendMessage(sendString, MAINPORT, senderIP);
 	   }
+
+
+     
+}
+
+//Handles all UI
+//Variable Time
+//L1  : port 6667
+//      READS: FIND_VALUE_UI, STORE_UI, KCLOS, FIND_VALUE_RESP
+//      SENDS: FIND_VALUE, FIND_NODE, STORE
+//			TO UI: FIND_VALUE_RESP_POSITIVE, FIND_VALUE_RESP_NEGATIVE, STORE_RESP
 
 //Refresher/ Update Table
 //Possibly Variable Time
