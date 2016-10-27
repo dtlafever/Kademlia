@@ -121,56 +121,56 @@ void Node::startListener(){
 
   uint32_t recNum; 
 
-  try{
-     UDPSocket socket(MAINPORT);
-     //ASSERT: connect socket to our main port
+  UDPSocket socket(MAINPORT);
+  //ASSERT: connect socket to our main port
 
-     Message sendMessageOBJ();
-     //ASSERT: empty message object to send later
+  Message sendMessageOBJ();
+  //ASSERT: empty message object to send later
      
-     while(listening){
-       //listening on the main socket
+  while(listening){
+    //listening on the main socket
        
-       recNum = socket.recvMessage(receiveString);
+    recNum = socket.recvMessage(receiveString);
        
-       if(recNum > 0){
-	 Message receivedMessageOBJ(receiveString);
-	 senderIP = socket.getRemoteIP();
+    if(recNum > 0){
+      Message receivedMessageOBJ(receiveString);
+      senderIP = socket.getRemoteIP();
         
-	 if(receivedMessageOBJ.getMSGType() == STORE){
-	   uint32_t keyToStore = receivedMessageOBJ.getID();
-	   keys.push_back(keyToStore);
+      if(receivedMessageOBJ.getMSGType() == STORE){
+	uint32_t keyToStore = receivedMessageOBJ.getID();
+	keys.push_back(keyToStore);
 	   
-	   //add sender to refresh queue
-	 }
-	 else if(receivedMessageOBJ.getMSGType() == KCLOS){
+	//add sender to refresh queue
+      }
+      else if(receivedMessageOBJ.getMSGType() == KCLOS){
 	   
-	   //access k closest to send over
+	//access k closest to send over
 	   
-	   //give back kclos
-	   //add sender to refresh queue
-	   sendString = sendMessageOBJ.toString();
-	   socket.sendMessage(sendString, UIPORT, senderIP);
-	 }
-	 else if(receivedMessageOBJ.getMSGType() == FIND_VALUE){
-	   uint32_t theKey = receivedMessageOBJ.getID();
+	//give back kclos
+	//add sender to refresh queue
+	sendString = sendMessageOBJ.toString();
+	socket.sendMessage(sendString, UIPORT, senderIP);
+      }
+      else if(receivedMessageOBJ.getMSGType() == FIND_VALUE){
+	uint32_t theKey = receivedMessageOBJ.getID();
 	   
-	   if(KeyFound){
-	     sendMessageOBJ.setMsgType = FVRESP;
-	     sendString = sendMessageOBJ.toString();
-	     socket.sendMessage(sendString, MAINPORT, senderIP);
-	   }
-	   else{
-	     sendMessageOBJ.setMsgType = KCLOSEST;
-	     //add k closest nodes to message? 
+	if(KeyFound){
+	  sendMessageOBJ.setMsgType = FVRESP;
+	  sendString = sendMessageOBJ.toString();
+	  socket.sendMessage(sendString, MAINPORT, senderIP);
+	}
+	else{
+	  sendMessageOBJ.setMsgType = KCLOSEST;
+	  //add k closest nodes to message? 
 
 
-	     sendString = sendMessageOBJ.toString();
-	     socket.sendMessage(sendString, UIPORT, senderIP);
-	   }
-	 }
-
-
+	  sendString = sendMessageOBJ.toString();
+	  socket.sendMessage(sendString, UIPORT, senderIP);
+	}
+      }
+    }
+  }
+ 
      
 }
 
