@@ -8,12 +8,12 @@ Ingy
 
 Todo:
 
-- Finish nonUITagResponse
+- Add includes function in Message class
 - Update comments in Message.cpp
-- Update comments in Node.h, Node.cpp, RoutingTable.h, .cpp, KBucket.h, .cpp
-
-
-Notes:
-Ignore list and timers for node timeouts.
+- ask for getIP function in MsgTimer
+- ask for reset function in MSGTimer
+-Do we need a port in Triple?
+- Update names in constants file for delays ...
+-
 
 
