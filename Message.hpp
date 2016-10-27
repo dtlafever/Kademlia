@@ -25,7 +25,7 @@
 // FVRESPP	: Positive response to the UI for a FINDVALUE request.
 // FVRESPN	: Negative response to the UI for a FINDVALUE request.
 // ========================================================
-enum MsgType { PING, STORE, FINDNODE, FINDVALUE, KCLOSEST, PINGRESP, FVRESP, STORERESP, FVRESPP, FVRESPN, NONE};
+enum MsgType { PING, FINDNODE, FINDVALUE, STORE, KCLOSEST, PINGRESP, FVRESP, STORERESP, FVRESPP, FVRESPN, NONE};
 
 // IMPORTANT: This class assumes that anything passed to it is valid. It will not check if the contents in the array are garbage or not, if the size is wrong there is no garantee how the program is going to react.
 
@@ -78,7 +78,7 @@ public:
 	// POST: This function parses the message and updates the appropriate private members. This function alters the string and
 	void parse (std::string );
 	
-	// PRE: takes a MsgType object and an ID which is the NodeID
+	// PRE: takes a MsgType object and an ID which depends on the type of the message
 	// POST: Creates a message to be able to send it in the appropriate format.
 	std::string toString (MsgType type, uint32_t ID = -1, bool UI=false);
 	

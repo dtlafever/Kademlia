@@ -9,13 +9,14 @@
 #define K 5
 #define UDPPORT 6666
 #define UIPORT 6667
+#define REFRESHERPORT 6668
 #define NUMBITS 32
 #define ALPHA 3
-#define RESPONDTIME 2000 //in milliseconds, the time to wait before
+#define RESPONDTIME_UI 2000 //in milliseconds, the time to wait before we consider a message timed out
+#define RESPONDTIME_PING 1000 // in milliseconds, the time before we consider that a PING request has timed out.
 #define DELAY_DURATION chrono::duration<int, std::milli> delay(RESPONDTIME)
 
-//moving on for an operation (such as findNode)
-#define PINGTIME 3600000 //in milliseconds, the time to wait before
+#define PINGTIME 3600000 //in milliseconds, the time to wait before 
 
 //pinging a node
 #define MAXRECV 500
@@ -31,6 +32,7 @@ struct Triple {
 	uint32_t port; // UDP Port
 	uint32_t node; // Node ID
 	Triple() : address(0), port(0), node(0) {} //DEFAULT VALUES
+	Triple(const Triple & rhs):address(rhs.address), port(rhs.port), node(rhs.node) {}
 };
 
 //PRE: the Triple we want to copy our data do and the data triple we want

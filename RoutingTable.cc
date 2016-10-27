@@ -12,7 +12,7 @@ using namespace std;
 
 //Tags: Creatation, Check and Find, Modifying, Getting Stuff, Print Table
 
-//-----------------------Creatation---------------------------------
+//-----------------------Creation---------------------------------
 
 //Pre: id is the nodeID who owns this RoutingTable
 //Post: table is an array of K kBuckets, that are each empty
