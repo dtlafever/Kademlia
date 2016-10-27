@@ -23,6 +23,12 @@ void SnapShot::setCompareID(uint32_t nodeID) {
 	}
 }
 
+//DEFAULT CONSTRUCTOR
+SnapShot::Snapshot() {
+	compareID = 0;
+	size = 0;
+}
+
 //PRE: an array of triples up to nodeSize.
 //     We are assuming the nodes array is sorted
 //POST: Triples from node placed into pair array
@@ -38,6 +44,7 @@ SnapShot::SnapShot(Triple nodes[], uint32_t nodesSize, uint32_t nodeID){
 
 SnapShot::SnapShot(uint32_t nodeID) {
 	compareID = nodeID;
+	size = 0;
 }
 
 //PRE: a k closest array already in closest to least closest order,
@@ -51,7 +58,7 @@ void SnapShot::addClosest(Triple * kClos, uint32_t kClosSize){
   while ((size < K) && (curKClosIndex < kClosSize)) {
     copyQuintFromTriple(closest[size], kClos[curKClosIndex]);
     closest[size].queried = false;
-		closest[size].compareID = compareID;
+	closest[size].compareID = compareID;
     size++;
     curKClosIndex++;
   }
