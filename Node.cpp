@@ -1,4 +1,9 @@
 #include "Node.h"
+#include "constants.h"
+#include "Message.hpp"
+#include "UDPSocket.h"
+#include "SnapShot.h"
+#include <vector>
 
 Node::Node(int id) : RT(id){
   ID = id;
@@ -143,5 +148,23 @@ void startRefresher() {
 
 void startUIListener() {
 	SnapShot snapSnot;
-	
+	MsgType curMsg;
+	vector<Timeout> timeoutVector;
+
+	std::string msgUI;
+	uint32_t recvlenUI;
+
+	UDPSocket socketUI(UIPORT);
+
+	for (;;) {
+		//Listening on UI socket
+		recvlenUI = socketUI.recvMessage(msgUI);
+		if (recvlenUI > 0) {
+			//Update the ip for the UI
+			ipUI = socketUI.getRemoteIP();
+
+			Message msg(msgUI);
+
+		}
+	}
 }

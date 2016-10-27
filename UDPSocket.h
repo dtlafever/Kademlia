@@ -31,7 +31,8 @@ public:
 		const uint32_t port);
 
 	//PRE: the buffer we want to store the message in
-	//POST: store the message in the string and return the size of that junk
+	//POST: store the message in the string and return the size of the message
+	//NOTE: returns -1 if there was an error in recieving the message
 	int recvMessage(std::string& s);
 
 	//PRE: assumes that remaddr has a value (AKA recvMessage called)
