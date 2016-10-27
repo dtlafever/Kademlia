@@ -7,7 +7,7 @@
 
 #define MAXTHREADS 15 //maximum number of threads
 #define K 5
-#define UDPPORT 6666
+#define MAINPORT 6666
 #define UIPORT 6667
 #define REFRESHERPORT 6668
 #define NUMBITS 32

@@ -28,6 +28,11 @@ class Node
   vector<Triple> refresherVector;
   bool exit = false;
 
+	// Index 0 is a vector of MsgTimer to keep track of the timeouts for the UI thread.
+	// Index 1 is reserved for messages that the PINGer sends for other threads.
+	// Index 2 is reserved for timeouts for the refresher -> there should never be more than ALPHA
+	vector<MsgTimer> timeouts[3];
+
   //Pre: msg, queue, and timeOut were declared in the constructor below
   //Post: the id of the node sending msg is removed from timeOut
   //      if our id is in closest times, return true, false other wise
@@ -42,6 +47,10 @@ class Node
 	
 	void sendUpToAlphaPing(KBucket & curKBucket, UDPSocket & socket, uint32_t & i, uint32_t & j);
 
+	//PRE: the snapshot we are currently using, as well as the socket to 
+	//     send messages on.
+	//POST: sends up to ALPHA nodes FINDVALUE and then add them to
+	//      the timer queue.
 	void sendUpToAlphaKClos(SnapShot & ss, UDPSocket & sock);
 	
  public:
