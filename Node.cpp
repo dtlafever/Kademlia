@@ -385,9 +385,8 @@ void Node::sendUpToAlphaPing(KBucket &curKBucket, UDPSocket &socket)
 //      SENDS: FIND_VALUE, FIND_NODE, STORE
 //			TO UI: FIND_VALUE_RESP_POSITIVE, FIND_VALUE_RESP_NEGATIVE, STORE_RESP
 void startUIListener() {
-  SnapShot snapSnot;
-
-  MsgType curMsg;
+	SnapShot snapSnot;
+	MsgType curMsg;
   vector<Timeout> timeoutVector;
 
   std::string msgUI;
@@ -395,16 +394,84 @@ void startUIListener() {
 
   UDPSocket socketUI(UIPORT);
 
-  bool listening = true;
+	while (listening) {
+		//Listening on UI socket
+		recvlenUI = socketUI.recvMessage(strUI);
+		if (recvlenUI > 0) {
+			//Update the ip for the UI
+			int ipUI = socketUI.getRemoteIP();
+			msgUI.parse(strUI);
 
-  while(listening) {
-    //Listening on UI socket
-    recvlenUI = socketUI.recvMessage(msgUI);
-    if (recvlenUI > 0) {
-      //Update the ip for the UI
-      ipUI = socketUI.getRemoteIP();
+			if (msgUI.getMsgType() == FINDVALUE) {
+				curMsg = msgUI;
+				if (std::find(keys.begin(), keys.end(), curMsg.getID())
+					!= keys.end()) {
+					//ASSERT: we have the value, send confirm message
+					Message sendMsg(FVRESPP);
+					socketUI.sendMessage(sendMsg.toString(), ipUI, UIPORT);
+				}
+				else {
+					//ASSERT: we did not find the value, lets check
+					//        the rest of the network
+					Triple kClos[K];
+					int size = getKClosetNodes(curMsg.getID(), kClos);
+					//ASSERT: kClos contains the K closest nodes that we
+					//        know about it.
+					snapSnot.addClosest(kClos, size);
+					if (!snapShot.nextExist()) {
+						//ASSERT: there is no k clos to check,
+						//        send fail message to UI
+						Message sendMsg(FVRESPN);
+						socketUI.sendMessage(sendMsg.toString(), ipUI, UIPORT);
+					}
+					else {
+						sendUpToAlphaKClos(SnapShot, socketUI);
+					}
+				}
+			}else if (msgUI.getMsgType() == STORE_UI) {
+				curMsg = msgUI;
+				Triple kClos[K];
+				int size = getKClosetNodes(curMsg.getID(), kClos);
+				snapSnot.addClosest(kClos, size);
+				sendUpToAlphaKClos(SnapShot, socketUI);
+			}
+		}
+	}
+}
 
-      Message msg(msgUI);
+void Node::sendUpToAlphaKClos(SnapShot & ss, UDPSocket & sock) {
+	Message sendMsg(FINDVALUE);
+	sendMsg.getKClos(kClos, size);
+	for (int i = 0; (i < ALPHA) && (snapSnot.nextExist()); i++) {
+		Triple nextNode;
+		snapSnot.getNext(nextNode);
+		socket.sendMessage(sendMsg.toString(), nextNode.address, UDPPORT);
+		MsgTimer timer(RESPONDTIME, nextNode.node, nextNode.address);
+		timeous[UI_TIMEOUT].push_back(timer);
+	}
+}
+
+		///TODO: check again
+										 
+ void Node::sendUpToAlphaPing(KBucket &curKBucket, UDPSocket &socket)
+{
+	while (timeouts[REFRESH_TIMEOUT].size()<ALPHA)
+	{
+		if(j>=curKBucket.getNumTriples()) // Check if we have reached the end of the Kbucket
+		{
+			i++; // Go to next KBucket
+			curKBucket= RT[i];
+			// Start at first element of the KBucket.
+			j =0;
+		}
+		
+		if(i>= NUMBITS) // If we did all the KBuckets, reset
+		{
+			i=j=0; // Reset indices
+			
+			// seet last refresh timepoint to Now
+			lastRefresh.reset();
+			refresh = false;
 			
       if (msg.getMsgType() == FINDVALUE) {
 	curMsg = msg.getMsgType();

@@ -37,6 +37,8 @@ class Node
 	vector<MsgTimer> timeouts[3];
 	
 	void sendUpToAlphaPing(KBucket & curKBucket, UDPSocket & sock);
+
+	void sendUpToAlphaKClos(SnapShot & ss, UDPSocket & sock);
   
  public:
 
