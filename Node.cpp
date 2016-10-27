@@ -105,15 +105,20 @@ void Node::startListener(){
   //       When we send a message, make sure we've got
   //       6666 included so people know to respond to the
   //       right one.
-  
+
+ 
   //Handles messages from other Nodes.
   //Everything is constant time
   //MAIN: port 6666
   //      READS: PING, STORE, FIND_NODE, FIND_VALUE
   //      SENDS: PING_RESP, K_CLOS, FIND_VALUE_RESP_TRUE
 
-  std::string newMSG;
-  uint32_t recNum;
+  std::string sendString; //the message we will fill up and send
+  std::string receiveString; //the message we will receive
+  
+  int senderIP; //the IP of the node we're receiving a msg from
+
+  uint32_t recNum; 
 
   try{
      UDPSocket socket(MAINPORT);
@@ -124,32 +129,51 @@ void Node::startListener(){
      //ASSERT: Create the two threads for handling Pings and
      //        for handling UIs
 
+     Message sendMessageOBJ();
+     //ASSERT: empty message object to send later
+     
      while(listening){
-       recNum = socket.recvMessage(newMSG);
+       //listening on the main socket
+       
+       recNum = socket.recvMessage(receiveString);
 
        if(recNum > 0){
-	 Message newMessage(newMSG);
-
-	 if(newMSG.getMSGType() == PING){
-	   //give back ping response
+	 Message receivedMessageOBJ(receiveString);
+	 senderIP = socket.getRemoteIP();
+	 
+	 if(receivedMessageOBJ.getMSGType() == PING){
+	   sendMessageOBJ.setMsgType = PINGRESP;
+	   sendString = sendMessageOBJ.toString();
+	   socket.sendMessage(sendString, MAINPORT, senderIP); 
+	   
 	   //add sender to refresh queue
 	 }
-	 else if(newMSG.getMSGType() == STORE){
+	 else if(receivedMessageOBJ.getMSGType() == STORE){
+	   uint32_t keyToStore = receivedMessageOBJ.getID();
 	   //push key to our key list
 	   //add sender to refresh queue
 	 }
-	 else if(newMSG.getMSGType() == KCLOS){
+	 else if(receivedMessageOBJ.getMSGType() == KCLOS){
+	   
+	   //access k closest to send over
+	   
 	   //give back kclos
 	   //add sender to refresh queue
 	 }
-	 else if(newMSG.getMSGType() == FIND_VALUE){
-	   //check for value
-	   // if(we have value){
-	   //   send back FIND_VALUE_RESP_TRUE;
-	   // }
-	   // else{
-	   //   send KCLOS;
-	   // }
+	 else if(receivedMessageOBJ.getMSGType() == FIND_VALUE){
+	   uint32_t theKey = receivedMessageOBJ.getID();
+	   //FIRST EXTRACT THE VALUE
+	   if(KeyFound){
+	     sendMessageOBJ.setMsgType = FVRESP;
+	     sendString = sendMessageOBJ.toString();
+	     socket.sendMessage(sendString, MAINPORT, senderIP);
+	   }
+	   else{
+	     sendMessageOBJ.setMsgType = KCLOSEST;
+	     //add k closest nodes to message? 
+	     sendString = sendMessageOBJ.toString();
+	     socket.sendMessage(sendString, MAINPORT, senderIP);
+	   }
 
 	   //add sender to refresh queue
 	 }
