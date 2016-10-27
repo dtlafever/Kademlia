@@ -226,7 +226,8 @@ void startUIListener() {
 	MsgType curMsg;
   vector<Timeout> timeoutVector;
 
-  std::string msgUI;
+  std::string strUI;
+	Message msgUI;
   uint32_t recvlenUI;
 
   UDPSocket socketUI(UIPORT);
@@ -269,6 +270,11 @@ void startUIListener() {
 				curMsg = msgUI;
 				Triple kClos[K];
 				int size = getKClosetNodes(curMsg.getID(), kClos);
+				if (size == 0) {
+					//ASSERT: We are the only node in the network, store
+					//        inside ourselves
+					keys.push_back(msgUI.);
+				}
 				snapSnot.addClosest(kClos, size);
 				sendUpToAlphaKClos(SnapShot, socketUI);
 			}
@@ -310,14 +316,6 @@ void Node::sendUpToAlphaKClos(SnapShot & ss, UDPSocket & sock) {
 			lastRefresh.reset();
 			refresh = false;
 			
-      if (msg.getMsgType() == FINDVALUE) {
-	curMsg = msg.getMsgType();
-	if (std::find(keys.begin(), keys.end(), curMsg.getID())
-	    != keys.end()) {
-	  //ASSERT: we have the value
-	  Message returnMsg(FVRESPP);
-	  socketUI.sendMessage(returnMesg);
-	}
       }
     }
   }
