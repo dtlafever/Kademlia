@@ -26,3 +26,16 @@ bool MsgTimer::timedOut() {
   }
   return isTimedOut;
 }
+
+uint32_t MsgTimer::getNodeID() {
+  return nodeID;
+}
+
+uint32_t MsgTimer::getNodeIP() {
+  return nodeIP;
+}
+
+void MsgTimer::resetTimer() {
+  timer_clock::time_point now = timer_clock::now();
+  finish_time = now + wait_for;
+}

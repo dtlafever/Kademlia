@@ -60,6 +60,9 @@ class SnapShot{
 	//POST: changes the quint.compareID to nodeID
 	SnapShot(uint32_t nodeID);
 
+	//DEFAULT CONSTRUCTOR
+	Snapshot();
+
 	//PRE: a k closest array already in closest to least closest order,
 	//     as well as its size (not greater than K)
 	//POST: add to the snapshot any items that are closer

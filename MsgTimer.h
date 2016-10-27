@@ -11,6 +11,7 @@ private:
   uint32_t nodeID, nodeIP;
   timer::duration<int> wait_for;
   timer_clock::time_point finish_time;
+	
 
 public:
   // PRE: expects an integer, t , of the number of <seconds?> to save the
@@ -25,6 +26,18 @@ public:
   // PRE: expects this object to be defined
   //POST: returns true iff the current time is less than the finish_time
   bool timedOut();
+
+  // PRE: expects this object to be defined
+  //POST: returns the id of the timeout object as uint32_t
+  uint32_t getNodeID();
+
+  // PRE: expects this object to be defined
+  //POST: returns the ip of the timeout object as uint32_t
+  uint32_t getNodeIP();
+
+  // PRE: expects this object to be defined
+  //POST: resets the finish_time to the current time plus the stored duration.
+  bool resetTimer();
 };
 
 #endif
