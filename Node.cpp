@@ -177,13 +177,6 @@ void Node::startListener(){
      
 }
 
-//Handles all UI
-//Variable Time
-//L1  : port 6667
-//      READS: FIND_VALUE_UI, STORE_UI, KCLOS, FIND_VALUE_RESP
-//      SENDS: FIND_VALUE, FIND_NODE, STORE
-//			TO UI: FIND_VALUE_RESP_POSITIVE, FIND_VALUE_RESP_NEGATIVE, STORE_RESP
-
 //Refresher/ Update Table
 //Possibly Variable Time
 //L2  : port 6668
@@ -339,7 +332,12 @@ void Node::startRefresher()
 	socket.close();
 }
 
-
+				 //Handles all UI
+				 //Variable Time
+				 //L1  : port 6667
+				 //      READS: FIND_VALUE_UI, STORE_UI, KCLOS, FIND_VALUE_RESP
+				 //      SENDS: FIND_VALUE, FIND_NODE, STORE
+				 //			TO UI: FIND_VALUE_RESP_POSITIVE, FIND_VALUE_RESP_NEGATIVE, STORE_RESP
 void startUIListener() {
 	SnapShot snapSnot;
 
