@@ -135,16 +135,7 @@ void Node::startListener(){
        if(recNum > 0){
 	 Message receivedMessageOBJ(receiveString);
 	 senderIP = socket.getRemoteIP();
-	 //ASSERT: 
-	 
-	 // if(receivedMessageOBJ.getMSGType() == PING){
-	 //   sendMessageOBJ.setMsgType = PINGRESP;
-	 //   sendString = sendMessageOBJ.toString();
-	 //   socket.sendMessage(sendString, MAINPORT, senderIP); 
-	   
-	 //   //add sender to refresh queue
-	 // }
-	 
+        
 	 if(receivedMessageOBJ.getMSGType() == STORE){
 	   uint32_t keyToStore = receivedMessageOBJ.getID();
 	   keys.push_back(keyToStore);
@@ -157,10 +148,12 @@ void Node::startListener(){
 	   
 	   //give back kclos
 	   //add sender to refresh queue
+	   sendString = sendMessageOBJ.toString();
+	   socket.sendMessage(sendString, UIPORT, senderIP);
 	 }
 	 else if(receivedMessageOBJ.getMSGType() == FIND_VALUE){
 	   uint32_t theKey = receivedMessageOBJ.getID();
-	   //FIRST EXTRACT THE VALUE
+	   
 	   if(KeyFound){
 	     sendMessageOBJ.setMsgType = FVRESP;
 	     sendString = sendMessageOBJ.toString();
@@ -169,9 +162,12 @@ void Node::startListener(){
 	   else{
 	     sendMessageOBJ.setMsgType = KCLOSEST;
 	     //add k closest nodes to message? 
+
+
 	     sendString = sendMessageOBJ.toString();
-	     socket.sendMessage(sendString, MAINPORT, senderIP);
+	     socket.sendMessage(sendString, UIPORT, senderIP);
 	   }
+	 }
 
 
      

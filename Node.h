@@ -4,7 +4,6 @@
 #include "RoutingTable.h"
 #include "MsgTimer.h"
 
-
 #define UI_TIMEOUT 0
 #define PINGER_TIMEOUT 1
 #define REFRESH_TIMEOUT 2
@@ -49,13 +48,15 @@ class Node
 
   bool joined();
 
-	//Handles messages from other Nodes.
-	//Everything is constant time
-	//MAIN: port 6666
-	//      READS:  STORE, FIND_NODE, FIND_VALUE
-	//      SENDS:  K_CLOS, FIND_VALUE_RESP
+  //Handles messages from other Nodes.
+  //Everything is constant time
+  //MAIN: port 6666
+  //      READS:  STORE, FIND_NODE, FIND_VALUE
+  //      SENDS:  K_CLOS, FIND_VALUE_RESP
   void startListener();
-	
+
+
+  
 	//Refresher/ Update Table
 	//Possibly Variable Time
 	//      port 6668
