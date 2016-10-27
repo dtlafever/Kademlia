@@ -149,15 +149,17 @@ void Node::startListener(){
        if(recNum > 0){
 	 Message receivedMessageOBJ(receiveString);
 	 senderIP = socket.getRemoteIP();
+	 //ASSERT: 
 	 
-	 if(receivedMessageOBJ.getMSGType() == PING){
-	   sendMessageOBJ.setMsgType = PINGRESP;
-	   sendString = sendMessageOBJ.toString();
-	   socket.sendMessage(sendString, MAINPORT, senderIP); 
+	 // if(receivedMessageOBJ.getMSGType() == PING){
+	 //   sendMessageOBJ.setMsgType = PINGRESP;
+	 //   sendString = sendMessageOBJ.toString();
+	 //   socket.sendMessage(sendString, MAINPORT, senderIP); 
 	   
-	   //add sender to refresh queue
-	 }
-	 else if(receivedMessageOBJ.getMSGType() == STORE){
+	 //   //add sender to refresh queue
+	 // }
+	 
+	 if(receivedMessageOBJ.getMSGType() == STORE){
 	   uint32_t keyToStore = receivedMessageOBJ.getID();
 	   //push key to our key list
 	   //add sender to refresh queue
