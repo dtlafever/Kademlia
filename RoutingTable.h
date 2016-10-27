@@ -50,6 +50,10 @@ class RoutingTable {
   //      False otherwise
   bool isEmpty();
 
+  //Pre: The Routing Table exists
+  //Post: RV = true if the Routing Table is full, false otherwise
+  bool isFull();
+
   //Pre: id is some node that belongs to a KBucket k
   //Post: RV = a copy of the oldest node in k
   Triple getOldestNode(uint32_t id);

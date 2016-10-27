@@ -31,7 +31,7 @@ bool JoinNetworkQueue::add(Triple new_contact) {
 bool JoinNetworkQueue::searched(Triple node) {
   bool found = false;
   Triple* found_node;
-  found_node = std::find(seen_nodes.begin(), seen_nodes.end(), node);
+  found_node = &(*std::find(seen_nodes.begin(), seen_nodes.end(), node));
   if (found_node != seen_nodes.end()) {
     found = true;
   }
@@ -45,7 +45,7 @@ bool JoinNetworkQueue::hasNext() {
   bool hasNext;
   bool* next_unseen;
   bool* front = &node_checked[0];
-  next_unseen = std::find(node_checked.begin(), node_checked.end(), false);
+  next_unseen = &(*std::find(node_checked.begin(), node_checked.end(), false));
   if (next_unseen != node_checked.end()) {
     index = next_unseen - front;
     hasNext = true;
@@ -63,7 +63,7 @@ Triple JoinNetworkQueue::getNext() {
   int index;
   bool* front = &node_checked[0];
   bool* next_unseen;
-  next_unseen = std::find(node_checked.begin(), node_checked.end(), false);
+  next_unseen = &(*std::find(node_checked.begin(), node_checked.end(), false));
   index = next_unseen - front;
   return (seen_nodes[index]);
 }
@@ -73,7 +73,7 @@ Triple JoinNetworkQueue::getNext() {
 bool JoinNetworkQueue::search_seen(Triple comparison) {
   bool found = false;
   Triple* element;
-  element = std::find(seen_nodes.begin(), seen_nodes.end(), comparison);
+  element = &(*std::find(seen_nodes.begin(), seen_nodes.end(), comparison));
   if (element != seen_nodes.end()) {
     found = true;
   }

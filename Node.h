@@ -4,7 +4,6 @@
 #include "RoutingTable.h"
 #include "MsgTimer.h"
 
-
 #define UI_TIMEOUT 0
 #define PINGER_TIMEOUT 1
 #define REFRESH_TIMEOUT 2
@@ -22,8 +21,14 @@ class Node
   uint32_t ID;
   bool inNetwork;
   vector<Triple> refresherVector;
+  bool exit = false;
 
-	bool exit = false;
+  //Pre: msg, queue, and timeOut were declared in the constructor below
+  //Post: the id of the node sending msg is removed from timeOut
+  //      if our id is in closest times, return true, false other wise
+  bool Node::handleKClosMsg(Message msg, vector<MsgTimer>& timeOut,
+			    JoinNewtorkQueue& queue);
+
 	
 	// Index 0 is a vector of MsgTimer to keep track of the timeouts for the UI thread.
 	// Index 1 is reserved for messages that the PINGer sends for other threads.
@@ -51,13 +56,15 @@ class Node
 
   bool joined();
 
-	//Handles messages from other Nodes.
-	//Everything is constant time
-	//MAIN: port 6666
-	//      READS:  STORE, FIND_NODE, FIND_VALUE
-	//      SENDS:  K_CLOS, FIND_VALUE_RESP
+  //Handles messages from other Nodes.
+  //Everything is constant time
+  //MAIN: port 6666
+  //      READS:  STORE, FIND_NODE, FIND_VALUE
+  //      SENDS:  K_CLOS, FIND_VALUE_RESP
   void startListener();
-	
+
+
+  
 	//Refresher/ Update Table
 	//Possibly Variable Time
 	//      port 6668

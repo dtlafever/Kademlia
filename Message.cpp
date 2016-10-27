@@ -16,10 +16,10 @@ Message::Message (std::string msg) : msgType(NONE), msg(msg)
 	parse(msg);
 }
 
-Message::Message(MsgType type, uint32_t ID, bool UI): msgType(type), ID(ID), isUI(UI)
+Message::Message(MsgType type, uint32_t nodeID, uint32_t ID, bool UI)
 {
 	size= 0;
-	toString(type, ID, UI);
+	toString(type, nodeID, ID, UI);
 }
 
 Message::Message(const Message & rhs) : msg(rhs.msg), msgType(rhs.msgType), ID(rhs.ID), isUI(rhs.isUI)
@@ -47,6 +47,21 @@ void Message::parse (std::string message)
 	
 	msgType = NONE;
 	msg ="";
+	
+	// Getting the sender ID
+	if((index=message.find(" "))!= -1)
+	{
+		// Reading the nodeID
+		std::string s = message.substr(0, index+1);
+		nodeID = atoi(s.c_str());
+		
+		// erasing the ID to continue parsing
+		message.erase(message.begin(), message.begin()+index+1);
+	}
+	else
+	{
+		std::cout << "Error in message, nodeID of sender not found"<<std::endl;
+	}
 	
 	if ((index=message.find("UI")!= -1))
 	{
@@ -175,48 +190,55 @@ void Message::parse (std::string message)
 		
 }
 
-std::string Message::toString(MsgType type, uint32_t ID, bool UI)
+std::string Message::toString(MsgType type, uint32_t nodeID, uint32_t ID, bool UI)
 {
-		msg = "";
+	msg = "" ;
+	
+	// assigning member data
+	this->nodeID = nodeID;
+	this->ID = ID;
+	this->isUI = UI;
+	this->msgType = type;
+	
+	// Adding the Node ID.
+	char temp[32];
+	sprintf(temp, "%d", nodeID); // convert to string
+	msg+= std::string(temp)+ " ";
 	
 	switch (type)
 	{
 		case PING:
-			msg = msgStrings[PING];
+			msg += msgStrings[PING];
 			break;
 			
 		case STORE:
 			if(ID != -1)
 			{
-				char temp [32];
 				sprintf(temp, "%d", ID); // convert to string
-				msg = msgStrings[STORE]+ std::string(temp);
+				msg += msgStrings[STORE]+ std::string(temp);
 			}
 			break;
 			
 		case FINDNODE:
 			if (ID != -1)
 			{
-				char temp [32];
 				sprintf(temp, "%d", ID); // convert to string
-				msg = msgStrings[FINDNODE]+ std::string(temp);
+				msg += msgStrings[FINDNODE]+ std::string(temp);
 			}
 			break;
 			
 		case FINDVALUE:
 			if(ID != -1)
 			{
-				char temp [32];
 				sprintf(temp, "%d", ID); // convert to string
-				msg = msgStrings[FINDVALUE]+ std::string(temp);
+				msg += msgStrings[FINDVALUE]+ std::string(temp);
 			}
 			break;
 			
 		case KCLOSEST:
-			msg = msgStrings[KCLOSEST];
+			msg += msgStrings[KCLOSEST];
 			
 			// Adding the size of the array to the message
-			char temp [32];
 			sprintf(temp, "%d", size);
 			msg += std::string(temp);
 			
@@ -246,23 +268,23 @@ std::string Message::toString(MsgType type, uint32_t ID, bool UI)
 			break;
 			
 		case PINGRESP:
-			msg = msgStrings[PINGRESP];
+			msg += msgStrings[PINGRESP];
 			break;
 		
 		case FVRESP:
-			msg= msgStrings[FVRESP];
+			msg += msgStrings[FVRESP];
 			break;
 			
 		case STORERESP:
-			msg = msgStrings[STORERESP];
+			msg += msgStrings[STORERESP];
 			break;
 			
 		case FVRESPP:
-			msg= msgStrings[FVRESPP];
+			msg += msgStrings[FVRESPP];
 			break;
 			
 		case FVRESPN:
-			msg = msgStrings[FVRESPN];
+			msg += msgStrings[FVRESPN];
 			break;
 		
 		case NONE:
@@ -295,6 +317,11 @@ uint32_t Message::getID()
 	return ID;
 }
 
+uint32_t Message::getNodeID()
+{
+	return nodeID;
+}
+
 void Message::setType(MsgType type)
 {
 	this->msgType = type;
@@ -303,6 +330,11 @@ void Message::setType(MsgType type)
 void Message::setID(uint32_t id)
 {
 	this->ID= id;
+}
+
+void Message::setNodeID(uint32_t nodeID)
+{
+	this->nodeID= nodeID;
 }
 
 void Message::setUI(bool UI)
@@ -335,5 +367,17 @@ bool Message::getUI()
 void Message::printMessageType()
 {
 	std::cout << "Type : "<< msgStrings[msgType] <<std::endl;
+}
+
+bool Message::includes(uint32_t & id)
+{
+	bool found = false;
+	for (int i=0; i<K && !found; ++i)
+	{
+		if(kclos[i].node == id)
+			found = true;
+	}
+	
+	return found;
 }
 
