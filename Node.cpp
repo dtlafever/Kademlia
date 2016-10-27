@@ -7,6 +7,7 @@
 #include "SnapShot.h"
 #include <vector>
 #include <algorithm>
+#include "MsgTimer.h"
 
 
 //Pre: id is a valid node id that is not yet taken
@@ -103,16 +104,23 @@ Node::Node(uint32_t id, uint32_t contactID, uint32_t contactIP) : RT(id) {
 //Handles messages from other Nodes.
 //Everything is constant time
 //MAIN: port 6666
-//      READS:  STORE, FIND_NODE, FIND_VALUE
-//      SENDS:  K_CLOS, FIND_VALUE_RESP
+//      READS:  STORE, FINDNODE, FINDVALUE
+//      SENDS:  KCLOSEST, FVRESP
 void Node::startListener(){
-  
-  //NOTES: Timeout?
+ 
   //       When we send a message, make sure we've got
   //       6666 included so people know to respond to the
   //       right one.
   //       WHENEVER WE SEND K CLOSEST, SEND TO 6667
-
+  
+  thread PingThread = thread(startRefresher);
+  thread UIThread = thread(startUIListener);
+  //ASSERT: Create the two threads for handling Pings and
+  //        for handling UIs
+  
+  Message sendMessageOBJ();
+  //ASSERT: empty message object to send later
+  
   std::string sendString; //the message we will fill up and send
   std::string receiveString; //the message we will receive
   
@@ -120,61 +128,63 @@ void Node::startListener(){
 
   uint32_t recNum; 
 
-  try{
-     UDPSocket socket(MAINPORT);
-     //ASSERT: connect socket to our main port
+  UDPSocket socket(MAINPORT);
+  //ASSERT: connect socket to our main port
 
-     Message sendMessageOBJ();
-     //ASSERT: empty message object to send later
+  Message sendMessageOBJ();
+  //ASSERT: empty message object to send later
      
-     while(listening){
-       //listening on the main socket
+  while(listening){
+    recNum = socket.recvMessage(receiveString);
        
-       recNum = socket.recvMessage(receiveString);
-       
-       if(recNum > 0){
-	 Message receivedMessageOBJ(receiveString);
-	 senderIP = socket.getRemoteIP();
-	 //ASSERT: 
-	 
-	 // if(receivedMessageOBJ.getMSGType() == PING){
-	 //   sendMessageOBJ.setMsgType = PINGRESP;
-	 //   sendString = sendMessageOBJ.toString();
-	 //   socket.sendMessage(sendString, MAINPORT, senderIP); 
+    if(recNum > 0){
+      Message receivedMessageOBJ(receiveString);
+      senderIP = socket.getRemoteIP();
+        
+      if(receivedMessageOBJ.getMSGType() == STORE){
+	uint32_t keyToStore = receivedMessageOBJ.getID();
+	keys.push_back(keyToStore);
 	   
-	 //   //add sender to refresh queue
-	 // }
-	 
-	 if(receivedMessageOBJ.getMSGType() == STORE){
-	   uint32_t keyToStore = receivedMessageOBJ.getID();
-	   keys.push_back(keyToStore);
+	//add sender to refresh queue
+      }
+      else if(receivedMessageOBJ.getMSGType() == FINDNODE){
 	   
-	   //add sender to refresh queue
-	 }
-	 else if(receivedMessageOBJ.getMSGType() == KCLOS){
+	//access k closest to send over
 	   
-	   //access k closest to send over
-	   
-	   //give back kclos
-	   //add sender to refresh queue
-	 }
-	 else if(receivedMessageOBJ.getMSGType() == FIND_VALUE){
-	   uint32_t theKey = receivedMessageOBJ.getID();
-	   //FIRST EXTRACT THE VALUE
-	   if(KeyFound){
-	     sendMessageOBJ.setMsgType = FVRESP;
-	     sendString = sendMessageOBJ.toString();
-	     socket.sendMessage(sendString, MAINPORT, senderIP);
-	   }
-	   else{
-	     sendMessageOBJ.setMsgType = KCLOSEST;
-	     //add k closest nodes to message? 
-	     sendString = sendMessageOBJ.toString();
-	     socket.sendMessage(sendString, MAINPORT, senderIP);
-	   }
 
+	sendString = sendMessageOBJ.toString();
+	socket.sendMessage(sendString, UIPORT, senderIP);
+      }
+      else if(receivedMessageOBJ.getMSGType() == FINDVALUE){
+	//ASSERT: A node is trying to find a key
+	uint32_t theKey = receivedMessageOBJ.getID();
 
-     
+	vector<int>::iterator it;
+	it = find(keys.begin(), keys.end(), theKey);
+	
+      	if(it != keys.end()){
+	  //ASSERT: we found the key
+	  sendMessageOBJ.setMsgType = FVRESP;
+	  sendString = sendMessageOBJ.toString();
+	  socket.sendMessage(sendString, MAINPORT, senderIP);
+	}
+	else{
+	  //ASSERT: we could not find in the key
+	  sendMessageOBJ.setMsgType = KCLOSEST;
+
+	  
+	  sendString = sendMessageOBJ.toString();
+	  socket.sendMessage(sendString, UIPORT, senderIP);
+	}
+
+	//ASSERT: ADD SENDER TO REFRESHER
+      }
+    }
+  }
+ 
+  PingThread.join();
+  UIThread.join();
+  //ASSERT: join the threads after we have finished listening
 }
 
 //Refresher/ Update Table
@@ -310,11 +320,11 @@ void Node::startRefresher()
 				 //			TO UI: FIND_VALUE_RESP_POSITIVE, FIND_VALUE_RESP_NEGATIVE, STORE_RESP
 void startUIListener() {
 	SnapShot snapSnot;
-
 	MsgType curMsg;
 	vector<Timeout> timeoutVector;
 
-	std::string msgUI;
+	std::string strUI;
+	Message msgUI;
 	uint32_t recvlenUI;
 
 	UDPSocket socketUI(UIPORT);
@@ -323,19 +333,35 @@ void startUIListener() {
 
 	while(listening) {
 		//Listening on UI socket
-		recvlenUI = socketUI.recvMessage(msgUI);
+		recvlenUI = socketUI.recvMessage(strUI);
 		if (recvlenUI > 0) {
 			//Update the ip for the UI
-			ipUI = socketUI.getRemoteIP();
-
-			Message msg(msgUI);
-			if (msg.getMsgType() == FINDVALUE) {
-				curMsg = msg.getMsgType();
+			int ipUI = socketUI.getRemoteIP();
+			msgUI.parse(strUI);
+			
+			if (msgUI.getMsgType() == FINDVALUE) {
+				curMsg = msgUI;
 				if (std::find(keys.begin(), keys.end(), curMsg.getID())
-						!= keys.end()) {
-					//ASSERT: we have the value
-					Message returnMsg(FVRESPP);
-					socketUI.sendMessage(returnMesg);
+					!= keys.end()) {
+					//ASSERT: we have the value, send confirm message
+					Message sendMsg(FVRESPP);
+					socketUI.sendMessage(sendMsg.toString(), ipUI, UIPORT);
+				}else{
+					//ASSERT: we did not find the value, lets check
+					//        the rest of the network
+					Triple kClos[K];
+					int size = getKClosetNodes(curMsg.getID(), kClos);
+					//ASSERT: kClos contains the K closest nodes that we
+					//        know about it.
+					snapSnot.addClosest(kClos, size);
+					Message sendMsg(FINDVALUE);
+					sendMsg.getKClos(kClos, size);
+					for (int i = 0; (i < ALPHA) && (snapSnot.nextExist()); i++) {
+						Triple nextNode;
+						snapSnot.getNext(nextNode);
+						socketUI.sendMessage(sendMsg.toString(), nextNode.address, UDPPORT);
+						
+					}
 				}
 			}
 				
