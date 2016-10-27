@@ -339,44 +339,6 @@ void Node::startRefresher()
 	socket.close();
 }
 
-///TODO: check again
-
-void Node::sendUpToAlphaPing(KBucket &curKBucket, UDPSocket &socket)
-{
-	while (timeouts[REFRESH_TIMEOUT].size()<ALPHA)
-	{
-		if(j>=curKBucket.getNumTriples()) // Check if we have reached the end of the Kbucket
-		{
-			i++; // Go to next KBucket
-			curKBucket= RT[i];
-			// Start at first element of the KBucket.
-			j =0;
-		}
-		
-		if(i>= NUMBITS) // If we did all the KBuckets, reset
-		{
-			i=j=0; // Reset indices
-			
-			// seet last refresh timepoint to Now
-			lastRefresh.reset();
-			refresh = false;
-			
-		}
-		
-		// get next element in curKBucket and increment j
-		Triple curTriple = curKBucket[j++];
-		
-		// Send PING
-		Message pingr(PING);
-		socket.sendMessage (pingr.toString(), curTriple.address, REFRESHERPORT);
-		
-		// Updating timeouts
-		///TODO: Update with respond time for PING
-		MsgTimer timer (RESPONDTIME_PING, curTriple.node, curTriple.address);
-		timeouts[REFRESH_TIMEOUT].push_back(timer);
-	}
-	
-}
 
 //Handles all UI
 //Variable Time
