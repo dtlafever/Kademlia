@@ -4,6 +4,10 @@
 #include "RoutingTable.h"
 #include "MsgTimer.h"
 #include "UDPSocket.h"
+#include "SnapShot.h"
+#include "JoinNetworkQueue.h"
+#include "MsgTimer.h"
+#include "constants.h"
 
 #define UI_TIMEOUT 0
 #define PINGER_TIMEOUT 1
@@ -27,19 +31,19 @@ class Node
   //Pre: msg, queue, and timeOut were declared in the constructor below
   //Post: the id of the node sending msg is removed from timeOut
   //      if our id is in closest times, return true, false other wise
-  void Node::handleKClosMsg(Message msg, vector<MsgTimer>& timeOut,
-			    JoinNewtorkQueue& queue);
+  void handleKClosMsg(Message msg, vector<MsgTimer>& timeOut,
+			    JoinNetworkQueue& queue);
 
 	
-	// Index 0 is a vector of MsgTimer to keep track of the timeouts for the UI thread.
-	// Index 1 is reserved for messages that the PINGer sends for other threads.
-	// Index 2 is reserved for timeouts for the refresher -> there should never be more than ALPHA
+	// Index 0 - UI_TIMEOUT is a vector of MsgTimer to keep track of the timeouts for the UI thread.
+	// Index 1 - PINGER_TIMEOUT is reserved for messages that the PINGer sends for other threads.
+	// Index 2 - REFRESH_TIMEOUT is reserved for timeouts for the refresher -> there should never be more than ALPHA
 	vector<MsgTimer> timeouts[3];
 	
-	void sendUpToAlphaPing(KBucket & curKBucket, UDPSocket & sock);
+	void sendUpToAlphaPing(KBucket & curKBucket, UDPSocket & socket, uint32_t & i, uint32_t & j);
 
 	void sendUpToAlphaKClos(SnapShot & ss, UDPSocket & sock);
-  
+	
  public:
 
   //Pre: id is a valid node id that is not yet taken
