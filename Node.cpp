@@ -1,3 +1,5 @@
+//Kadelima Node Class
+
 #include "Node.h"
 #include "constants.h"
 #include "Message.hpp"
@@ -5,15 +7,22 @@
 #include "SnapShot.h"
 #include <vector>
 
-Node::Node(int id) : RT(id){
+//Pre: id is a valid node id that is not yet taken
+//Post: RT is initalized, ID = id, inNetwork = true
+//      RT is empty since this node is starting a new network
+Node::Node(uint32_t id) : RT(id){
   ID = id;
   inNetwork = true;
 }
 
-Node::Node(int id, int contactID, int contactIP) : RT(id){
+//Pre: id is a valid node id that is not yet taken, contactID and contactIP
+//     belongs to a node already existing in the network
+//Post: ID = id, contact exists within our routing table, as well as
+//      other nodes our contact has told about us
+//      inNetwork = true if FindNode on ourselves succeds, false otherwise
+Node::Node(uint32_t id, uint32_t contactID, uint32_t contactIP) : RT(id){
   ID = id;
-  Triple contact(contactID, contactIP, PORT);
-  RT.updateTable(contact);
+  RT.updateTable(contactID, contactIP);
   inNetwork = true;
   //ASSERT: contact is in our routing table
 
@@ -24,12 +33,25 @@ Node::Node(int id, int contactID, int contactIP) : RT(id){
   socket.sendMessage(FIND_NODE ID, contactIP, PORT);
   TV.push_back(contactID);
 
-  StupidQueueObject queue();
-  //TODO: create a queue where:
-  //       - inserting will not add duplicates
-  //       - each element has a bool queried
-  //       - each element is a Triple
 
+  QueryQueue nodesToAsk(contactID, contactIP);
+
+  //Note, we have joined the network as long as some other node added us
+  //in its KBucket, until then, we are not a part of the network
+
+  while ((!nodesToAsk.isAllQuereied() and RT.isEmpty())) {
+    if (socket.recieved()) {
+      Message msg = socket.getMessage();
+      if (msg == KCLOS) {
+	RT.updateTable(msg.getID(), msg.getIP(), PORT);
+	TV.erase(/*iterator where msg.getID() lives*/);
+	if (!msg.includes(ID)) {
+	  queryQueue.add(msg.getKClos());
+	}
+	socket.sendMessage(FIND_NODE ID
+      }
+  }
+  /*
   //LOOP
   //TODO: stop when our KBuckets are full or when our
   //      query has all elements are queried
@@ -70,6 +92,7 @@ Node::Node(int id, int contactID, int contactIP) : RT(id){
       inNetwork = false;
     }
   }
+  */
 
 }
 
@@ -168,3 +191,4 @@ void startUIListener() {
 		}
 	}
 }
+
