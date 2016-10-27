@@ -6,6 +6,8 @@
 #include "UDPSocket.h"
 #include "SnapShot.h"
 #include <vector>
+#include <algorithm>
+
 
 //Pre: id is a valid node id that is not yet taken
 //Post: RT is initalized, ID = id, inNetwork = true
@@ -20,80 +22,81 @@ Node::Node(uint32_t id) : RT(id){
 //Post: ID = id, contact exists within our routing table, as well as
 //      other nodes our contact has told about us
 //      inNetwork = true if FindNode on ourselves succeds, false otherwise
-Node::Node(uint32_t id, uint32_t contactID, uint32_t contactIP) : RT(id){
-  ID = id;
-  RT.updateTable(contactID, contactIP);
-  inNetwork = true;
-  //ASSERT: contact is in our routing table
+Node::Node(uint32_t id, uint32_t contactID, uint32_t contactIP) : RT(id) {
+	ID = id;
+	RT.updateTable(contactID, contactIP);
+	inNetwork = true;
+	//ASSERT: contact is in our routing table
 
-  vector<Timeout> TV();
+	vector<Timeout> TV();
 
-  UDPSocket socket(PORT);
+	UDPSocket socket(PORT);
 
-  socket.sendMessage(FIND_NODE ID, contactIP, PORT);
-  TV.push_back(contactID);
+	socket.sendMessage(FIND_NODE ID, contactIP, PORT);
+	TV.push_back(contactID);
 
 
-  QueryQueue nodesToAsk(contactID, contactIP);
+	QueryQueue nodesToAsk(contactID, contactIP);
 
-  //Note, we have joined the network as long as some other node added us
-  //in its KBucket, until then, we are not a part of the network
+	//Note, we have joined the network as long as some other node added us
+	//in its KBucket, until then, we are not a part of the network
 
-  while ((!nodesToAsk.isAllQuereied() and RT.isEmpty())) {
-    if (socket.recieved()) {
-      Message msg = socket.getMessage();
-      if (msg == KCLOS) {
-	RT.updateTable(msg.getID(), msg.getIP(), PORT);
-	TV.erase(/*iterator where msg.getID() lives*/);
-	if (!msg.includes(ID)) {
-	  queryQueue.add(msg.getKClos());
+	while ((!nodesToAsk.isAllQuereied() and RT.isEmpty())) {
+		if (socket.recieved()) {
+			Message msg = socket.getMessage();
+			if (msg == KCLOS) {
+				RT.updateTable(msg.getID(), msg.getIP(), PORT);
+				TV.erase(/*iterator where msg.getID() lives*/);
+				if (!msg.includes(ID)) {
+					queryQueue.add(msg.getKClos());
+				}
+				socket.sendMessage(FIND_NODE ID
+			}
+		}
+		/*
+		//LOOP
+		//TODO: stop when our KBuckets are full or when our
+		//      query has all elements are queried
+		while(inNetwork){
+		  if (socket.recieved()){
+			Message msg = socket.getMessage();
+			if (msg == KCLOS){
+		  RT.updateTable(msg.getID(), msg.getIP(), PORT);
+		  if(RT.full()){ //TODO: routing table is full function
+			//ASSERT: the routing table is full,
+			//        stop trying to add to the network
+			break;
+		  }
+		  TV.eraseElement(msg.getID()); //TODO:remove element
+										//     of the msg sender ID
+		  if (!msg.includes(ID)){
+			//ASSERT: these kClos should be added to the queue
+			queue.add(msg.getKClos()); //TODO:
+		  }
+		  if(queue.isNext()){
+			socket.sendMessage(FIND_NODE ID, queue.getNext()); //TODO
+		  }else{
+			//ASSERT: nothing left to check
+			break;
+		  }
+			}
+		  }
+
+		  for (int i=0; i < TV.size(); i++){
+			if (TV[i].timedOut()){
+		  TV.erase(i);
+		  i--;
+		  socket.sendMessage(FIND_NODE ID, queue.getNext()); //TODO
+			}
+		  }
+		  if (TV.size() == 0){
+			//ASSERT: We have not joined the network
+			inNetwork = false;
+		  }
+		}
+		*/
+
 	}
-	socket.sendMessage(FIND_NODE ID
-      }
-  }
-  /*
-  //LOOP
-  //TODO: stop when our KBuckets are full or when our
-  //      query has all elements are queried
-  while(inNetwork){
-    if (socket.recieved()){
-      Message msg = socket.getMessage();
-      if (msg == KCLOS){
-	RT.updateTable(msg.getID(), msg.getIP(), PORT);
-	if(RT.full()){ //TODO: routing table is full function
-	  //ASSERT: the routing table is full,
-	  //        stop trying to add to the network
-	  break;
-	}
-	TV.eraseElement(msg.getID()); //TODO:remove element
-	                              //     of the msg sender ID
-	if (!msg.includes(ID)){
-	  //ASSERT: these kClos should be added to the queue
-	  queue.add(msg.getKClos()); //TODO:
-	}
-	if(queue.isNext()){
-	  socket.sendMessage(FIND_NODE ID, queue.getNext()); //TODO
-	}else{
-	  //ASSERT: nothing left to check
-	  break;
-	}
-      }
-    }
-
-    for (int i=0; i < TV.size(); i++){
-      if (TV[i].timedOut()){
-	TV.erase(i);
-	i--;
-	socket.sendMessage(FIND_NODE ID, queue.getNext()); //TODO
-      }
-    }
-    if (TV.size() == 0){
-      //ASSERT: We have not joined the network
-      inNetwork = false;
-    }
-  }
-  */
-
 }
 
 void Node::startListener(){
@@ -139,7 +142,7 @@ void Node::startListener(){
 	   //give back kclos
 	   //add sender to refresh queue
 	 }
-	 else if(new.getMSGType() == FIND_VALUE){
+	 else if(newMSG.getMSGType() == FIND_VALUE){
 	   //check for value
 	   // if(we have value){
 	   //   send back FIND_VALUE_RESP_TRUE;
@@ -179,7 +182,9 @@ void startUIListener() {
 
 	UDPSocket socketUI(UIPORT);
 
-	for (;;) {
+	bool listening = true;
+
+	while(listening) {
 		//Listening on UI socket
 		recvlenUI = socketUI.recvMessage(msgUI);
 		if (recvlenUI > 0) {
@@ -187,7 +192,16 @@ void startUIListener() {
 			ipUI = socketUI.getRemoteIP();
 
 			Message msg(msgUI);
-
+			
+			if (msg.getMsgType() == FINDVALUE) {
+				curMsg = msg.getMsgType();
+				if (std::find(keys.begin(), keys.end(), curMsg.getID())
+					!= keys.end()) {
+					//ASSERT: we have the value
+					Message returnMsg(FVRESPP);
+					socketUI.sendMessage(returnMesg);
+				}
+			}
 		}
 	}
 }

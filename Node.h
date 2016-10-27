@@ -5,7 +5,7 @@ class Node {
  private:
   
   RoutingTable RT;
-  vector<int> keys();
+  vector<int> keys;
   uint32_t ID;
   bool inNetwork;
   vector<Triple> refresherVector;
