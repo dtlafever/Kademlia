@@ -31,8 +31,11 @@ enum MsgType { PING, FINDNODE, FINDVALUE, STORE, KCLOSEST, PINGRESP, FVRESP, STO
 
 class Message
 {
-	//Contents of the message
+	// Contents of the message
 	std::string msg = "";
+	
+	// NodeID of sender
+	uint32_t nodeID = -1;
 	
 	// Type of the message
 	MsgType msgType;
@@ -63,7 +66,7 @@ public:
 	
 	// PRE:
 	// POST:
-	Message(MsgType type, uint32_t ID = -1, bool UI = false);
+	Message(MsgType type, uint32_t nodeID=-1, uint32_t ID = -1, bool UI = false);
 	
 	// Copy constructor
 	Message (const  Message & rhs);
@@ -80,7 +83,7 @@ public:
 	
 	// PRE: takes a MsgType object and an ID which depends on the type of the message
 	// POST: Creates a message to be able to send it in the appropriate format.
-	std::string toString (MsgType type, uint32_t ID = -1, bool UI=false);
+	std::string toString (MsgType type, uint32_t nodeID=-1, uint32_t ID = -1, bool UI=false);
 	
 	// PRE: this function is to be used if the Message object is already created and we want to retrieve the string format.
 	// POST: This function creates a string relative to its attributes that can be used when communicating. The function will return an empty string if it fails.
@@ -89,6 +92,10 @@ public:
 	// PRE:
 	// POST: returns the Node of File ID.
 	uint32_t getID();
+	
+	// PRE:
+	// POST: Returns the ID of the sender node.
+	uint32_t getNodeID();
 	
 	// PRE:
 	// POST: returns true if the Message is from the UI and false if it is not.
@@ -104,6 +111,10 @@ public:
 	
 	// PRE:
 	// POST:
+	void setNodeID(uint32_t id);
+	
+	// PRE:
+	// POST:
 	void setUI(bool UI);
 	
 	// PRE: Takes the array of triples to put in the message and the size of the array
@@ -115,6 +126,8 @@ public:
 	uint32_t getKClos (Triple clos[K]);
 	
 	void printMessageType ();
+	
+	bool includes(uint32_t & id);
 
 };
 #endif /* Message_cpp */

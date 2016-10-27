@@ -215,116 +215,86 @@ void Node::startRefresher()
 		IP=0;
 		// Check for new message
 		if (socket.recvMessage(incoming) != -1) // if it returns 0 then no message was received
+		{
+			IP=socket.getRemoteIP();
+			
+			msg.parse(incoming);
+			
+			switch(msg.getMsgType())
 			{
-				IP=socket.getRemoteIP();
-				
-				msg.parse(incoming);
-				
-				switch(msg.getMsgType())
-				{
-					case PING:
-						Message pingr(PINGRESP);
-						socket.sendMessage (pingr.toString(), IP, REFRESHERPORT);
-						break;
-						
-					case PINGRESP:
-						//check timeouts & clear timeouts using IP.
-						// Is there a case where we could have pinged the same IP more than once and have more than one timeout corresponding
-						// We update the older one (the one at the beginning of the vector
-						
-						bool found = false;
-						
-						/// TODO: check to see order of checking
-						
-						// Check in timeouts for other threads & refresher
-						for (int i =0; i<timeouts[PINGER_TIMEOUT] && !found; ++i)
-						{
-							// Checking in other threads timeouts
-							if(timeouts[PINGER_TIMEOUT][i].getIP() == IP) // If we found a timeout with the same IP
-							{
-								// erase element in vector
-								timeouts[PINGER_TIMEOUT][i].erase(timeouts[PINGER_TIMEOUT].begin()+i);
-								found = true; // Update flag
-								
-								///TODO: Do something about refreshing the table?
-							}
-							
-							// Checking in timeouts for refresher
-							if(timeouts[REFRESH_TIMEOUT][i].getIP() == IP) // If we found a timeout with the same IP
-							{
-								// erase element in vector
-								timeouts[REFRESH_TIMEOUT][i].erase(timeouts[REFRESH_TIMEOUT].begin()+i);
-								found = true; // Update flag
-							}
-						}
-						
-						if(!found)
-							cout << "Error PINGRESP does not correspond to any PING request"<<endl;
-						break;
-						
-					default:
-						cout << "Unrecognized message received: "<< incoming<<endl;
-						break;
-				}
-			}
-		
-		if(refresh) // We are currently refreshing the routingTable
-			{
-				//check if we can send more PINGs
-				if(timeouts[REFRESH_TIMEOUT].size()<ALPHA)
-				{
-//					send more messages such that a max of alpha are sent.
-					while (timeouts[REFRESH_TIMEOUT].size()<ALPHA)
+				case PING: // We are receiving a ping request
+					Message pingr(PINGRESP);
+					socket.sendMessage (pingr.toString(), IP, REFRESHERPORT);
+					break;
+					
+				case PINGRESP:
+					//check timeouts & clear timeouts using IP.
+					// Is there a case where we could have pinged the same IP more than once and have more than one timeout corresponding
+					// We update the older one (the one at the beginning of the vector
+					
+					bool found = false;
+					
+					/// TODO: check to see order of checking
+					
+					// Check in timeouts for other threads & refresher
+					for (int i =0; i<timeouts[PINGER_TIMEOUT] && !found; ++i)
 					{
-						if(j>=curKBucket.getNumTriples()) // Check if we have reached the end of the Kbucket
+						// Checking in other threads timeouts
+						if(timeouts[PINGER_TIMEOUT][i].getIP() == IP) // If we found a timeout with the same IP
 						{
-							i++; // Go to next KBucket
-							curKBucket= RT[i];
-							// Start at first element of the KBucket.
-							j =0;
-						}
-						
-						if(i>= NUMBITS) // If we did all the KBuckets, reset
-						{
-							i=j=0; // Reset indices
+							// erase element in vector
+							timeouts[PINGER_TIMEOUT][i].erase(timeouts[PINGER_TIMEOUT].begin()+i);
+							found = true; // Update flag
 							
-							// seet last refresh timepoint to Now
-							lastRefresh.reset();
-							refresh = false;
+							///TODO: Do something about refreshing the table?
 						}
 						
-						// get next element in curKBucket and increment j
-						Triple curTriple = curKBucket[j++];
-						
-						// Send PING
-						Message pingr(PING);
-						socket.sendMessage (pingr.toString(), curTriple.address, REFRESHERPORT);
-						
-						// Updating timeouts
-						///TODO: Update with respond time for PING
-						MsgTimer timer (RESPONDTIME, curTriple.node, curTriple.address);
-						timeouts[REFRESH_TIMEOUT].push_back(timer);
+						// Checking in timeouts for refresher
+						if(timeouts[REFRESH_TIMEOUT][i].getIP() == IP) // If we found a timeout with the same IP
+						{
+							// erase element in vector
+							timeouts[REFRESH_TIMEOUT][i].erase(timeouts[REFRESH_TIMEOUT].begin()+i);
+							found = true; // Update flag
+						}
 					}
 					
-
-				}
-				
+					if(!found)
+						cout << "Error PINGRESP does not correspond to any PING request"<<endl;
+					break;
+					
+				default:
+					cout << "Unrecognized message received: "<< incoming<<endl;
+					break;
 			}
+		}
+		
+		if(refresh) // We are currently refreshing the routingTable
+		{
+			//check if we can send more PINGs
+			if(timeouts[REFRESH_TIMEOUT].size()<ALPHA)
+			{
+				//					send more messages such that a max of alpha are sent.
+				sendUpToAlphaPing(curKBucket, socket);
+			}
+			
+		}
+		
+		
 		
 		// Check if we are currently refreshing and if it is time to refresh
-			if(!refresh && lastRefresh.timedOut())
-			{
-				refresh = true; // start refreshing
-				i=j=0; // reset indices
-				
-				// Retrieve the first KBucket
-				curKBucket =RT[i];
-				
-				// Send the first alpha messages
-				///TODO: check this again
-				sendUpToAlphaPing(curKBucket, socket);
-
-			}
+		if(!refresh && lastRefresh.timedOut())
+		{
+			refresh = true; // start refreshing
+			i=j=0; // reset indices
+			
+			// Retrieve the first KBucket
+			curKBucket =RT[i];
+			
+			// Send the first alpha messages
+			///TODO: check this again
+			sendUpToAlphaPing(curKBucket, socket);
+			
+		}
 		
 		///TODO: check the refresh queue.
 	}
@@ -405,7 +375,7 @@ void startUIListener() {
 		
 		// Updating timeouts
 		///TODO: Update with respond time for PING
-		MsgTimer timer (RESPONDTIME, curTriple.node, curTriple.address);
+		MsgTimer timer (RESPONDTIME_PING, curTriple.node, curTriple.address);
 		timeouts[REFRESH_TIMEOUT].push_back(timer);
 	}
 	
