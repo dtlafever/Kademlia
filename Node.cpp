@@ -107,12 +107,16 @@ Node::Node(uint32_t nodeID, uint32_t contactID, uint32_t contactIP) : RT(nodeID)
 	
   // Create socket
   UDPSocket socket(UIPORT, "Add.log");
-	
+
+  //can return true if we recieve contact message or
+  //contact has timed out
+  bool recvContactResp = false;
+  
   // Create Contact triple and add it to the queue
   Triple contactTriple (contactIP, contactID, UIPORT);
   JoinNetworkQueue nodesToAsk(contactTriple);
 	
-  while (nodesToAsk.hasNext() && !RT.isFull())
+  while ((nodesToAsk.hasNext() && !RT.isFull()) || (!recvContactResp))
     {
       // Try to receive a message
       string response;
@@ -123,24 +127,36 @@ Node::Node(uint32_t nodeID, uint32_t contactID, uint32_t contactIP) : RT(nodeID)
 	{
 	  Message msg(response);
 	  msg.setNodeID(ID);
+	  if(msg.getNodeID() == contactID){
+	    //ASSERT: we have recieved at least the contact response
+	    recvContactResp = true;
+	  }
+	  
 	  if (msg.getMsgType() == KCLOSEST)
 	    {
 	      handleKClosMsg(msg, timeOut, nodesToAsk, contactIP);
 	    } //Done Dealing with a received message
 	}
+
+      if(nodesToAsk.hasNext()){
+	// Get next Triple to ask
+	Triple nextToAsk = nodesToAsk.getNext();
 		
-      // Get next Triple to ask
-      Triple nextToAsk = nodesToAsk.getNext();
+	// Send a FINDNODE message to the next node.
+	Message toSend(FINDNODE, ID, ID);
+	socket.sendMessage(toSend.toString(), nextToAsk.address, UIPORT);
 		
-      // Send a FINDNODE message to the next node.
-      Message toSend(FINDNODE, ID, ID);
-      socket.sendMessage(toSend.toString(), nextToAsk.address, UIPORT);
-		
-      // Add a timeout
-      MsgTimer timer(RESPONDTIME_UI, nextToAsk.node, nextToAsk.address);
-      timeOut.push_back(timer);
-		
+	// Add a timeout
+	MsgTimer timer(RESPONDTIME_UI, nextToAsk.node, nextToAsk.address);
+	timeOut.push_back(timer);
+      }
+	
       clearTimeOut(timeOut);
+
+      if((timeOut.size() == 0) && !recvContactResp){
+	//ASSERT: contact never responded
+	recvContactResp = true;
+      }
     }
 }
 
