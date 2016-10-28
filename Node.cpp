@@ -110,23 +110,23 @@ Node::Node(uint32_t nodeID, uint32_t contactID, uint32_t contactIP) : RT(nodeID)
 	
   // Create socket
   UDPSocket socket(UIPORT, "Add.log");
-
+	
   //can return true if we recieve contact message or
   //contact has timed out
   bool recvContactResp = false;
-  
+	
   // Create Contact triple and add it to the queue
   Triple contactTriple (contactIP, contactID, UIPORT);
   JoinNetworkQueue nodesToAsk;
-
+	
   // Send a FINDNODE message to the next node.
   Message toSend(FINDNODE, ID, ID);
   socket.sendMessage(toSend.toString(), contactTriple.address, UIPORT);
-  
+	
   // Add a timeout
   MsgTimer timer(RESPONDTIME_UI, contactTriple.node, contactTriple.address);
   timeOut.push_back(timer);
-  
+	
   while ((nodesToAsk.hasNext() && !RT.isFull()) || (!recvContactResp))
     {
       // Try to receive a message
@@ -148,22 +148,22 @@ Node::Node(uint32_t nodeID, uint32_t contactID, uint32_t contactIP) : RT(nodeID)
 	      handleKClosMsg(msg, timeOut, nodesToAsk, contactIP);
 	    } //Done Dealing with a received message
 	}
-
+		
       if(nodesToAsk.hasNext()){
 	// Get next Triple to ask
 	Triple nextToAsk = nodesToAsk.getNext();
-		
+			
 	// Send a FINDNODE message to the next node.
 	Message toSend(FINDNODE, ID, ID);
 	socket.sendMessage(toSend.toString(), nextToAsk.address, UIPORT);
-		
+			
 	// Add a timeout
 	MsgTimer timer(RESPONDTIME_UI, nextToAsk.node, nextToAsk.address);
 	timeOut.push_back(timer);
       }
-	
+		
       clearTimeOut(timeOut);
-
+		
       if((timeOut.size() == 0) && !recvContactResp){
 	//ASSERT: contact never responded
 	recvContactResp = true;
@@ -244,6 +244,7 @@ void Node::startListener(){
 				
 		closestSize = RT.getKClosestNodes(aKey, KClosest);
 		sendMessageOBJ.setKClos(KClosest, closestSize);
+
 					
 		sendMessageOBJ.setType(KCLOSEST);
 		sendMessageOBJ.setNodeID(ID);
@@ -379,12 +380,14 @@ void Node::startRefresher()
 		      }
 						
 		    /// Refreshing nodes in updateTable if possible
-		    RT.updateTable(msg.getNodeID(), IP);
+		    if( msg.getNodeID() != ID)
+		      RT.updateTable(msg.getNodeID(), IP);
 		  }
 					
 		if(!found)
 		  {
-		    RT.updateTable(msg.getNodeID(),IP);
+		    if( msg.getNodeID() != ID)
+		      RT.updateTable(msg.getNodeID(),IP);
 		  }
 	      }
 	      break;
@@ -424,7 +427,7 @@ void Node::startRefresher()
       for (int i=0; refresherVector.size()>0 && i<ALPHA; ++i)
 	{
 	  // try to update in table then ping if necessary
-	  if (!RT.updateTable(refresherVector[0].node, refresherVector[0].address))
+	  if ((refresherVector[0].node != ID)&&!RT.updateTable(refresherVector[0].node, refresherVector[0].address))
 	    {
 	      // PING
 	      Message msg(PING, ID);
@@ -482,7 +485,7 @@ void Node::startUIListener() {
   Message recvMsg(NONE, ID);
   int32_t recvlenUI;
 	
-
+	
   UDPSocket socketUI(UIPORT, "UI.log");
 	
   while (!exit)
@@ -546,8 +549,8 @@ void Node::startUIListener() {
 		// If there are no close nodes, there are no nodes.
 		if (size == 0)
 		  {
-				
-				
+						
+						
 		    //ASSERT: special case where we are the only node in network,
 		    //        so we store the key
 		    keys.push_back(recvMsg.getID());
@@ -577,8 +580,8 @@ void Node::startUIListener() {
 		  {
 		  case STORE:
 		    {
-		      //Add to refresh vector
-		      Triple refresh;
+			//Add to refresh vector
+			Triple refresh;
 		      refresh.address = socketUI.getRemoteIP();
 		      refresh.node = recvMsg.getNodeID();
 		      refresherVector.push_back(refresh);
@@ -597,106 +600,106 @@ void Node::startUIListener() {
 		    }
 		    break;
 		  case FINDVALUE:
-		    {
-		      if (!snapShot.nextExist()) {
-			//ASSERT: we have found the K closest and no value,
-			//        send UI that wouldn't couldnt find it.
-			Message sendMsg(FVRESPN, ID);
-			socketUI.sendMessage(sendMsg.toString(), ipUI, UIPORT);
-		      }
-		      else {
-			//ASSERT: we are not done searching for kClos
-			sendUpToAlphaKClos(snapShot, socketUI, curMsg.getID());
-		      }
-		    }
-		    break;
-							
-		  default:
-		    break;
-		  }
-	      }
-	      break;
-	    case FVRESP:
-	      {
-		//ASSERT: we have the value, send confirm message
-		removeFromUITimeout(recvMsg.getNodeID());
-					
-		//Add to refresh vector
-		Triple refresh;
-		refresh.address = socketUI.getRemoteIP();
-		refresh.node = recvMsg.getNodeID();
-		refresherVector.push_back(refresh);
-					
-		Message sendMsg(FVRESPP, ID);
-		socketUI.sendMessage(sendMsg.toString(), ipUI, UIPORT);
-	      }
-	      break;
-				case FINDNODE:
-				{
-					//ASSERT: A node wants k closest nodes
-					uint32_t key = recvMsg.getID();
-					Triple kClos [K];
-					int32_t closestSize = RT.getKClosestNodes(key, kClos);
-					
-					Message sendMsg(KCLOSEST, ID);
-					sendMsg.setKClos(kClos, closestSize);
-					
-					socketUI.sendMessage(sendMsg.toString(), ipUI, UIPORT);
-					
-					Triple sendTriple;
-					sendTriple.address = ipUI;
-					sendTriple.port = UIPORT;
-					sendTriple.node = recvMsg.getNodeID();
-					refresherVector.push_back(sendTriple);
-				}
-					break;
-	    default:
-	      break;
-	    }
-			
-	  // TIMEOUTS
-	  for (int i = 0; i < timeouts[UI_TIMEOUT].size(); i++)
-	    {
-	      if (timeouts[UI_TIMEOUT][i].timedOut()) {
-		//ASSERT: this node timed out, remove from queue
-		RT.deleteNode(timeouts[UI_TIMEOUT][i].getNodeID());
-		timeouts[UI_TIMEOUT].erase(timeouts[UI_TIMEOUT].begin()+i);
-		i--;
-				
-		//Now we need to continue depending on what we are on
-		if (curMsg.getMsgType() == STORE)
 		  {
 		    if (!snapShot.nextExist()) {
-		      //ASSERT: we have found the K closest, send store messages
-		      Message sendMsg(STORE, ID);
-		      for (int i = 0; i < snapShot.getSize(); i++)
-			{
-			  socketUI.sendMessage(sendMsg.toString(), snapShot.getElementIP(i), MAINPORT);
-			}
+		      //ASSERT: we have found the K closest and no value,
+		      //        send UI that wouldn't couldnt find it.
+		      Message sendMsg(FVRESPN, ID);
+		      socketUI.sendMessage(sendMsg.toString(), ipUI, UIPORT);
 		    }
 		    else {
 		      //ASSERT: we are not done searching for kClos
 		      sendUpToAlphaKClos(snapShot, socketUI, curMsg.getID());
 		    }
-		  }else if(curMsg.getMsgType() == FINDVALUE)
-		  {
-		    if (!snapShot.nextExist())
-		      {
-			//ASSERT: we have found the K closest and no value,
-			//        send UI that wouldn't couldnt find it.
-			Message sendMsg(FVRESPN);
-			socketUI.sendMessage(sendMsg.toString(), ipUI, UIPORT);
-		      }
-		    else
-		      {
-			//ASSERT: we are not done searching for kClos
-			sendUpToAlphaKClos(snapShot, socketUI, curMsg.getID());
-		      }
 		  }
+		break;
+							
+	      default:
+		break;
 	      }
 	    }
+	  break;
+	case FVRESP:
+	  {
+	    //ASSERT: we have the value, send confirm message
+	    removeFromUITimeout(recvMsg.getNodeID());
+					
+	    //Add to refresh vector
+	    Triple refresh;
+	    refresh.address = socketUI.getRemoteIP();
+	    refresh.node = recvMsg.getNodeID();
+	    refresherVector.push_back(refresh);
+					
+	    Message sendMsg(FVRESPP, ID);
+	    socketUI.sendMessage(sendMsg.toString(), ipUI, UIPORT);
+	  }
+	  break;
+	case FINDNODE:
+	  {
+	    //ASSERT: A node wants k closest nodes
+	    uint32_t key = recvMsg.getID();
+	    Triple kClos [K];
+	    int32_t closestSize = RT.getKClosestNodes(key, kClos);
+					
+	    Message sendMsg(KCLOSEST, ID);
+	    sendMsg.setKClos(kClos, closestSize);
+					
+	    socketUI.sendMessage(sendMsg.toString(), ipUI, UIPORT);
+					
+	    Triple sendTriple;
+	    sendTriple.address = ipUI;
+	    sendTriple.port = UIPORT;
+	    sendTriple.node = recvMsg.getNodeID();
+	    refresherVector.push_back(sendTriple);
+	  }
+	  break;
+	default:
+	  break;
+	}
+			
+      // TIMEOUTS
+      for (int i = 0; i < timeouts[UI_TIMEOUT].size(); i++)
+	{
+	  if (timeouts[UI_TIMEOUT][i].timedOut()) {
+	    //ASSERT: this node timed out, remove from queue
+	    RT.deleteNode(timeouts[UI_TIMEOUT][i].getNodeID());
+	    timeouts[UI_TIMEOUT].erase(timeouts[UI_TIMEOUT].begin()+i);
+	    i--;
+				
+	    //Now we need to continue depending on what we are on
+	    if (curMsg.getMsgType() == STORE)
+	      {
+		if (!snapShot.nextExist()) {
+		  //ASSERT: we have found the K closest, send store messages
+		  Message sendMsg(STORE, ID);
+		  for (int i = 0; i < snapShot.getSize(); i++)
+		    {
+		      socketUI.sendMessage(sendMsg.toString(), snapShot.getElementIP(i), MAINPORT);
+		    }
+		}
+		else {
+		  //ASSERT: we are not done searching for kClos
+		  sendUpToAlphaKClos(snapShot, socketUI, curMsg.getID());
+		}
+	      }else if(curMsg.getMsgType() == FINDVALUE)
+	      {
+		if (!snapShot.nextExist())
+		  {
+		    //ASSERT: we have found the K closest and no value,
+		    //        send UI that wouldn't couldnt find it.
+		    Message sendMsg(FVRESPN);
+		    socketUI.sendMessage(sendMsg.toString(), ipUI, UIPORT);
+		  }
+		else
+		  {
+		    //ASSERT: we are not done searching for kClos
+		    sendUpToAlphaKClos(snapShot, socketUI, curMsg.getID());
+		  }
+	      }
+	  }
 	}
     }
+}
 }
 //PRE: a node ID we want to remove from the list
 //POST: finds the node ID in the list and removes from timeout,
@@ -710,6 +713,7 @@ void Node::removeFromUITimeout(uint32_t ID)
 	{
 	  timeouts[UI_TIMEOUT].erase(timeouts[UI_TIMEOUT].begin()+i);
 	  foundNode = true;
+	  i--;
 	}
     }
 }
@@ -727,7 +731,7 @@ void Node::sendUpToAlphaKClos(SnapShot & ss, UDPSocket & sock, uint32_t msgID)
       Triple nextNode;
       ss.getNext(nextNode);
 
-      if (nextNode.node == ID){
+      if (nextNode.node != ID){
 	// Sending Message
 	sock.sendMessage(sendMsg.toString(), nextNode.address, MAINPORT);
 		
@@ -736,7 +740,7 @@ void Node::sendUpToAlphaKClos(SnapShot & ss, UDPSocket & sock, uint32_t msgID)
 	timeouts[UI_TIMEOUT].push_back(timer);
       }
     }
-	
+	    
 }
 
 void Node::sendUpToAlphaPing(KBucket &curKBucket, UDPSocket &socket, uint32_t & i, uint32_t & j, MsgTimer & lastRefresh, bool & refresh)
@@ -765,13 +769,16 @@ void Node::sendUpToAlphaPing(KBucket &curKBucket, UDPSocket &socket, uint32_t & 
 	  // get next element in curKBucket and increment j
 	  Triple curTriple = curKBucket[j++];
 			
-	  // Send PING
-	  Message pingr(PING, ID);
-	  socket.sendMessage (pingr.toString(), curTriple.address, REFRESHERPORT);
-			
-	  // Updating timeouts
-	  MsgTimer timer (RESPONDTIME_PING, curTriple.node, curTriple.address);
-	  timeouts[REFRESH_TIMEOUT].push_back(timer);
+	  if( curTriple.node != ID)
+	    {
+	      // Send PING
+	      Message pingr(PING, ID);
+	      socket.sendMessage (pingr.toString(), curTriple.address, REFRESHERPORT);
+				
+	      // Updating timeouts
+	      MsgTimer timer (RESPONDTIME_PING, curTriple.node, curTriple.address);
+	      timeouts[REFRESH_TIMEOUT].push_back(timer);
+	    }
 			
 	}
     }
