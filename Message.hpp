@@ -53,7 +53,7 @@ class Message
 	uint32_t size =0;
 	
 	// This array stores the names of the different types to simplify the parsing
-	const std::string msgStrings [11] = {"PING ", "STORE ", "FINDNODE ", "FINDVALUE ", "KCLOSEST ", "PINGRESP", "FVRESP", "STORERESP", "FVRESPP", "FVRESPN",  "NONE "};
+	const std::string msgStrings [11] = {"PING ", "FINDNODE ",  "FINDVALUE ", "STORE ", "KCLOSEST ", "PINGRESP", "FVRESP", "STORERESP", "FVRESPP", "FVRESPN",  "NONE "};
 		
 public:
 	

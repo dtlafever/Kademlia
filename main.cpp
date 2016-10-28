@@ -1,6 +1,6 @@
 //Main Program for Starting a Kademlia Node
 
-#include "node.h"
+#include "Node.h"
 #include <stdlib.h>
 #include <stdio.h>
 

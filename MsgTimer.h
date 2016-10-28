@@ -4,8 +4,8 @@
 #include <stdint.h>
 #include <unistd.h>
 #include <chrono>
-typedef std::chrono::duration<int> dur;
-typedef std::chrono::system_clock::time_point tp;
+#define dur std::chrono::duration<int>
+#define tp std::chrono::system_clock::time_point
 
 class MsgTimer {
 

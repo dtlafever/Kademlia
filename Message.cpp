@@ -48,8 +48,12 @@ void Message::parse (std::string message)
 	msgType = NONE;
 	msg ="";
 	
+	if(msg == "")
+		Message::msg = message;
+	
 	// Getting the sender ID
-	if((index=message.find(" "))!= -1)
+	index=message.find_first_of(" ");
+	if(index!= -1)
 	{
 		// Reading the nodeID
 		std::string s = message.substr(0, index+1);
@@ -60,17 +64,15 @@ void Message::parse (std::string message)
 	}
 	else
 	{
-		std::cout << "Error in message, nodeID of sender not found"<<std::endl;
+		printf( "Error in message, nodeID of sender not found\n");
 	}
-	
-	if ((index=message.find("UI")!= -1))
+	index = -1;
+	index=message.find("UI");
+	if (index!= -1)
 	{
 		isUI = true;
 		message.erase(message.begin()+index, message.begin()+index+2);
 	}
-	
-	if(msg == "")
-		Message::msg = message;
 	
 	if (message.find(msgStrings[PING]) != -1)
 	{
@@ -205,6 +207,8 @@ std::string Message::toString(MsgType type, uint32_t nodeID, uint32_t ID, bool U
 	sprintf(temp, "%d", nodeID); // convert to string
 	msg+= std::string(temp)+ " ";
 	
+	//std::cout << msg <<std::endl;
+	
 	switch (type)
 	{
 		case PING:
@@ -232,6 +236,8 @@ std::string Message::toString(MsgType type, uint32_t nodeID, uint32_t ID, bool U
 			{
 				sprintf(temp, "%d", ID); // convert to string
 				msg += msgStrings[FINDVALUE]+ std::string(temp);
+				std::cout << msg <<std::endl;
+
 			}
 			break;
 			
@@ -293,7 +299,7 @@ std::string Message::toString(MsgType type, uint32_t nodeID, uint32_t ID, bool U
 			
 		default:
 			msg = "";
-			std::cout << "Unable to create string properly!"<<std::endl;
+			printf("Unable to create string properly!\n");
 			break;
 	}
 	
@@ -307,7 +313,7 @@ std::string Message::toString()
 {
 	std::string m = "";
 	
-	m=toString(msgType, ID, isUI);
+	m=toString(msgType, nodeID, ID, isUI);
 	
 	return m;
 }
@@ -366,7 +372,7 @@ bool Message::getUI()
 
 void Message::printMessageType()
 {
-	std::cout << "Type : "<< msgStrings[msgType] <<std::endl;
+	printf("Type: %s \n",  msgStrings[msgType].c_str());
 }
 
 bool Message::includes(uint32_t & id)

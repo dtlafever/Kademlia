@@ -8,6 +8,7 @@
 #include "JoinNetworkQueue.h"
 #include "MsgTimer.h"
 #include "constants.h"
+#include <mutex>
 
 #define UI_TIMEOUT 0
 #define PINGER_TIMEOUT 1
@@ -27,6 +28,7 @@ class Node
   bool inNetwork;
   vector<Triple> refresherVector;
   bool exit = false;
+	mutex outputLock;
 
 	// Index 0 is a vector of MsgTimer to keep track of the timeouts for the UI thread.
 	// Index 1 is reserved for messages that the PINGer sends for other threads.
