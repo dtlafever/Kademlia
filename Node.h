@@ -36,22 +36,17 @@ class Node
   //Pre: msg, queue, and timeOut were declared in the constructor below
   //Post: the id of the node sending msg is removed from timeOut
   //      if our id is in closest times, return true, false other wise
-  void handleKClosMsg(Message msg, vector<MsgTimer>& timeOut,
-			    JoinNetworkQueue& queue);
+  void handleKClosMsg(Message & msg, vector<MsgTimer>& timeOut,
+			    JoinNetworkQueue& queue, uint32_t & IP);
 
-	
-	// Index 0 - UI_TIMEOUT is a vector of MsgTimer to keep track of the timeouts for the UI thread.
-	// Index 1 - PINGER_TIMEOUT is reserved for messages that the PINGer sends for other threads.
-	// Index 2 - REFRESH_TIMEOUT is reserved for timeouts for the refresher -> there should never be more than ALPHA
-	vector<MsgTimer> timeouts[3];
+
 	
 	void sendUpToAlphaPing(KBucket & curKBucket, UDPSocket & socket, uint32_t & i, uint32_t & j);
-
-	//PRE: the snapshot we are currently using, as well as the socket to 
-	//     send messages on.
 	//POST: sends up to ALPHA nodes FINDVALUE and then add them to
 	//      the timer queue.
 	void sendUpToAlphaKClos(SnapShot & ss, UDPSocket & sock);
+	
+	void clearTimeOut(vector<MsgTimer>& timer);
 	
  public:
 

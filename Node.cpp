@@ -2,6 +2,14 @@
 
 #include "Node.h"
 #include <algorithm>
+#include "JoinNetworkQueue.h"
+#include "MsgTimer.h"
+#include "string.h"
+
+//Node Construction, Node Listener,
+//Refresher and Update, User Interface, Sending
+
+//------------------------------Node Construction---------------------------
 
 //Pre: id is a valid node id that is not yet taken
 //Post: RT is initalized, ID = id, inNetwork = true
@@ -14,46 +22,67 @@ Node::Node(uint32_t id) : RT(id){
 //Pre: msg, queue, and timeOut were declared in the constructor below
 //Post: the id of the node sending msg is removed from timeOut
 //      if our id is in closest times, return true, false other wise
-void Node::handleKClosMsg(Message msg, vector<MsgTimer>& timeOut,
-													JoinNetworkQueue& queue) {
+
+/// TODO: return value problem??? 
+void Node::handleKClosMsg(Message & msg, vector<MsgTimer>& timeOut,
+													JoinNetworkQueue& queue, uint32_t & IP) {
 	bool isMyIDInMsg = false;
-	uint32_t senderID = msg.getID();
-	uint32_t senderIP = msg.get();
-	RT.updateTable(senderID, senderIP, PORT);
 	bool found = false;
 	int index = 0;
-	MsgTimer currTimer;
-	while (!found) {
-		currTimer = timeOut[timeOut.begin() + index];
-		if (currTimer.getID() == senderID) {
+	
+	// Get the IP and ID
+	uint32_t senderID = msg.getNodeID();
+	uint32_t senderIP = IP;
+	
+	RT.updateTable(senderID, senderIP);
+	
+	MsgTimer curTimer (RESPONDTIME_UI, senderID, senderIP);
+	
+	while (!found)
+	{
+		curTimer = timeOut[index];
+		
+		if (curTimer.getNodeID() == senderID) // If it is the same ID
+		{
 			found = true;
 			timeOut.erase(timeOut.begin() + index);
 		}
 		index++;
+		
 	} //the sender node is now removed from the time out vector
-	if (msg.includes(ID)) {  //This node knows us
+	
+	if (msg.includes(ID))// If this node knows us
+	{
 		isMyIDInMsg = true;
 	}
-	//Continue adding in the nodes we have not asked yet
+	
+	// Continue adding in the nodes we have not asked yet
 	Triple closestK[K];
 	int size = msg.getKClos(closestK);
-	for (int index = 0; (index < size); index) {
+	
+	for (int index = 0; (index < size); ++index)
+	{
 		queue.add(closestK[index]);
 	}
-	if (!inNetwork) { //no need to check if we're already in network
-		inNetwork = myIdInMsg;
+	if (!inNetwork) //no need to check if we're already in network
+	{
+		inNetwork = isMyIDInMsg;
 	}
 }
 
 //Pre: timer is from the constructor
 //Post: Removes elements from timer that have timed out
-Node::clearTimeOut(Vector<MsgTimer>& timer) {
+void Node::clearTimeOut(vector<MsgTimer>& timer)
+{
   int size = timer.size(); //number of elements in timer
   MsgTimer currTimer;
-  for (int index = 0; (index < size); index++){
-    currTimer = timer[timeOut.begin() + index];
+	
+  for (int index = 0; (index < size); index++)
+	{
+    currTimer = timer[index];
+		
     if (currTimer.timedOut()) {
-      timeOut.erase(timeOut.begin() + index);
+      timer.erase(timer.begin() + index);
     }
   }
 }
@@ -63,30 +92,58 @@ Node::clearTimeOut(Vector<MsgTimer>& timer) {
 //Post: ID = id, contact exists within our routing table, as well as
 //      other nodes our contact has told about us
 //      inNetwork = true if FindNode on ourselves succeds, false otherwise
-Node::Node(uint32_t id, uint32_t contactID, uint32_t contactIP) : RT(id) {
-  ID = id;
-  RT.updateTable(contactID, contactIP);
+Node::Node(uint32_t id, uint32_t contactID, uint32_t contactIP) : RT(id)
+{
+	ID = id; // update this node's nodeID
+	RT.updateTable(contactID, contactIP); // Insert contact node in routing table
   inNetwork = false; //at this point, no other node knows about us
-  vector<MsgTimer> timeOut();
+	
+	// Create a vector for timeouts
+  vector<MsgTimer> timeOut;
+	
+	// Create socket
   UDPSocket socket(UIPORT);
-  Message firstMsg(FINDNODE, ID, "FINDNODE", ID);
-  socket.sendMessage(firstMsg, contactIP, MAINPORT);
-  timeOut.push_back(MsgTimer(RESPONSETIME, contactID, contactIP));
-  Triple contactTriple(contactID, contactIP, MAINPORT);
-  JoinNetworkQueue nodesToAsk(contactID, contactIP);
-  while (nodesToAsk.hasNext() and !RT.isFull()) {
-    string resposne;
+	
+	// Send FINDNODE message
+  Message firstMsg(FINDNODE, ID, ID);
+  socket.sendMessage(firstMsg.toString(), contactIP, MAINPORT);
+	
+	// Add a timeout
+	MsgTimer timer(RESPONDTIME_UI, contactID, contactIP);
+  timeOut.push_back(timer);
+	
+	/// TODO: Should we add the contact triple to the nodesToAsk???
+	Triple contactTriple;
+	contactTriple.address = contactIP;
+	contactTriple.node = contactID;
+ 	contactTriple.port = UIPORT;
+	
+  JoinNetworkQueue nodesToAsk(contactTriple);
+	
+	/// TODO: didn't we discuss the problem of the "full"routing table?
+  while (nodesToAsk.hasNext() && !RT.isFull())
+	{
+		// Try to receive a message
+    string response;
     int msgSize = socket.recvMessage(response);
-    if (msgSize != -1) {
+		
+		// If there is a message
+    if (msgSize != -1)
+		{
       Message msg(response);
-      if (msg.getMsgType() == KCLOSEST) {
-	bool myIdInMsg = handleKClosMsg(msg, timeOut, nodesToAsk);
+      if (msg.getMsgType() == KCLOSEST)
+			{
+				/// TODO: ?????
+				bool myIdInMsg = handleKClosMsg(msg, timeOut, nodesToAsk, contactIP);
       } //Done Dealing with a received message
     }
+		
+		// Get next Triple to ask
     Triple nextToAsk = nodesToAsk.getNext();
-    Message toSend(FINDNODE, ID, "FINDNODE", ID);
-    socket.sendMessage(toSend.toString(), nextToAsk.address, nextToAsk.port);
-    clearTimeOut(timeOut);
+    Message toSend(FINDNODE, ID, ID);
+    socket.sendMessage(toSend.toString(), nextToAsk.address, UIPORT);
+		
+		clearTimeOut(timeOut);
   }
 }
 
@@ -373,70 +430,76 @@ void Node::startRefresher()
 //      SENDS: FIND_VALUE, FIND_NODE, STORE
 //			TO UI: FIND_VALUE_RESP_POSITIVE, FIND_VALUE_RESP_NEGATIVE, STORE_RESP
 void startUIListener() {
-	SnapShot snapSnot;
-	MsgType curMsg;
-	vector<Timeout> timeoutVector;
+  SnapShot snapSnot;
+  MsgType curMsg;
+  std::string strUI;
+  Message msgUI;
+  uint32_t recvlenUI;
+  UDPSocket socketUI(UIPORT);
 	
-	std::string strUI;
-	Message msgUI;
-	uint32_t recvlenUI;
-	
-	UDPSocket socketUI(UIPORT);
-	
-	while (listening) {
-		//Listening on UI socket
-		recvlenUI = socketUI.recvMessage(strUI);
-		if (recvlenUI > 0) {
-			//Update the ip for the UI
-			int ipUI = socketUI.getRemoteIP();
-			msgUI.parse(strUI);
-			
-			if (msgUI.getMsgType() == FINDVALUE) {
-				curMsg = msgUI;
-				if (std::find(keys.begin(), keys.end(), curMsg.getID())
-						!= keys.end()) {
-					//ASSERT: we have the value, send confirm message
-					Message sendMsg(FVRESPP);
-					socketUI.sendMessage(sendMsg.toString(), ipUI, UIPORT);
-				}
-				else {
-					//ASSERT: we did not find the value, lets check
-					//        the rest of the network
-					Triple kClos[K];
-					int size = getKClosetNodes(curMsg.getID(), kClos);
-					//ASSERT: kClos contains the K closest nodes that we
-					//        know about it.
-					snapSnot.addClosest(kClos, size);
-					if (!snapShot.nextExist()) {
-						//ASSERT: there is no k clos to check,
-						//        send fail message to UI
-						Message sendMsg(FVRESPN);
-						socketUI.sendMessage(sendMsg.toString(), ipUI, UIPORT);
-					}
-					else {
-						sendUpToAlphaKClos(SnapShot, socketUI);
-					}
-				}
-			}else if (msgUI.getMsgType() == STORE_UI) {
-				curMsg = msgUI;
-				Triple kClos[K];
-				int size = getKClosetNodes(curMsg.getID(), kClos);
-				if (size == 0) {
-					//ASSERT: We are the only node in the network, store
-					//        inside ourselves
-					keys.push_back(msgUI.);
-				}
-				snapSnot.addClosest(kClos, size);
-				sendUpToAlphaKClos(SnapShot, socketUI);
-			}
-		}
+  while (listening) {
+    //Listening on UI socket
+    recvlenUI = socketUI.recvMessage(strUI);
+    if (recvlenUI > 0) {
+      //Update the ip for the UI
+      int ipUI = socketUI.getRemoteIP();
+      msgUI.parse(strUI);
+      if (msgUI.getMsgType() == FINDVALUE) {
+	curMsg = msgUI;
+	if (std::find(keys.begin(), keys.end(), curMsg.getID())
+	    != keys.end()) {
+	  //ASSERT: we have the value, send confirm message
+	  Message sendMsg(FVRESPP);
+	  socketUI.sendMessage(sendMsg.toString(), ipUI, UIPORT);
 	}
-}else if (msgUI.getMsgType() == STORE_UI) {
+	else {
+	  //ASSERT: we did not find the value, lets check
+	  //        the rest of the network
+	  Triple kClos[K];
+	  int size = getKClosetNodes(curMsg.getID(), kClos);
+	  //ASSERT: kClos contains the K closest nodes that we
+	  //        know about it.
+	  snapSnot.addClosest(kClos, size);
+	  if (!snapShot.nextExist()) {
+	    //ASSERT: there is no k clos to check,
+	    //        send fail message to UI
+	    Message sendMsg(FVRESPN);
+	    socketUI.sendMessage(sendMsg.toString(), ipUI, UIPORT);
+	  }
+	  else {
+	    sendUpToAlphaKClos(SnapShot, socketUI);
+	  }
+	}
+      }else if (msgUI.getMsgType() == STORE) {
 	curMsg = msgUI;
 	Triple kClos[K];
 	int size = getKClosetNodes(curMsg.getID(), kClos);
-	snapSnot.addClosest(kClos, size);
-	sendUpToAlphaKClos(SnapShot, socketUI);
+	if (size == 0) {
+	  //ASSERT: special case where we are the only node in network,
+	  //        so we store the key
+	  keys.push_back(msgUI.getID());
+	  Message sendMsg(STORERESP);
+	  socketUI.sendMessage(sendMsg.toString(), ipUI, UIPORT);
+	}
+	else {
+	  snapSnot.addClosest(kClos, size);
+	  sendUpToAlphaKClos(SnapShot, socketUI);
+	}
+      }else if (msgUI.getMsgType() == KCLOSEST){
+	//ASSERT: this is a response from a node
+	for (int i = 0; i < timeouts[UI_TIMEOUT].size(); i++) {
+	  if(timeouts[UI_TIMEOUT][i].getNodeID() == )
+	    }
+      }
+    }
+  }
+}else if (msgUI.getMsgType() == STORE_UI) {
+  curMsg = msgUI;
+  Triple kClos[K];
+  int size = getKClosetNodes(curMsg.getID(), kClos);
+  snapSnot.addClosest(kClos, size);
+  sendUpToAlphaKClos(SnapShot, socketUI);
+ }
 }
 }
 }
@@ -458,8 +521,6 @@ void Node::sendUpToAlphaKClos(SnapShot & ss, UDPSocket & sock) {
   }
 
 }
-
-///TODO: check again
 
 void Node::sendUpToAlphaPing(KBucket &curKBucket, UDPSocket &socket, uint32_t & i, uint32_t & j)
 {

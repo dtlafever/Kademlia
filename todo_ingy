@@ -8,12 +8,8 @@ Ingy
 
 Todo:
 
-- Add includes function in Message class
 - Update comments in Message.cpp
-- ask for getIP function in MsgTimer
-- ask for reset function in MSGTimer
 -Do we need a port in Triple?
-- Update names in constants file for delays ...
 -
 
 

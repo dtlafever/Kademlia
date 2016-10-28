@@ -32,6 +32,7 @@ struct Triple {
 	uint32_t port; // UDP Port
 	uint32_t node; // Node ID
 	Triple() : address(0), port(0), node(0) {} //DEFAULT VALUES
+	Triple( uint32_t & addressRhs, uint32_t & idRhs,  uint32_t & portRhs): address(addressRhs), node(idRhs), port(portRhs) {};
 	Triple(const Triple & rhs):address(rhs.address), port(rhs.port), node(rhs.node) {}
 };
 
