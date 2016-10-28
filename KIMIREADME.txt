@@ -205,4 +205,49 @@ Node C is now in the network!
 
 ========================================
 
+=======
 
+Suppose there are N nodes in the network, such that N < 2^32.
+
+A node wants to join the network, and has a contact.
+
+=======
+
+-The joining node J must have a contact in order to join. It provides the ID of the Contact Node.
+-JoinNode gets D = distance(JoinNode, ConNode), where 0 < D < (2^32) - 1
+-JoinNode places ConNode into the tail of the appropriate K-bucket, where 2^i <= D < 2^i+1
+
+-JoinNode must populate itself and the rest of the network's K-buckets.
+-JoinNode sends FINDNODE request to ConNode.
+-ConNode receives a FINDNODE request with JoinNode's ID.
+
+-ConNode calculates the distance between itself and JoinNode.
+   It goes to that K-bucket, and collects up to K of the closest nodes to the ID using the XOR metric
+   If the K-bucket is not full, compare it to the distance of buckets 2^i-1 and 2^i+1. Go to the bucket
+   with the closer distance until you have K nodes.
+   Once it has K nodes (or as many as it can get) it will send the list back to JoinNode.
+-ConNode will then place JoinNode in the right K-bucket.
+
+-JoinNode will receive a list of the K closest nodes given it's ID. 
+
+
+
+
+
+
+
+-Node C will receive a list of just one node. It'll select ALPHA nodes (or as much as we can,
+ in this case just one) and then resend the FINDNODE request to Node B with Node C's ID.
+-Node C will refresh it's K-buckets so Node A is LRU in it's bucket.
+ 
+-Node B receives a FINDNODE request with Node C's ID.
+-Node B calculates the distance between itself and Node C. Dist = 6, so it goes to look in
+ it's third k-bucket and finds Node A. It won't find any other nodes, so it will only return
+ Node A to Node C.
+-Node B will then place Node C in the appropriat K-bucket (Dist = 6, the third bucket) 
+
+-Node C will receive a list of just one node. It's already queried this node, and there
+ are no other nodes to query; therefore the lookup will terminate.
+-Node C will refresh it's K-buckets so Node B is LRU in it's bucket.
+
+Node C is now in the network!
