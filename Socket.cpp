@@ -205,6 +205,19 @@ bool Socket::sendTo(const std::string s, std::string host, const int port) {
 	}
 }
 
+uint32_t getIPInt(std::string ip){
+  uint32_t intIP;
+  struct sockaddr_in remaddr;
+  memset((char *)&remaddr, 0, sizeof(remaddr));
+  int slen = sizeof(remaddr);
+  remaddr.sin_family = AF_INET;
+
+  char * ip = (char *)host.c_str();
+  inet_aton(ip, &remaddr.sin_addr);
+  
+  return intIP;
+}
+
 //PRE: the message we want to send, the host ip address, and the port 
 //     number of that host
 //POST: sends a message to the a given host and port number. Returns true if 

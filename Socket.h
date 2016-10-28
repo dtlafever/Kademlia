@@ -26,10 +26,20 @@
 const int MAXHOSTNAME = 200;
 const int MAXCONNECTIONS = 20;
 
-uint32_t static parseIPV4string(char* ipAddress) {
-  char ipbytes[4];
-  sscanf(ipAddress, "%uhh.%uhh.%uhh.%uhh", &ipbytes[3], &ipbytes[2], &ipbytes[1], &ipbytes[0]);
-  return ipbytes[0] | ipbytes[1] << 8 | ipbytes[2] << 16 | ipbytes[3] << 24;
+//PRE: shende you better not read this
+//     takes a string in dot integer form
+//POST: returns the integer IP address
+uint32_t getIPInt(std::string ip){
+
+  struct sockaddr_in remaddr;
+  memset((char *)&remaddr, 0, sizeof(remaddr));
+  int slen = sizeof(remaddr);
+  remaddr.sin_family = AF_INET;
+
+  char * ip = (char *)host.c_str();
+  inet_aton(ip, &remaddr.sin_addr);
+  
+  return remaddr.sin_addr.s_addr;
 }
 
 class Socket
