@@ -163,8 +163,8 @@ void Node::startListener(){
   //ASSERT: Create the two threads for handling Pings and
   //        for handling UIs
 	
-  Message sendMessageOBJ(NONE, ID);
-  //ASSERT: empty message object to send later
+	Message sendMessageOBJ(NONE, ID);
+	//ASSERT: empty message object to send later
 	
   std::string sendString; //the message we will fill up and send
   std::string receiveString; //the message we will receive
@@ -172,7 +172,7 @@ void Node::startListener(){
   uint32_t senderIP;//the IP of the node we're receiving a msg from
   uint32_t senderID; //the ID of the node we're receiving a msg from
 	
-  int32_t recNum = -1;
+	int32_t recNum = -1;
 	
   UDPSocket socket(MAINPORT);
   //ASSERT: connect socket to our main port
@@ -293,8 +293,8 @@ void Node::startRefresher()
   // Incoming Message as a string
   std::string incoming;
 	
-  // Incoming message as a Message
-  Message msg;
+	// Incoming message as a Message
+	Message msg(NONE, ID);
 	
   // Incoming IP
   uint32_t IP =0;
@@ -360,11 +360,11 @@ void Node::startRefresher()
 	      }
 	      break;
 					
-	    default:
-	      cout << "Unrecognized message received: "<< incoming<<endl;
-	      break;
-	    }
-	}
+				default:
+					printf("Unrecognized message received: %s\n", incoming.c_str());
+					break;
+			}
+		}
 		
       if(refresh) // We are currently refreshing the routingTable
 	{
@@ -446,12 +446,12 @@ void Node::startRefresher()
 //      SENDS: FIND_VALUE, FIND_NODE, STORE
 //			TO UI: FIND_VALUE_RESP_POSITIVE, FIND_VALUE_RESP_NEGATIVE, STORE_RESP
 void Node::startUIListener() {
-  SnapShot snapShot;
-  Message curMsg(NONE);
+	SnapShot snapShot;
+	Message curMsg(NONE, ID);
 	
-  std::string strUI;
-  Message recvMsg;
-  int32_t recvlenUI;
+	std::string strUI;
+	Message recvMsg(NONE, ID);
+	int32_t recvlenUI;
 	
   UDPSocket socketUI(UIPORT);
 	
@@ -612,15 +612,37 @@ void Node::startUIListener() {
 		timeouts[UI_TIMEOUT].erase(timeouts[UI_TIMEOUT].begin()+i);
 		i--;
 					
-		//Now we need to continue depending on what we are on
-		if (curMsg.getMsgType() == STORE)
-		  {
-		    if (!snapShot.nextExist()) {
-		      //ASSERT: we have found the K closest, send store messages
-		      Message sendMsg(STORE, ID);
-		      for (int i = 0; i < snapShot.getSize(); i++)
-			{
-			  socketUI.sendMessage(sendMsg.toString(), snapShot.getElementIP(i), MAINPORT);
+					//Now we need to continue depending on what we are on
+					if (curMsg.getMsgType() == STORE)
+					{
+						if (!snapShot.nextExist()) {
+							//ASSERT: we have found the K closest, send store messages
+							Message sendMsg(STORE, ID);
+							for (int i = 0; i < snapShot.getSize(); i++)
+							{
+								socketUI.sendMessage(sendMsg.toString(), snapShot.getElementIP(i), MAINPORT);
+							}
+						}
+						else {
+							//ASSERT: we are not done searching for kClos
+							sendUpToAlphaKClos(snapShot, socketUI, curMsg.getID());
+						}
+					}else if(curMsg.getMsgType() == FINDVALUE)
+					{
+						if (!snapShot.nextExist())
+						{
+							//ASSERT: we have found the K closest and no value,
+							//        send UI that wouldn't couldnt find it.
+							Message sendMsg(FVRESPN);
+							socketUI.sendMessage(sendMsg.toString(), ipUI, UIPORT);
+						}
+						else
+						{
+							//ASSERT: we are not done searching for kClos
+							sendUpToAlphaKClos(snapShot, socketUI, curMsg.getID());
+						}
+					}
+				}
 			}
 		    }
 		    else {
@@ -713,9 +735,9 @@ void Node::sendUpToAlphaPing(KBucket &curKBucket, UDPSocket &socket, uint32_t & 
 	  // get next element in curKBucket and increment j
 	  Triple curTriple = curKBucket[j++];
 			
-	  // Send PING
-	  Message pingr(PING, ID);
-	  socket.sendMessage (pingr.toString(), curTriple.address, REFRESHERPORT);
+			// Send PING
+			Message pingr(PING, ID);
+			socket.sendMessage (pingr.toString(), curTriple.address, REFRESHERPORT);
 			
 	  // Updating timeouts
 	  MsgTimer timer (RESPONDTIME_PING, curTriple.node, curTriple.address);
