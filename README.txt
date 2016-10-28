@@ -56,4 +56,53 @@ Test Cases:
      14. Suppose that node 3 has initalized FindNode to find node 11 when node
      	 11 does not exist in the network. Return a fail after querying every
 	 node.
-     15. 
+
+
+For a network with 10 nodes (ie, ids are between 0 and 9), this is what
+the network should look like:
+
+After Node 0 joins: The Routing Table of Node 0 is empty
+After Node 1 joins:
+      Node0: RT[0] = 1
+      Node1: RT[0] = 0
+After Node2 joins:
+      Node0: RT[0] = 1, RT[1] = 2
+      Node1: RT[0] = 0, RT[1] = 2
+      Node2: RT[1] = 0, 1 (order depends on which node responded back 1st)
+After Node3 joins:
+      Node0: RT[0] = 1, RT[1] = 2, 3
+      Node1: RT[0] = 0, RT[1] = 2, 3
+      Node2: RT[0] = 3, RT[1] = 0, 1
+      Node3: RT[0] = 2, RT[1] = 0, 1
+After Node4 joins:
+      Node0: RT[0] = 1, RT[1] = 2, 3, RT[2] = 4
+      Node1: RT[0] = 0, RT[1] = 2, 3, RT[2] = 4
+      Node2: RT[0] = 3, RT[1] = 0, 1, RT[2] = 4
+      Node3: RT[0] = 2, RT[1] = 0, 1, RT[2] = 4
+      Node4: RT[2] = 0, 1, 2, 3 (depends on which ones responded first)
+After Node5 joins:
+      Node0: RT[0] = 1, RT[1] = 2, 3, RT[2] = 4, 5
+      Node1: RT[0] = 0, RT[1] = 2, 3, RT[2] = 4, 5
+      Node2: RT[0] = 3, RT[1] = 0, 1, RT[2] = 4, 5
+      Node3: RT[0] = 2, RT[1] = 0, 1, RT[2] = 4, 5
+      Node4: RT[0] = 5, RT[2] = 0, 1, 2, 3
+      Node5: RT[0] = 4, RT[2] = 0, 1, 2, 3 (which one responded first)
+After Node6 joins:
+      Node0: RT[0] = 1, RT[1] = 2, 3, RT[2] = 4, 5, 6
+      Node1: RT[0] = 0, RT[1] = 2, 3, RT[2] = 4, 5, 6
+      Node2: RT[0] = 3, RT[1] = 0, 1, RT[2] = 4, 5, 6
+      Node3: RT[0] = 2, RT[1] = 0, 1, RT[2] = 4, 5, 6
+      Node4: RT[0] = 5, RT[1] = 6, RT[2] = 0, 1, 2, 3
+      Node5: RT[0] = 4, RT[1] = 6, RT[2] = 0, 1, 2, 3
+      Node6: RT[1] = 2, 3, RT[2] = 0, 1, 2, 3 (which one responded first)
+After Node7 joins:
+      Node0: RT[0] = 1, RT[1] = 2, 3, RT[2] = 4, 5, 6, 7
+      Node1: RT[0] = 0, RT[1] = 2, 3, RT[2] = 4, 5, 6, 7
+      Node2: RT[0] = 3, RT[1] = 0, 1, RT[2] = 4, 5, 6, 7
+      Node3: RT[0] = 2, RT[1] = 0, 1, RT[2] = 4, 5, 6, 7
+      Node4: RT[0] = 5, RT[1] = 6, 7, RT[2] = 0, 1, 2, 3
+      Node5: RT[0] = 4, RT[1] = 6, 7, RT[2] = 0, 1, 2, 3
+      Node6: RT[0] = 7, RT[1] = 2, 3, RT[2] = 0, 1, 2, 3
+      Node7: RT[0] = 6, RT[1] = 3, 2, RT[2] = 0, 1, 2, 3 (which one 1st)
+
+      blah blah blah, that whole pattern thing continues

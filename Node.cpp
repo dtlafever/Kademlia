@@ -189,13 +189,16 @@ void Node::startListener(){
 			uint32_t aKey;
 			//ASSERT: to be extracted from each message.
 			
-			if(receivedMessageOBJ.getMsgType() == STORE){
+			switch (receivedMessageOBJ.getMsgType())
+			{
+			case STORE:
 				//ASSERT: A node wants to store
 				aKey = receivedMessageOBJ.getID();
-				keys.push_back(keyToStore);
+				keys.push_back(aKey);
 				refresherVector.push_back(sendTriple);
-			}
-			else if(receivedMessageOBJ.getMsgType() == FINDNODE){
+				break;
+			
+			case FINDNODE:
 				//ASSERT: A node wants k closest nodes
 				aKey = receivedMessageOBJ.getID();
 				
@@ -206,25 +209,25 @@ void Node::startListener(){
 				sendMessageOBJ.setNodeID(ID);
 				
 				sendString = sendMessageOBJ.toString();
-				socket.sendMessage(sendString, UIPORT, senderIP);
-				
+				socket.sendMessage(sendString, senderIP, UIPORT);
+
 				refresherVector.push_back(sendTriple);
 			}
 			else if(receivedMessageOBJ.getMsgType() == FINDVALUE){
 				//ASSERT: A node is trying to find a key
 				aKey = receivedMessageOBJ.getID();
-				
+
 				vector<int>::iterator it;
-				it = find(keys.begin(), keys.end(), theKey);
-				
-				if(it != keys.end()){
+				it = std::find(keys.begin(), keys.end(), theKey);
+
+				if (it != keys.end()) {
 					//ASSERT: we found the key
 					sendMessageOBJ.setType(FVRESP);
 					sendMessageOBJ.setNodeID(ID);
 					sendString = sendMessageOBJ.toString();
-					socket.sendMessage(sendString, MAINPORT, senderIP);
+					socket.sendMessage(sendString, senderIP, MAINPORT);
 				}
-				else{
+				else {
 					//ASSERT: we could not find in the key
 					closestSize = RT.getKClosestNodes(aKey, KClosest);
 					sendMessageOBJ.setKClos(KClosest, closestSize);
@@ -233,10 +236,14 @@ void Node::startListener(){
 					sendMessageOBJ.setNodeID(ID);
 					
 					sendString = sendMessageOBJ.toString();
-					socket.sendMessage(sendString, UIPORT, senderIP);
+					socket.sendMessage(sendString, senderIP, UIPORT);
 				}
-				
+
 				refresherVector.push_back(sendTriple);
+				break;
+
+			default:
+				break;
 			}
 		}
 	}
