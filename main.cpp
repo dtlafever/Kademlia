@@ -3,7 +3,7 @@
 #include "Node.h"
 #include <stdlib.h>
 #include <stdio.h>
-#include "socket.h"
+#include "Socket.h"
 
 #define MY_ID 1
 #define CONTACT_ID 2
