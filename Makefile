@@ -24,5 +24,6 @@ main.o: main.cpp
 	$(GCC) -c main.cpp
 clean:                                                                          
 	rm *.o                                                                  
-	rm *~
+	rm *.log
 	rm main
+	rm *~

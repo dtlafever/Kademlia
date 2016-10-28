@@ -24,4 +24,7 @@ UImain.o: UImain.cc
 	$(GCC) -c UImain.cc
 
 clean:
-	$(RM) UIerror.o UserInterface.o UImain.o Message.o Socket.o UDPSocket.o UI 
+	$(RM) *~
+	$(RM) *.o
+	$(RM) *.log
+	$(RM) UI 
