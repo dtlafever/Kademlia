@@ -32,29 +32,45 @@ bool JoinNetworkQueue::add(Triple new_contact) {
 bool JoinNetworkQueue::hasNext() {
   bool hasNext;
   int index;
-  std::vector<bool>::iterator next_unseen;
-  std::vector<bool>::iterator front;
-  next_unseen = std::find(node_checked.begin(), node_checked.end(), false);
-  front = node_checked.begin();
-  if (next_unseen != node_checked.end()) {
-    index = next_unseen - front;
-    hasNext = true;
-  }
-  else {
-    hasNext = false;
-  }
-  return hasNext;
+  //std::vector<bool>::iterator next_unseen;
+  //std::vector<bool>::iterator front;
+  //next_unseen = std::find(node_checked.begin(), node_checked.end(), false);
+
+  bool found = false;
+  for (int i=0; (i < node_checked.size()) && (!found); i++){
+		if(false == node_checked[i]){
+			found = true;
+		}
+	}
+
+  // front = node_checked.begin();
+  // if (next_unseen != node_checked.end()) {
+  //   index = next_unseen - front;
+  //   hasNext = true;
+  // }
+  // else {
+  //   hasNext = false;
+  // }
+  //return hasNext;
+  return found;
 }
 
 // PRE: assumes that hasNext will return true if the function is called.
 //POST: returns the triple of the first node in seen_nodes [index i]
 //      where the i index of node_checked is false.
 Triple JoinNetworkQueue::getNext() {
-  int index;
-  std::vector<bool>::iterator front = node_checked.begin();
-  std::vector<bool>::iterator next_unseen;
-  next_unseen = std::find(node_checked.begin(), node_checked.end(), false);
-  index = next_unseen - front;
+  //std::vector<bool>::iterator front = node_checked.begin();
+  //td::vector<bool>::iterator next_unseen;
+  //next_unseen = std::find(node_checked.begin(), node_checked.end(), false);
+  bool found = false;
+  int index = 0;
+  for (int i=0; (i < node_checked.size()) && (!found); i++){
+		if(false == node_checked[i]){
+			found = true;
+			index = i;
+		}
+	}
+  //index = next_unseen - front;
   node_checked[index] = true; // sets the node to be ineligible to get again
   return (seen_nodes[index]);
 }
@@ -63,11 +79,11 @@ Triple JoinNetworkQueue::getNext() {
 //POST: returns true iff comparison is not already in seen_nodes
 bool JoinNetworkQueue::search_seen(Triple comparison) {
   bool found = false;
-//  std::vector<Triple>::iterator element;
-//  element = std::find(seen_nodes.begin(), seen_nodes.end(), comparison);
-//  if (element != seen_nodes.end()) {
-//    found = true;
-//  }
+ // std::vector<Triple>::iterator element;
+ // element = std::find(seen_nodes.begin(), seen_nodes.end(), comparison);
+ // if (element != seen_nodes.end()) {
+ //   found = true;
+ // }
 	for (int i=0; (i < seen_nodes.size()) && (!found); i++){
 		if(comparison.address == seen_nodes[i].address &&
 			 comparison.node == seen_nodes[i].node &&
