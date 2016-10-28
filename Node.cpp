@@ -193,54 +193,62 @@ void Node::startListener(){
 			uint32_t aKey;
 			//ASSERT: to be extracted from each message.
 			
-			if(receivedMessageOBJ.getMsgType() == STORE){
+			switch (receivedMessageOBJ.getMsgType())
+			{
+			case STORE:
 				//ASSERT: A node wants to store
 				aKey = receivedMessageOBJ.getID();
-				keys.push_back(keyToStore);
+				keys.push_back(aKey);
 				refresherVector.push_back(sendTriple);
-			}
-			else if(receivedMessageOBJ.getMsgType() == FINDNODE){
+				break;
+			
+			case FINDNODE:
 				//ASSERT: A node wants k closest nodes
 				aKey = receivedMessageOBJ.getID();
-				
+
 				closestSize = RT.getKClosetNodes(aKey, KClosest);
 				sendMessageOBJ.setKClos(KClosest, closestSize);
-				
+
 				sendMessageOBJ.setMsgType(KCLOSEST);
 				sendMessageOBJ.setNodeId(ID);
-				
+
 				sendString = sendMessageOBJ.toString();
-				socket.sendMessage(sendString, UIPORT, senderIP);
-				
+				socket.sendMessage(sendString, senderIP, UIPORT);
+
 				refresherVector.push_back(sendTriple);
-			}
-			else if(receivedMessageOBJ.getMSGType() == FINDVALUE){
+				break;
+
+			case FINDVALUE:
 				//ASSERT: A node is trying to find a key
 				aKey = receivedMessageOBJ.getID();
-				
+
 				vector<int>::iterator it;
-				it = find(keys.begin(), keys.end(), theKey);
-				
-				if(it != keys.end()){
+				it = std::find(keys.begin(), keys.end(), theKey);
+
+				if (it != keys.end()) {
 					//ASSERT: we found the key
 					sendMessageOBJ.setMsgType(FVRESP);
 					sendMessageOBJ.setNodeId(ID);
 					sendString = sendMessageOBJ.toString();
-					socket.sendMessage(sendString, MAINPORT, senderIP);
+					socket.sendMessage(sendString, senderIP, MAINPORT);
 				}
-				else{
+				else {
 					//ASSERT: we could not find in the key
 					closestSize = RT.getKClosetNodes(aKey, KClosest);
 					sendMessageOBJ.setKClos(KClosest, closestSize);
-					
+
 					sendMessageOBJ.setMsgType(KCLOSEST);
 					sendMessageOBJ.setNodeId(ID);
-					
+
 					sendString = sendMessageOBJ.toString();
-					socket.sendMessage(sendString, UIPORT, senderIP);
+					socket.sendMessage(sendString, senderIP, UIPORT);
 				}
-				
+
 				refresherVector.push_back(sendTriple);
+				break;
+
+			default:
+				break;
 			}
 		}
 	}
@@ -588,24 +596,25 @@ void Node::removeFromUITimeout(uint32_t ID) {
 			timeouts[UI_TIMEOUT].erase(i);
 			foundNode = true;
 		}
+	}
+}
 		
-		
-		//PRE: the snapshot we are currently using, as well as the socket to
-		//     send messages on.
-		//POST: sends up to ALPHA nodes FINDVALUE and then add them to
-		//      the timer queue.
-		void Node::sendUpToAlphaKClos(SnapShot & ss, UDPSocket & sock) {
-			Message sendMsg(FINDVALUE);
-			sendMsg.getKClos(kClos, size);
-			for (int i = 0; (i < ALPHA) && (snapSnot.nextExist()); i++) {
-    Triple nextNode;
-    snapSnot.getNext(nextNode);
-    socket.sendMessage(sendMsg.toString(), nextNode.address, MAINPORT);
-    MsgTimer timer(RESPONDTIME, nextNode.node, nextNode.address);
-    timeouts[UI_TIMEOUT].push_back(timer);
-			}
+//PRE: the snapshot we are currently using, as well as the socket to
+//     send messages on.
+//POST: sends up to ALPHA nodes FINDVALUE and then add them to
+//      the timer queue.
+void Node::sendUpToAlphaKClos(SnapShot & ss, UDPSocket & sock) {
+	Message sendMsg(FINDVALUE);
+	sendMsg.getKClos(kClos, size);
+	for (int i = 0; (i < ALPHA) && (snapSnot.nextExist()); i++) {
+		Triple nextNode;
+		snapSnot.getNext(nextNode);
+		socket.sendMessage(sendMsg.toString(), nextNode.address, MAINPORT);
+		MsgTimer timer(RESPONDTIME, nextNode.node, nextNode.address);
+		timeouts[UI_TIMEOUT].push_back(timer);
+	}
 			
-		}
+}
 		
 		void Node::sendUpToAlphaPing(KBucket &curKBucket, UDPSocket &socket, uint32_t & i, uint32_t & j)
 		{
