@@ -5,6 +5,8 @@
 
 #include <stdint.h>
 
+#define DEBUG true
+
 #define MAXTHREADS 15 //maximum number of threads
 #define K 5
 #define MAINPORT 6666
