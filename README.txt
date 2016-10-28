@@ -109,12 +109,6 @@ After Node7 joins:
 
       blah blah blah, that whole pattern thing continues
 
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-Johnathan's Test Corner
-
-
-
-
 
 
 
@@ -353,28 +347,6 @@ A node wants to join the network, and has a contact.
 -ConNode will then place JoinNode in the right K-bucket.
 
 -JoinNode will receive a list of the K closest nodes given it's ID. 
-
-
-
-
-
-
-
--Node C will receive a list of just one node. It'll select ALPHA nodes (or as much as we can,
- in this case just one) and then resend the FINDNODE request to Node B with Node C's ID.
--Node C will refresh it's K-buckets so Node A is LRU in it's bucket.
- 
--Node B receives a FINDNODE request with Node C's ID.
--Node B calculates the distance between itself and Node C. Dist = 6, so it goes to look in
- it's third k-bucket and finds Node A. It won't find any other nodes, so it will only return
- Node A to Node C.
--Node B will then place Node C in the appropriat K-bucket (Dist = 6, the third bucket) 
-
--Node C will receive a list of just one node. It's already queried this node, and there
- are no other nodes to query; therefore the lookup will terminate.
--Node C will refresh it's K-buckets so Node B is LRU in it's bucket.
-
-Node C is now in the network!
 
 
 
