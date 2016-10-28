@@ -274,3 +274,22 @@ void KBucket::operator= (KBucket& otherBucket) {
   unlockBucket();
   otherBucket.unlockBucket();
 }
+
+
+void KBucket::copyKBucket(KBucket &otherBucket)
+{
+	lockBucket();
+	otherBucket.lockBucket();
+	numTriples = otherBucket.numTriples;
+	for (int index = 0; (index < numTriples); index++) {
+		Triple* tripleCopy = new Triple;
+		Triple original = otherBucket[index];
+		tripleCopy->node = original.node;
+		tripleCopy->address = original.address;
+		tripleCopy->port = original.port;
+		bucket[index] = tripleCopy;
+	}
+	unlockBucket();
+	otherBucket.unlockBucket();
+
+}

@@ -1,5 +1,5 @@
 #include "JoinNetworkQueue.h"
-#include <algorithm>
+//#include <algorithm>
 
 // PRE:
 //POST: initializes the vector of the nodes we've communicated with with our
@@ -7,7 +7,7 @@
 //      triple of our contact in index i. node_checked vector will also hold
 //      false in the index i.
 JoinNetworkQueue::JoinNetworkQueue(Triple contact) {
-  seen_nodes.push_back(contact);
+	seen_nodes.push_back(contact);
   node_checked.push_back(false);
 }
 
@@ -63,11 +63,19 @@ Triple JoinNetworkQueue::getNext() {
 //POST: returns true iff comparison is not already in seen_nodes
 bool JoinNetworkQueue::search_seen(Triple comparison) {
   bool found = false;
-  std::vector<Triple>::iterator element;
-  element = std::find(seen_nodes.begin(), seen_nodes.end(), comparison);
-  if (element != seen_nodes.end()) {
-    found = true;
-  }
+//  std::vector<Triple>::iterator element;
+//  element = std::find(seen_nodes.begin(), seen_nodes.end(), comparison);
+//  if (element != seen_nodes.end()) {
+//    found = true;
+//  }
+	for (int i=0; (i < seen_nodes.size()) && (!found); i++){
+		if(comparison.address == seen_nodes[i].address &&
+			 comparison.node == seen_nodes[i].node &&
+			 comparison.port == seen_nodes[i].port){
+			found = true;
+		}
+	}
+	
   return found;
 }
 

@@ -64,7 +64,7 @@ class SnapShot{
 	SnapShot(uint32_t nodeID);
 
 	//DEFAULT CONSTRUCTOR
-	Snapshot();
+	SnapShot();
 
 	//COPY CONSTRUCTOR
 	SnapShot(SnapShot & ss);

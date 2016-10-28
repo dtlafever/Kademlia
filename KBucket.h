@@ -25,10 +25,6 @@ class KBucket {
   //Post: lock is unlocked
   void unlockBucket();
 
-  //Pre: id is a valid id
-  //Post: RV = true if id is in the bucket, false otherwise
-  bool isNodeInBucket(uint32_t id);
-
   //bucket is organized by time last seen, head is least recent, tail is most
 
  public:
@@ -90,7 +86,11 @@ class KBucket {
   //     index is where that home is
   //Post: nodes[index] = curNode and nodes is shifted as needed
   void insertNode(Triple* nodes, int insertDex, Triple* curNode, int size);
-  
+	
+	//Pre: id is a valid id
+	//Post: RV = true if id is in the bucket, false otherwise
+	bool isNodeInBucket(uint32_t id);
+	
   //Pre: id1 and id2 are two identifiers
   //Post: RV = id1 XOR id2
   uint32_t findDist(uint32_t id1, uint32_t id2);
@@ -102,7 +102,9 @@ class KBucket {
   //Pre: This bucket is empty, it is unlocked
   //Post: This bucket is a deep copy of bucket
   void operator= (KBucket& otherBucket);
-  
+	
+	void copyKBucket(KBucket &otherBucket);
+
 };
 
 #endif

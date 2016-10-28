@@ -2,7 +2,10 @@
 #define UDPSocket_class
 
 #include "Socket.h"
+#include <fstream>
 #include <string>
+
+#define LOG_NAME "Socket.log"
 
 class UDPSocket : private Socket {
 public:
@@ -42,7 +45,7 @@ public:
 	//same as above except return the string formatted IP and butts
 	std::string getRemoteIP(int dummy);
 private:
-	
+	std::ofstream fileLog;
 };
 
 #endif // !UDPSocket_class
