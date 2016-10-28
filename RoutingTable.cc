@@ -77,8 +77,8 @@ int RoutingTable::findKBucket(uint32_t id) {
     tempt = tempt / 2;
     twoPower++;
   }
-  printf("in findKBucket, id = %u, dist = %u nthBucket = %d \n",
-	 id, myDist, twoPower);
+  //printf("in findKBucket, id = %u, dist = %u nthBucket = %d \n",
+  //	 id, myDist, twoPower);
   return (twoPower);
 }
 
@@ -108,11 +108,11 @@ bool RoutingTable::addNode(uint32_t node, uint32_t address) {
   bool added = false;
   Triple* newTriple = createTriple(node, address);
   if (currBucket->getNumTriples() == K) {  //the bucket is full
-    printf("Rout addNode: bucketOverFlow \n");
+    //printf("Rout addNode: bucketOverFlow \n");
     currBucket->deleteNode(currTriple->node);
   }
   else {
-    printf("Rout addNode: bucket not full \n");
+    //printf("Rout addNode: bucket not full \n");
     currBucket->addNode(newTriple);
     added = true;
   }

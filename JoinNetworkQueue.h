@@ -17,6 +17,9 @@ private:
 
 public:
 
+  
+  JoinNetworkQueue();
+  
   // PRE:
   //POST: initializes the vector of the nodes we've communicated with with our
   //      contact in the network we are joining. seen_nodes will hold the
