@@ -109,7 +109,8 @@ Node::Node(uint32_t nodeID, uint32_t contactID, uint32_t contactIP) : RT(nodeID)
   Triple contactTriple (contactIP, contactID, UIPORT);
   JoinNetworkQueue nodesToAsk(contactTriple);
 
-  while (!recvContact || (nodesToAsk.hasNext() && !inNetwork))
+  while (!recvContact || (timeOut.size() > 0 && !inNetwork)
+	 || (nodesToAsk.hasNext() && !inNetwork))
     {
       // Try to receive a message
       string response;
@@ -118,6 +119,9 @@ Node::Node(uint32_t nodeID, uint32_t contactID, uint32_t contactIP) : RT(nodeID)
       // If there is a message
       if (msgSize != -1)
 	{
+	  uint32_t IP = socket.getRemoteIP();
+	  printf("%s\n from %u\n", response.c_str(), IP);
+	  
 	  Message msg(response);
 
 	  if (msg.getMsgType() == KCLOSEST)
@@ -135,10 +139,10 @@ Node::Node(uint32_t nodeID, uint32_t contactID, uint32_t contactIP) : RT(nodeID)
 		  //        network.
 		  inNetwork = true;
 		}else{
-		  handleKClosMsg(msg, timeOut, nodesToAsk, contactIP);
+		  handleKClosMsg(msg, timeOut, nodesToAsk, IP);
 		}
 	      }else{
-		handleKClosMsg(msg, timeOut, nodesToAsk, contactIP);
+		handleKClosMsg(msg, timeOut, nodesToAsk, IP);
 	      }
 	    } //Done Dealing with a received message
 	}
@@ -150,6 +154,7 @@ Node::Node(uint32_t nodeID, uint32_t contactID, uint32_t contactIP) : RT(nodeID)
 	// Send a FINDNODE message to the next node.
 	Message toSend(FINDNODE, ID, ID);
 	socket.sendMessage(toSend.toString(), nextToAsk.address, UIPORT);
+	printf("%s to %u\n", toSend.toString().c_str(), nextToAsk.address);
 
 	// Add a timeout
 	MsgTimer timer(RESPONDTIME_UI, nextToAsk.node, nextToAsk.address);
@@ -480,7 +485,7 @@ void Node::startUIListener() {
 
   std::string strUI;
   Message recvMsg(NONE, ID);
-  int32_t recvlenUI;
+  int recvlenUI;
 
 
   UDPSocket socketUI(UIPORT, "UI.log");
@@ -492,6 +497,9 @@ void Node::startUIListener() {
       recvlenUI = socketUI.recvMessage(strUI);
       if (recvlenUI > 0)
 	{
+
+	  printf("%s\n", strUI.c_str());
+	  
 	  //Update the ip for the UI
 	  int ipUI = socketUI.getRemoteIP();
 
