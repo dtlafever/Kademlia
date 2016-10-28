@@ -152,7 +152,7 @@ bool RoutingTable::updateTable(uint32_t nodeID, uint32_t address) {
 //      The list is ordered by distance, that is, the closest node is
 //      at the head
 //      RV = number nodes in closeNodes
-int RoutingTable::getKClosetNodes(uint32_t target, Triple* closeNodes) {
+int RoutingTable::getKClosestNodes(uint32_t target, Triple* closeNodes) {
   int size = 0;
   for (int index = 0; (index < NUMBITS); index++) {
     table[index].getKClosestNodes(target, closeNodes, size);

@@ -17,13 +17,6 @@ bool sortByDistance(const Quint &lhs,
 uint32_t SnapShot::getSize() const {
 	return size;
 }
-Quint SnapShot::getElement(int i) const {
-	return closest[i];
-}
-
-uint32_t SnapShot::getSize() const {
-	return size;
-}
 
 uint32_t SnapShot::getElementIP(int i) const {
 	return closest[i].node;
@@ -39,14 +32,14 @@ void SnapShot::setCompareID(uint32_t nodeID) {
 }
 
 //DEFAULT CONSTRUCTOR
-SnapShot::Snapshot() {
+SnapShot::SnapShot() {
 	compareID = 0;
 	size = 0;
 }
 
 //COPY CONSTRUCTOR
 SnapShot::SnapShot(SnapShot & ss) {
-	size = ss.size()
+	size = ss.getSize();
 }
 
 //PRE: an array of triples up to nodeSize.

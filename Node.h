@@ -44,13 +44,13 @@ class Node
 	//      if it exist in the list.
 	void removeFromUITimeout(uint32_t ID);
 
-	void sendUpToAlphaPing(KBucket & curKBucket, UDPSocket & socket, uint32_t & i, uint32_t & j);
+	void sendUpToAlphaPing(KBucket &curKBucket, UDPSocket &socket, uint32_t & i, uint32_t & j, MsgTimer & lastRefresh, bool & refresh);
 
 //PRE: the snapshot we are currently using, as well as the socket to 
 //     send messages on.
 	//POST: sends up to ALPHA nodes FINDVALUE and then add them to
 	//      the timer queue.
-	void sendUpToAlphaKClos(SnapShot & ss, UDPSocket & sock, uint32_t & msgID);
+	void sendUpToAlphaKClos(SnapShot & ss, UDPSocket & sock, uint32_t  msgID);
 	
 	void clearTimeOut(vector<MsgTimer>& timer);
 	

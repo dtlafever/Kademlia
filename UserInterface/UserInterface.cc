@@ -55,7 +55,7 @@ void UserInterface::runUI(){
 	timeStamp = chrono::system_clock::now();
 	//ASSERT: we're sending a new message so we reset the timeStamp
 	
-	UIsocket.sendMessage(newMessage, IPaddress, UDPPORT);
+	UIsocket.sendMessage(newMessage, IPaddress, UIPORT);
 	//ASSERT: send the message to the node we are connecting to
 	
 	recNum = -1;
@@ -66,7 +66,7 @@ void UserInterface::runUI(){
 
 	    cout << "Error: Request timed out. Please re-enter an IP: ";
 	    getline(cin, IPaddress);
-	    UIsocket.open(UDPPORT);
+	    UIsocket.open(UIPORT);
        
 	  }
 	  else{
