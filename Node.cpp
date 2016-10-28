@@ -65,7 +65,7 @@ void Node::handleKClosMsg(Message & msg, vector<MsgTimer>& timeOut,
   //   }
   //else{
     // Continue adding in the nodes we have not asked yet
-    Triple closestK[NUMBITS];
+    Triple closestK[K];
     int size = msg.getKClos(closestK);
     
     for (int index = 0; (index < size); ++index){
@@ -130,7 +130,7 @@ Node::Node(uint32_t nodeID, uint32_t contactID, uint32_t contactIP) : RT(nodeID)
 		recvContact = true;
 		
 		//ASSERT: contact node responds, but no one else in the network
-		Triple closestK[NUMBITS];
+		Triple closestK[K];
 		int size = msg.getKClos(closestK);
 
 		if(size == 0){
@@ -208,7 +208,7 @@ void Node::startListener(){
   UDPSocket socket(MAINPORT, "main.log");
   //ASSERT: connect socket to our main port
 
-  Triple KClosest[NUMBITS];
+  Triple KClosest[K];
   int closestSize; //size of nodes after we fill with K closest
   //ASSERT: Declare a Triple array of size K to send to FINDNODE
   //        and FINDVALUE requests
@@ -524,7 +524,7 @@ void Node::startUIListener() {
 		  {
 		    //ASSERT: we did not find the value, let's check
 		    //        the rest of the network
-		    Triple kClos[NUMBITS];
+		    Triple kClos[K];
 		    Message sendMsg(KCLOSEST, ID);
 		    int size = RT.getKClosestNodes(sendMsg.getID(), kClos);
 		    //ASSERT: kClos contains the K closest nodes that we
@@ -550,7 +550,7 @@ void Node::startUIListener() {
 		curMsg.setType(recvMsg.getMsgType());
 		curMsg.setID(recvMsg.getID());
 		// Get KClosest nodes to the key
-		Triple kClos[NUMBITS];
+		Triple kClos[K];
 		int size = RT.getKClosestNodes(curMsg.getID(), kClos);
 
 		// If there are no close nodes, there are no nodes.
@@ -576,7 +576,7 @@ void Node::startUIListener() {
 	      {
 
 		//ASSERT: this is a response from a node.
-		Triple kClos[NUMBITS];
+		Triple kClos[K];
 		removeFromUITimeout(recvMsg.getNodeID());
 		int size = recvMsg.getKClos(kClos);
 		snapShot.addClosest(kClos, size);
@@ -645,7 +645,7 @@ void Node::startUIListener() {
 	  {
 	    //ASSERT: A node wants k closest nodes
 	    uint32_t key = recvMsg.getID();
-	    Triple kClos [NUMBITS];
+	    Triple kClos [K];
 	    int32_t closestSize = RT.getKClosestNodes(key, kClos);
 
 	    Message sendMsg(KCLOSEST, ID);
