@@ -24,8 +24,8 @@ int main(int argc, char * argv[]){
   }
   else if (argc == JOIN_NETWORK) {
     uint32_t contactID = atoi(argv[CONTACT_ID]);
-		
-		uint32_t contactIP = getIPInt(string(argv[CONTACT_IP]));
+    std::string strIP(argv[CONTACT_IP]);
+    uint32_t contactIP = getIPInt(strIP);
     Node newNode(myID, contactID, contactIP);
     if (newNode.joined()) {
       newNode.startListener();

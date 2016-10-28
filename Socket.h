@@ -10,6 +10,7 @@
 #include <netdb.h>
 #include <unistd.h>
 #include <string>
+#include <cstring>
 #include <arpa/inet.h>
 #include "constants.h"
 
@@ -38,6 +39,9 @@ static uint32_t getIPInt(std::string ip){
 
   char * stringip = (char *)ip.c_str();
   inet_aton(stringip, &remaddr.sin_addr);
+
+  printf("STRING: %s\n", ip.c_str());
+  printf("INT: %u\n", remaddr.sin_addr.s_addr);
   
   return remaddr.sin_addr.s_addr;
 }
