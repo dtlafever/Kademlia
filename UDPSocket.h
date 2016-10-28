@@ -45,7 +45,7 @@ public:
 	//same as above except return the string formatted IP and butts
 	std::string getRemoteIP(int dummy);
 private:
-	std::ofstream log(LOG_NAME, std::ofstream::app);
+	std::ofstream fileLog;
 };
 
 #endif // !UDPSocket_class
