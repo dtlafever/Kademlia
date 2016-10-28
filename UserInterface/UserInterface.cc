@@ -67,7 +67,11 @@ void UserInterface::runUI(){
 	    cout << "Error: Request timed out. Please re-enter an IP: ";
 	    getline(cin, IPaddress);
 	    UIsocket.open(UIPORT);
-       
+
+	    timeStamp = chrono::system_clock::now();
+
+	    recNum = 1;
+	    //end the loop
 	  }
 	  else{
 	    //ASSERT: Keep attempting to listen as we haven't timed out yet

@@ -17,6 +17,7 @@
 #define TCP true
 #define UDP false
 #define MORE true
+
 #ifdef __APPLE__
 #define MSG_NOSIGNAL 0x4000
 #define MSG_MORE 0x8000
@@ -24,6 +25,12 @@
 
 const int MAXHOSTNAME = 200;
 const int MAXCONNECTIONS = 20;
+
+uint32_t static parseIPV4string(char* ipAddress) {
+  char ipbytes[4];
+  sscanf(ipAddress, "%uhh.%uhh.%uhh.%uhh", &ipbytes[3], &ipbytes[2], &ipbytes[1], &ipbytes[0]);
+  return ipbytes[0] | ipbytes[1] << 8 | ipbytes[2] << 16 | ipbytes[3] << 24;
+}
 
 class Socket
 {
