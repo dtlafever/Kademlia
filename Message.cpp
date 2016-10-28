@@ -8,6 +8,7 @@
 
 #include "Message.hpp"
 #include <cstdlib>
+#include <stdexcept>
 #include <iostream>
 
 Message::Message (std::string msg) : msgType(NONE), msg(msg)
@@ -44,13 +45,13 @@ MsgType Message::getMsgType() const
 void Message::parse (std::string message)
 {
 	int index = -1;
-	
+
 	msgType = NONE;
 	msg ="";
-	
+
 	if(msg == "")
 		Message::msg = message;
-	
+
 	// Getting the sender ID
 	index=message.find_first_of(" ");
 	if(index!= -1)
@@ -58,7 +59,7 @@ void Message::parse (std::string message)
 		// Reading the nodeID
 		std::string s = message.substr(0, index+1);
 		nodeID = atoi(s.c_str());
-		
+
 		// erasing the ID to continue parsing
 		message.erase(message.begin(), message.begin()+index+1);
 	}
@@ -73,7 +74,7 @@ void Message::parse (std::string message)
 		isUI = true;
 		message.erase(message.begin()+index, message.begin()+index+2);
 	}
-	
+
 	if (message.find(msgStrings[PING]) != -1)
 	{
 		msgType = PING;
@@ -81,28 +82,28 @@ void Message::parse (std::string message)
 	else if ((index = message.find(msgStrings[STORE])) != -1)
 	{
 		msgType = STORE;
-		
+
 		message.erase(message.begin(), message.begin()+msgStrings[STORE].size());
-		
+
 		index = message.find(" ");
-		
+
 		std::string id = message.substr(0, index);
 		ID = atoi(id.c_str());
 	}
 	else if ( message.find(msgStrings[FINDNODE])!= -1)
 	{
 		msgType = FINDNODE;
-		
+
 		message.erase(message.begin(), message.begin()+msgStrings[FINDNODE].size());
-		
+
 		ID = atoi (message.c_str());
 	}
 	else if (message.find(msgStrings[FINDVALUE])!= -1)
 	{
 		msgType = FINDVALUE;
-		
+
 		message.erase(message.begin(), message.begin()+msgStrings[FINDVALUE].size());
-		
+
 		ID = atoi(message.c_str());
 	}
 	else if (message.find(msgStrings[KCLOSEST])!= -1)
@@ -113,57 +114,57 @@ void Message::parse (std::string message)
 		// "Retrieving the size from the message
 		int ind = 0;
 		std::string temp;
-	
+
 		ind = message.find("\n");
-		
+
 		if(ind == -1)
 			throw std::invalid_argument("Error in parsing message invalid format");
-		
+
 		temp = message.substr(0, ind); // take the size
 		message.erase(message.begin(), message.begin()+ind);
-		
+
 		size = atoi(temp.c_str()); // Converting the size to an integer.
-		
+
 		/// Iterate and insert in Kclos
 		/// One line is of the form :
 		/// IP   UDPPort   NodeID
-		
+
 		for (int i=0; i<size; ++i)
 		{
 			ind = message.find(" ");
-			
+
 			if(ind == -1)
 				throw std::invalid_argument("Error in parsing message invalid format");
-			
+
 			// IP
 			temp = message.substr(0, ind);
 			kclos[i].address = atoi(temp.c_str());
-			
+
 			message.erase(message.begin(), message.begin()+ind+1);
-			
+
 			ind = message.find(" ");
-			
+
 			if(ind == -1)
 				throw std::invalid_argument("Error in parsing message invalid format");
-			
+
 			//UDPPort
 			temp = message.substr(0, ind);
 			kclos[i].port = atoi(temp.c_str());
-			
+
 			message.erase(message.begin(), message.begin()+ind+1);
 
 			ind = message.find("\n");
 			if(ind == -1)
 				throw std::invalid_argument("Error in parsing message invalid format");
-			
+
 			// Node ID
 
 			temp = message.substr(0, ind);
 			kclos[i].node = atoi(temp.c_str());
-			
+
 			message.erase(message.begin(), message.begin()+ind+1);
 		}
-		
+
 	}
 	else if(message.find(msgStrings[PINGRESP]) != -1)
 	{
@@ -186,35 +187,35 @@ void Message::parse (std::string message)
 		msgType = STORERESP;
 	}
 
-	
+
 	if(msgType == NONE)
 		msg = "";
-		
+
 }
 
 std::string Message::toString(MsgType type, uint32_t nodeID, uint32_t ID, bool UI)
 {
 	msg = "" ;
-	
+
 	// assigning member data
 	this->nodeID = nodeID;
 	this->ID = ID;
 	this->isUI = UI;
 	this->msgType = type;
-	
+
 	// Adding the Node ID.
 	char temp[32];
 	sprintf(temp, "%d", nodeID); // convert to string
 	msg+= std::string(temp)+ " ";
-	
+
 	//std::cout << msg <<std::endl;
-	
+
 	switch (type)
 	{
 		case PING:
 			msg += msgStrings[PING];
 			break;
-			
+
 		case STORE:
 			if(ID != -1)
 			{
@@ -222,7 +223,7 @@ std::string Message::toString(MsgType type, uint32_t nodeID, uint32_t ID, bool U
 				msg += msgStrings[STORE]+ std::string(temp);
 			}
 			break;
-			
+
 		case FINDNODE:
 			if (ID != -1)
 			{
@@ -230,7 +231,7 @@ std::string Message::toString(MsgType type, uint32_t nodeID, uint32_t ID, bool U
 				msg += msgStrings[FINDNODE]+ std::string(temp);
 			}
 			break;
-			
+
 		case FINDVALUE:
 			if(ID != -1)
 			{
@@ -240,81 +241,81 @@ std::string Message::toString(MsgType type, uint32_t nodeID, uint32_t ID, bool U
 
 			}
 			break;
-			
+
 		case KCLOSEST:
 			msg += msgStrings[KCLOSEST];
-			
+
 			// Adding the size of the array to the message
 			sprintf(temp, "%d", size);
 			msg += std::string(temp);
-			
+
 			/// iterate over all elements of kclosest and put them in the message.
 			/// One line is of the form :
 			/// IP   UDPPort   NodeID
-			
+
 			for (int i =0; i<size; ++i)
 			{
 				msg += "\n";
-				
+
 				// Adding the IP
 				char temp [32];
 				sprintf(temp, "%d", kclos[i].address); // convert to string
 				msg += std::string (temp) + " ";
-				
+
 				// Adding the UDP Port
 				sprintf(temp, "%d", kclos[i].port); // convert to string
 				msg += std::string (temp)+" ";
-				
+
 				// Adding the Node ID
 				sprintf(temp, "%d", kclos[i].node); // convert to string
 				msg += std::string (temp);
 			}
 			msg += "\n";
-			
+
 			break;
-			
+
 		case PINGRESP:
 			msg += msgStrings[PINGRESP];
 			break;
-		
+
 		case FVRESP:
 			msg += msgStrings[FVRESP];
 			break;
-			
+
 		case STORERESP:
 			msg += msgStrings[STORERESP];
 			break;
-			
+
 		case FVRESPP:
 			msg += msgStrings[FVRESPP];
 			break;
-			
+
 		case FVRESPN:
 			msg += msgStrings[FVRESPN];
 			break;
-		
+
 		case NONE:
 			msg="";
 			break;
-			
+
 		default:
 			msg = "";
 			printf("Unable to create string properly!\n");
 			break;
 	}
-	
+
 	if(UI)
 		msg += " UI";
-	
+
 	return msg;
 }
 
 std::string Message::toString()
 {
 	std::string m = "";
-	
+
 	m=toString(msgType, nodeID, ID, isUI);
-	
+
 	return m;
 }
 
@@ -352,7 +353,7 @@ void Message::setKClos ( Triple clos [K], uint32_t s)
 {
 	size = s;
 	for (int i =0; i<s; ++i)
-		
+
 	{
 		kclos[i]= clos [i];
 	}
@@ -362,7 +363,7 @@ uint32_t Message::getKClos(Triple *clos)
 {
 	clos = kclos;
 	return size;
-	
+
 }
 
 bool Message::getUI()
@@ -383,7 +384,6 @@ bool Message::includes(uint32_t & id)
 		if(kclos[i].node == id)
 			found = true;
 	}
-	
+
 	return found;
 }
-
