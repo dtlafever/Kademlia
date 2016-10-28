@@ -29,4 +29,31 @@ Test Cases:
      5. Node 0 and Node 1 exists within the network. A new node also known
      	as 0 joins. It fails to join.
      6. Suppose that enough nodes are in the network such that every
-     	node's Routing table is full. 
+     	node's Routing table is full. All such nodes are still alive.
+	A new node n attempts to join, it fails to join.
+     7. Suppose that some node n is in the network. Further suppose that
+     	n is dead. After a few moments n should not exist in any Routing Table.
+     8. Suppose that for 0 <= i < 10 that node i exists within the network.
+     	Let k be a key where k = 7. Suppose that node 5 is storing k.
+	Then nodes 2, 3, 4, 6, and 7 contains k.
+     9. Suppose that 10 nodes exist in the network as above. And suppose that
+     	no nodes contains the key 4. Then node n calling find value for 4
+	will fail.
+     10. Suppose that 10 nodes exist in the network as above. And suppose that
+     	 key 5 exists within the network. Node n calling for key 5 will succed
+	 (we really don't care which node gives us the value).
+     11. Suppose that nodes 0 and 1 exists in the network where node 1 is
+     	 storing the key 5. Further suppose that node0 is trying to find the
+	 value associated with key 5 and that during the process, node 1 dies.
+	 The find value should fail.
+     12. Suppose that node 0 exists in the network. And suppose that two nodes
+     	 are trying to join the network at the same time with the same id
+	 (for example, 1). One of the two nodes started first, call the first
+	 one 1-A and the second one 1-B. 1-A succeeds in joining the network,
+	 and 1-B fails in joining the network.
+     13. Suppose node 0 is expecting a response from node 5. Node 5 dies,
+     	 node 5 is ultimately removed from node 0's routing table.
+     14. Suppose that node 3 has initalized FindNode to find node 11 when node
+     	 11 does not exist in the network. Return a fail after querying every
+	 node.
+     15. 
