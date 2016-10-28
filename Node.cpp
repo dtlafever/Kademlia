@@ -39,8 +39,11 @@ void Node::handleKClosMsg(Message & msg, vector<MsgTimer>& timeOut,
   // Get the IP and ID
   uint32_t senderID = msg.getNodeID();
   uint32_t senderIP = IP;
-	
-  RT.updateTable(senderID, senderIP);
+
+  if(senderID != ID){
+    //ASSERT: where we don't want to add ourselves to the kBucket
+    RT.updateTable(senderID, senderIP);
+  }
 	
   MsgTimer curTimer (RESPONDTIME_UI, senderID, senderIP);
 	
@@ -227,8 +230,10 @@ void Node::startListener(){
 	      {
 		//ASSERT: A node wants to store
 		aKey = receivedMessageOBJ.getID();
-		keys.push_back(aKey);
-		refresherVector.push_back(sendTriple);
+		if (find(keys.begin(), keys.end(), aKey) == keys.end()){
+		  keys.push_back(aKey);
+		  refresherVector.push_back(sendTriple);
+		}
 	      }
 	      break;
 					
@@ -236,7 +241,7 @@ void Node::startListener(){
 	      {
 		//ASSERT: A node wants k closest nodes
 		aKey = receivedMessageOBJ.getID();
-					
+				
 		closestSize = RT.getKClosestNodes(aKey, KClosest);
 		sendMessageOBJ.setKClos(KClosest, closestSize);
 					
@@ -577,7 +582,7 @@ void Node::startUIListener() {
 		      refresh.address = socketUI.getRemoteIP();
 		      refresh.node = recvMsg.getNodeID();
 		      refresherVector.push_back(refresh);
-					
+		      
 		      if (!snapShot.nextExist()) {
 			//ASSERT: we have found the K closest, send store messages
 			Message sendMsg(STORE, ID);
@@ -721,13 +726,15 @@ void Node::sendUpToAlphaKClos(SnapShot & ss, UDPSocket & sock, uint32_t msgID)
     {
       Triple nextNode;
       ss.getNext(nextNode);
+
+      if (nextNode.node == ID){
+	// Sending Message
+	sock.sendMessage(sendMsg.toString(), nextNode.address, MAINPORT);
 		
-      // Sending Message
-      sock.sendMessage(sendMsg.toString(), nextNode.address, MAINPORT);
-		
-      // Adding a timeout
-      MsgTimer timer(RESPONDTIME_UI, nextNode.node, nextNode.address);
-      timeouts[UI_TIMEOUT].push_back(timer);
+	// Adding a timeout
+	MsgTimer timer(RESPONDTIME_UI, nextNode.node, nextNode.address);
+	timeouts[UI_TIMEOUT].push_back(timer);
+      }
     }
 	
 }
