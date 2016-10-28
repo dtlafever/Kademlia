@@ -1,3 +1,18 @@
+
+
+=============================================
+Suppose as the UI we try to contact a Node,
+but it died and was removed from the network
+=============================================
+
+The UI will send any type of request to the Node it is connected to.
+There is a predefined point in time where the UI needs to give up waiting for a response.
+
+If the predefined timeout arrives and there still is no response, the UI will print
+to the user that the connection has timed out and ended.
+
+The UI will also give the user the option to enter a new IP address to connect to.
+
 =============================================
 Suppose there is onle 1 node in the network
 
@@ -9,7 +24,7 @@ Node A
 From the UI we say:
 >store 10
 
--The UI will be connected to Node A and so A will receive the request to store A.
+-The UI will be connected to Node A and so A will receive the request to store key.
 -A will first attempt to find the K closest nodes by calculating the distance between itself
  and the given key.
 -Since A is the only node in the network, there will be no K closest nodes returned.
@@ -51,7 +66,32 @@ Node A will send a "Success" message to the UI.
 
 The UI will print out "Success" to the user.
 
-***********************************************************
+*********************************************************
+============================================
+Suppose we have Node B and we want to join the network
+
+Node B (ID = 4) uses Node A (ID = 3) as it's contact
+============================================
+
+-Node B must have a contact to join. It provides the ID of Node A
+-Node B calculates the distance between itself and Node A.
+-Node B places Node A into the appropriate K-bucket. (Dist = 7, so the third bucket)
+
+-Node B must now populate it and the rest of the network's K-buckets.
+-Node B sends FINDNODE request to Node A.
+-Node A receives a FINDNODE request with Node B's ID.
+-Node A calculate the distance between itself and Node B. Dist = 7, so it goes to look
+ in it's 3rd K-bucket. Nothing will be in there, so it'll search through the rest of the
+ K-buckets. Since Node A is the only one in the network, it'll return an empty list to Node B
+-Node A will then place Node B in the appropriate K-bucket (Dist =7, so the third bucket)
+-Node B will receive an empty list. The lookup will terminate since there are no more nodes
+ to query.
+-Node B will refresh it's routing table since it got a response from Node A.
+
+Node B is now successfully in the network!
+
+
+*********************************************************
 
 =============================================
 Suppose there are only 2 nodes in the network
@@ -88,6 +128,8 @@ From the UI we say:
 Node A and Node B will receive a STORE request, and since it received this from a fellow Node
 and not the UI, then it will simply push the given Key(5) into it's list of keys. 
 
+**********************************
+
 2. FIND (with the UI connected to Node A - assuming we have stored a key first)
 
 From the UI we say:
@@ -103,6 +145,8 @@ From the UI we say:
 Node A will send a "success" message to the UI.
 
 The UI will print a "success" message to the user.
+
+***********************************
 
 3. Find (with the UI connected to Node B - assuming we have stored a key first)
 
@@ -122,7 +166,43 @@ The UI will print a "success" message to the user.
 
 ***************************************************************
 
+========================================
+Suppose there are 3 nodes in the network.
+Suppose ALPHA = 3 and K = 5
 
+Node A (ID = 3) and Node B (ID = 4) are in the network.
 
+Node C (ID = 2) wants to join the network and uses Node A as a contact.
+========================================
+
+-Node C must have a contact to join. It provides the ID of Node A
+-Node C calculates the distance between itself and Node A.
+-Node C places Node A into the appropriate K-bucket. (Dist = 1, so the first bucket)
+
+-Node C must now populate it and the rest of the network's K-buckets.
+-Node C sends FINDNODE request to Node A.
+-Node A receives a FINDNODE request with Node C's ID.
+-Node A calculate the distance between itself and Node C. Dist = 1, so it goes to look
+ in it's first K-bucket. Nothing will be in there, so it'll search through the rest of the
+ K-buckets. Node A will reach the third K-bucket and find Node B and add it to the KClosest
+ list. It'll look through the rest, not find any, and send back Node B to Node C.
+-Node A will then place Node C in the appropriate K-bucket (Dist = 1, so the first bucket)
+-Node C will receive a list of just one node. It'll select ALPHA nodes (or as much as we can,
+ in this case just one) and then resend the FINDNODE request to Node B with Node C's ID.
+-Node C will refresh it's K-buckets so Node A is LRU in it's bucket.
+ 
+-Node B receives a FINDNODE request with Node C's ID.
+-Node B calculates the distance between itself and Node C. Dist = 6, so it goes to look in
+ it's third k-bucket and finds Node A. It won't find any other nodes, so it will only return
+ Node A to Node C.
+-Node B will then place Node C in the appropriat K-bucket (Dist = 6, the third bucket) 
+
+-Node C will receive a list of just one node. It's already queried this node, and there
+ are no other nodes to query; therefore the lookup will terminate.
+-Node C will refresh it's K-buckets so Node B is LRU in it's bucket.
+
+Node C is now in the network!
+
+========================================
 
 
