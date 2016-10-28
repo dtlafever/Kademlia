@@ -48,8 +48,12 @@ void Message::parse (std::string message)
 	msgType = NONE;
 	msg ="";
 	
+	if(msg == "")
+		Message::msg = message;
+	
 	// Getting the sender ID
-	if((index=message.find_first_of(" "))!= -1)
+	index=message.find_first_of(" ");
+	if(index!= -1)
 	{
 		// Reading the nodeID
 		std::string s = message.substr(0, index+1);
@@ -62,15 +66,13 @@ void Message::parse (std::string message)
 	{
 		printf( "Error in message, nodeID of sender not found\n");
 	}
-	
-	if ((index=message.find("UI")!= -1))
+	index = -1;
+	index=message.find("UI");
+	if (index!= -1)
 	{
 		isUI = true;
 		message.erase(message.begin()+index, message.begin()+index+2);
 	}
-	
-	if(msg == "")
-		Message::msg = message;
 	
 	if (message.find(msgStrings[PING]) != -1)
 	{
@@ -205,7 +207,7 @@ std::string Message::toString(MsgType type, uint32_t nodeID, uint32_t ID, bool U
 	sprintf(temp, "%d", nodeID); // convert to string
 	msg+= std::string(temp)+ " ";
 	
-	std::cout << msg <<std::endl;
+	//std::cout << msg <<std::endl;
 	
 	switch (type)
 	{
