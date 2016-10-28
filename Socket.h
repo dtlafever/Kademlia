@@ -17,8 +17,8 @@
 #define TCP true
 #define UDP false
 #define MORE true
-//#define MSG_NOSIGNAL 0x4000
-//#define MSG_MORE 0x8000
+#define MSG_NOSIGNAL 0x4000
+#define MSG_MORE 0x8000
 
 const int MAXHOSTNAME = 200;
 const int MAXCONNECTIONS = 20;

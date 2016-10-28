@@ -475,7 +475,7 @@ void Node::startUIListener() {
 	      {
 		MsgType type = recvMsg.getMsgType();
 		curMsg.setType(type);
-		if (std::find(keys.begin(), keys.end(), curMsg.getID())!= keys.end())
+		if (std::find(keys.begin(), keys.end(), recvMsg.getID())!= keys.end())
 		  {
 		    //ASSERT: we have the value, send confirm message
 		    Message sendMsg(FVRESPP, ID);
@@ -517,6 +517,8 @@ void Node::startUIListener() {
 		// If there are no close nodes, there are no nodes.
 		if (size == 0)
 		  {
+				
+				
 		    //ASSERT: special case where we are the only node in network,
 		    //        so we store the key
 		    keys.push_back(recvMsg.getID());
