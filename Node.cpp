@@ -538,7 +538,7 @@ void Node::startUIListener() {
 		      }
 		    else
 		      {
-			sendUpToAlphaKClos(snapShot, socketUI, curMsg.getID());
+			sendUpToAlphaKClos(snapShot, socketUI, curMsg.getID(), FINDVALUE);
 		      }
 		  }
 	      }
@@ -555,9 +555,6 @@ void Node::startUIListener() {
 		// If there are no close nodes, there are no nodes.
 		if (size == 0)
 		  {
-
-
-
 		    //ASSERT: special case where we are the only node in network,
 		    //        so we store the key
 		    keys.push_back(recvMsg.getID());
@@ -569,7 +566,7 @@ void Node::startUIListener() {
 		else // Try to find the KClosest to the Key
 		  {
 		    snapShot.addClosest(kClos, size);
-		    sendUpToAlphaKClos(snapShot, socketUI, curMsg.getID());
+		    sendUpToAlphaKClos(snapShot, socketUI, curMsg.getID(), FINDNODE);
 		  }
 	      }
 	      break;
@@ -603,7 +600,7 @@ void Node::startUIListener() {
 			}
 		      }else{
 			//ASSERT: we are not done searching for kClos
-			sendUpToAlphaKClos(snapShot, socketUI, curMsg.getID());
+			sendUpToAlphaKClos(snapShot, socketUI, curMsg.getID(), FINDNODE);
 		      }
 		    }
 		    break;
@@ -617,7 +614,7 @@ void Node::startUIListener() {
 		    }
 		    else {
 		      //ASSERT: we are not done searching for kClos
-		      sendUpToAlphaKClos(snapShot, socketUI, curMsg.getID());
+		      sendUpToAlphaKClos(snapShot, socketUI, curMsg.getID(), FINDVALUE);
 		    }
 
 		  }
@@ -688,7 +685,7 @@ void Node::startUIListener() {
 		}
 		else {
 		  //ASSERT: we are not done searching for kClos
-		  sendUpToAlphaKClos(snapShot, socketUI, curMsg.getID());
+		  sendUpToAlphaKClos(snapShot, socketUI, curMsg.getID(), FINDNODE);
 		}
 	      }else if(curMsg.getMsgType() == FINDVALUE)
 	      {
@@ -702,7 +699,7 @@ void Node::startUIListener() {
 		else
 		  {
 		    //ASSERT: we are not done searching for kClos
-		    sendUpToAlphaKClos(snapShot, socketUI, curMsg.getID());
+		    sendUpToAlphaKClos(snapShot, socketUI, curMsg.getID(), FINDVALUE);
 		  }
 	      }
 	  }
@@ -731,9 +728,10 @@ void Node::removeFromUITimeout(uint32_t ID)
 //     send messages on.
 //POST: sends up to ALPHA nodes FINDVALUE and then add them to
 //      the timer queue.
-void Node::sendUpToAlphaKClos(SnapShot & ss, UDPSocket & sock, uint32_t msgID)
+void Node::sendUpToAlphaKClos(SnapShot & ss, UDPSocket & sock, uint32_t msgID, MsgType mType)
 {
-  Message sendMsg(FINDVALUE, ID, msgID);
+
+  Message sendMsg(mType, ID, msgID);
 
   for (int i = 0; (i < ALPHA) && (ss.nextExist()); i++)
     {

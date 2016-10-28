@@ -52,7 +52,7 @@ class Node
 //     send messages on.
 	//POST: sends up to ALPHA nodes FINDVALUE and then add them to
 	//      the timer queue.
-	void sendUpToAlphaKClos(SnapShot & ss, UDPSocket & sock, uint32_t  msgID);
+	void sendUpToAlphaKClos(SnapShot & ss, UDPSocket & sock, uint32_t  msgID, MsgType mType);
 	
 	void clearTimeOut(vector<MsgTimer>& timer);
 	
