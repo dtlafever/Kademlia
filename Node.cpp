@@ -626,6 +626,25 @@ void Node::startUIListener() {
 		socketUI.sendMessage(sendMsg.toString(), ipUI, UIPORT);
 	      }
 	      break;
+				case FINDNODE:
+				{
+					//ASSERT: A node wants k closest nodes
+					uint32_t key = recvMsg.getID();
+					Triple kClos [K];
+					int32_t closestSize = RT.getKClosestNodes(key, kClos);
+					
+					Message sendMsg(KCLOSEST, ID);
+					sendMsg.setKClos(kClos, closestSize);
+					
+					socketUI.sendMessage(sendMsg.toString(), ipUI, UIPORT);
+					
+					Triple sendTriple;
+					sendTriple.address = ipUI;
+					sendTriple.port = UIPORT;
+					sendTriple.node = recvMsg.getNodeID();
+					refresherVector.push_back(sendTriple);
+				}
+					break;
 	    default:
 	      break;
 	    }
