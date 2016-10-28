@@ -294,7 +294,7 @@ void Node::startRefresher()
   std::string incoming;
 	
   // Incoming message as a Message
-  Message msg;
+  Message msg(NONE, ID);
 	
   // Incoming IP
   uint32_t IP =0;
@@ -361,7 +361,7 @@ void Node::startRefresher()
 	      break;
 					
 	    default:
-	      cout << "Unrecognized message received: "<< incoming<<endl;
+	      printf("Unrecognized message received: %s\n", incoming.c_str());
 	      break;
 	    }
 	}
@@ -400,11 +400,11 @@ void Node::startRefresher()
 	      // PING
 	      Message msg(PING, ID);
 	      socket.sendMessage(msg.toString(), refresherVector[0].address, REFRESHERPORT);
-				
+			
 	      // Add to the timeouts
 	      MsgTimer timer(RESPONDTIME_PING, refresherVector[0].node, refresherVector[0].address);
 	      timeouts[PINGER_TIMEOUT].push_back(timer);
-				
+			
 	    }
 	  refresherVector.erase(refresherVector.begin()); // Remove from the vector, the node was refreshed
 	}
@@ -421,14 +421,14 @@ void Node::startRefresher()
 		timeouts[PINGER_TIMEOUT].erase(timeouts[PINGER_TIMEOUT].begin()+i);
 		i--;
 	      }
-				
+			
 	    if (timeouts[REFRESH_TIMEOUT][j].timedOut())
 	      {
 		RT.deleteNode(timeouts[PINGER_TIMEOUT][i].getNodeID());
 		timeouts[REFRESH_TIMEOUT].erase(timeouts[REFRESH_TIMEOUT].begin()+j);
 		j--;
 	      }
-				
+			
 	  }
 			
       }
@@ -447,12 +447,13 @@ void Node::startRefresher()
 //			TO UI: FIND_VALUE_RESP_POSITIVE, FIND_VALUE_RESP_NEGATIVE, STORE_RESP
 void Node::startUIListener() {
   SnapShot snapShot;
-  Message curMsg(NONE);
+  Message curMsg(NONE, ID);
 	
   std::string strUI;
-  Message recvMsg;
+  Message recvMsg(NONE, ID);
   int32_t recvlenUI;
 	
+
   UDPSocket socketUI(UIPORT, "UI.log");
 	
   while (!exit)
@@ -462,7 +463,6 @@ void Node::startUIListener() {
       recvlenUI = socketUI.recvMessage(strUI);
       if (recvlenUI > 0)
 	{
-	  printf("%s\n", strUI.c_str());
 	  //Update the ip for the UI
 	  int ipUI = socketUI.getRemoteIP();
 			
@@ -551,7 +551,7 @@ void Node::startUIListener() {
 		      refresh.address = socketUI.getRemoteIP();
 		      refresh.node = recvMsg.getNodeID();
 		      refresherVector.push_back(refresh);
-							
+					
 		      if (!snapShot.nextExist()) {
 			//ASSERT: we have found the K closest, send store messages
 			Message sendMsg(STORE, ID);
@@ -612,7 +612,7 @@ void Node::startUIListener() {
 		RT.deleteNode(timeouts[UI_TIMEOUT][i].getNodeID());
 		timeouts[UI_TIMEOUT].erase(timeouts[UI_TIMEOUT].begin()+i);
 		i--;
-					
+				
 		//Now we need to continue depending on what we are on
 		if (curMsg.getMsgType() == STORE)
 		  {
@@ -648,7 +648,6 @@ void Node::startUIListener() {
 	}
     }
 }
-
 //PRE: a node ID we want to remove from the list
 //POST: finds the node ID in the list and removes from timeout,
 //      if it exist in the list.
@@ -705,7 +704,7 @@ void Node::sendUpToAlphaPing(KBucket &curKBucket, UDPSocket &socket, uint32_t & 
 	  if(i>= NUMBITS) // If we did all the KBuckets, reset
 	    {
 	      i=j=0; // Reset indices
-				
+			
 	      // seet last refresh timepoint to Now
 	      lastRefresh.resetTimer();
 	      refresh = false;

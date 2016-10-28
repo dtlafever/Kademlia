@@ -165,7 +165,7 @@ void UserInterface::exit(){
 //      return the string.
 string UserInterface::storeKey(uint32_t ID){
   MsgType type = STORE;
-  Message storeMessage(type, ID, true);
+  Message storeMessage(type, 0, ID, true);
   string store = storeMessage.toString();
 
   return(store);
@@ -177,7 +177,7 @@ string UserInterface::storeKey(uint32_t ID){
 //      return the string.
 string UserInterface::findKey(uint32_t ID){
   MsgType type = FINDVALUE;
-  Message findMessage(type, ID, true);
+  Message findMessage(type, 0, ID, true);
   string find = findMessage.toString();
 
   return(find);
