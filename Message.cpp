@@ -60,7 +60,7 @@ void Message::parse (std::string message)
 	}
 	else
 	{
-		std::cout << "Error in message, nodeID of sender not found"<<std::endl;
+		printf( "Error in message, nodeID of sender not found\n");
 	}
 	
 	if ((index=message.find("UI")!= -1))
@@ -293,7 +293,7 @@ std::string Message::toString(MsgType type, uint32_t nodeID, uint32_t ID, bool U
 			
 		default:
 			msg = "";
-			std::cout << "Unable to create string properly!"<<std::endl;
+			printf("Unable to create string properly!\n");
 			break;
 	}
 	
@@ -366,7 +366,7 @@ bool Message::getUI()
 
 void Message::printMessageType()
 {
-	std::cout << "Type : "<< msgStrings[msgType] <<std::endl;
+	printf("Type: %s \n",  msgStrings[msgType].c_str());
 }
 
 bool Message::includes(uint32_t & id)

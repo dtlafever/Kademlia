@@ -162,7 +162,7 @@ void Node::startListener(){
 	//ASSERT: Create the two threads for handling Pings and
 	//        for handling UIs
 	
-	Message sendMessageOBJ(NONE);
+	Message sendMessageOBJ(NONE, ID);
 	//ASSERT: empty message object to send later
 	
 	std::string sendString; //the message we will fill up and send
@@ -171,7 +171,7 @@ void Node::startListener(){
 	uint32_t senderIP;//the IP of the node we're receiving a msg from
 	uint32_t senderID; //the ID of the node we're receiving a msg from
 	
-	uint32_t recNum = -1;
+	int32_t recNum = -1;
 	
 	UDPSocket socket(MAINPORT);
 	//ASSERT: connect socket to our main port
@@ -292,7 +292,7 @@ void Node::startRefresher()
 	std::string incoming;
 	
 	// Incoming message as a Message
-	Message msg;
+	Message msg(NONE, ID);
 	
 	// Incoming IP
 	uint32_t IP =0;
@@ -358,7 +358,7 @@ void Node::startRefresher()
 					break;
 					
 				default:
-					cout << "Unrecognized message received: "<< incoming<<endl;
+					printf("Unrecognized message received: %s\n", incoming.c_str());
 					break;
 			}
 		}
@@ -444,11 +444,11 @@ void Node::startRefresher()
 //			TO UI: FIND_VALUE_RESP_POSITIVE, FIND_VALUE_RESP_NEGATIVE, STORE_RESP
 void Node::startUIListener() {
 	SnapShot snapShot;
-	Message curMsg(NONE);
+	Message curMsg(NONE, ID);
 	
 	std::string strUI;
-	Message recvMsg;
-	uint32_t recvlenUI;
+	Message recvMsg(NONE, ID);
+	int32_t recvlenUI;
 	
 	UDPSocket socketUI(UIPORT);
 	
@@ -613,7 +613,7 @@ void Node::startUIListener() {
 					{
 						if (!snapShot.nextExist()) {
 							//ASSERT: we have found the K closest, send store messages
-							Message sendMsg(STORE);
+							Message sendMsg(STORE, ID);
 							for (int i = 0; i < snapShot.getSize(); i++)
 							{
 								socketUI.sendMessage(sendMsg.toString(), snapShot.getElementIP(i), MAINPORT);
@@ -710,7 +710,7 @@ void Node::sendUpToAlphaPing(KBucket &curKBucket, UDPSocket &socket, uint32_t & 
 			Triple curTriple = curKBucket[j++];
 			
 			// Send PING
-			Message pingr(PING);
+			Message pingr(PING, ID);
 			socket.sendMessage (pingr.toString(), curTriple.address, REFRESHERPORT);
 			
 			// Updating timeouts
