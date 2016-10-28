@@ -16,7 +16,7 @@
 #define RESPONDTIME_PING 1000 // in milliseconds, the time before we consider that a PING request has timed out.
 #define DELAY_DURATION chrono::duration<int, std::milli> delay(RESPONDTIME)
 
-#define PINGTIME 3600000 //in milliseconds, the time to wait before 
+#define PINGTIME 3600000 //in milliseconds, the time to wait before
 
 //pinging a node
 #define MAXRECV 500
@@ -65,4 +65,3 @@ void static copyTriple(Triple & to, Triple & from) {
 static char allCommands[MAXCOMMANDS][MAXCHAR] = {"exit", "store", "find"};
 
 #endif
-
