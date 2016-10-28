@@ -29,15 +29,15 @@ const int MAXCONNECTIONS = 20;
 //PRE: shende you better not read this
 //     takes a string in dot integer form
 //POST: returns the integer IP address
-uint32_t getIPInt(std::string ip){
+static uint32_t getIPInt(std::string ip){
 
   struct sockaddr_in remaddr;
   memset((char *)&remaddr, 0, sizeof(remaddr));
   int slen = sizeof(remaddr);
   remaddr.sin_family = AF_INET;
 
-  char * ip = (char *)host.c_str();
-  inet_aton(ip, &remaddr.sin_addr);
+  char * stringip = (char *)ip.c_str();
+  inet_aton(stringip, &remaddr.sin_addr);
   
   return remaddr.sin_addr.s_addr;
 }

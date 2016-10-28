@@ -96,7 +96,7 @@ void Node::clearTimeOut(vector<MsgTimer>& timer)
 //Post: ID = id, contact exists within our routing table, as well as
 //      other nodes our contact has told about us
 //      inNetwork = true if FindNode on ourselves succeds, false otherwise
-Node::Node(uint32_t nodeID, uint32_t contactID, std::string contactIP) : RT(nodeID)
+Node::Node(uint32_t nodeID, uint32_t contactID, uint32_t contactIP) : RT(nodeID)
 {
   ID = nodeID; // update this node's nodeID
   RT.updateTable(contactID, contactIP); // Insert contact node in routing table

@@ -68,7 +68,7 @@ class Node
   //Post: ID = id, contact exists within our routing table, as well as
   //      other nodes our contact has told about us
   //      inNetwork = true if FindNode on ourselves succeds, false otherwise
-  Node(uint32_t nodeID, uint32_t contactID, std::string contactIP);
+  Node(uint32_t nodeID, uint32_t contactID, uint32_t contactIP);
   
 
   bool joined();
