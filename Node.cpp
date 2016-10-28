@@ -165,9 +165,9 @@ Node::Node(uint32_t nodeID, uint32_t contactID, uint32_t contactIP) : RT(nodeID)
 				recvContactResp = true;
 			}
 		}
-		>>>>>>> origin/master
 	}
-	
+}
+
 	//--------------------------------Node Listener----------------------------
 	
 	//Handles messages from other Nodes.
