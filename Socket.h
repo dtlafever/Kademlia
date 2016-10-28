@@ -17,8 +17,11 @@
 #define TCP true
 #define UDP false
 #define MORE true
+
+#ifdef __APPLE__
 #define MSG_NOSIGNAL 0x4000
 #define MSG_MORE 0x8000
+#endif
 
 const int MAXHOSTNAME = 200;
 const int MAXCONNECTIONS = 20;
