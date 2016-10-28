@@ -50,7 +50,7 @@ class Node
 //     send messages on.
 	//POST: sends up to ALPHA nodes FINDVALUE and then add them to
 	//      the timer queue.
-	void sendUpToAlphaKClos(SnapShot & ss, UDPSocket & sock);
+	void sendUpToAlphaKClos(SnapShot & ss, UDPSocket & sock, uint32_t & msgID);
 	
 	void clearTimeOut(vector<MsgTimer>& timer);
 	
@@ -59,14 +59,14 @@ class Node
   //Pre: id is a valid node id that is not yet taken
   //Post: RT is initalized, ID = id, inNetwork = true
   //      RT is empty since this node is starting a new network
-  Node(uint32_t id);
+  Node(uint32_t nodeID);
 
   //Pre: id is a valid node id that is not yet taken, contactID and contactIP
   //     belongs to a node already existing in the network
   //Post: ID = id, contact exists within our routing table, as well as
   //      other nodes our contact has told about us
   //      inNetwork = true if FindNode on ourselves succeds, false otherwise
-  Node(uint32_t id, uint32_t contactID, uint32_t contactIP);
+  Node(uint32_t nodeID, uint32_t contactID, uint32_t contactIP);
   
 
   bool joined();

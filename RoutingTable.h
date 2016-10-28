@@ -64,7 +64,7 @@ class RoutingTable {
   //      The list is ordered by distance, that is, the closest node is
   //      at the head
   //      RV = number nodes in closeNodes
-  int getKClosetNodes(uint32_t target, Triple* closeNodes);
+  int getKClosestNodes(uint32_t target, Triple* closeNodes);
 
   //Pre: nodeID exists in the table, and is known to be dead
   //Post: Removes the respected Triple from the table
