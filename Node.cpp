@@ -339,7 +339,7 @@ void Node::startRefresher()
       if (socket.recvMessage(incoming) != -1) // if it returns 0 then no message was received
 	{
 	  IP=socket.getRemoteIP();
-	  //printf("Before Parse\n");
+	  printf("%s from %u\n", incoming.c_str(), IP);
 	  msg.parse(incoming);
 
 	  switch(msg.getMsgType())
@@ -497,12 +497,12 @@ void Node::startUIListener() {
       recvlenUI = socketUI.recvMessage(strUI);
       if (recvlenUI > 0)
 	{
-
-	  printf("%s\n", strUI.c_str());
 	  
 	  //Update the ip for the UI
 	  int ipUI = socketUI.getRemoteIP();
 
+	  printf("%s from %u\n", strUI.c_str(), ipUI);
+	  
 	  // Parsing incoming string
 	  recvMsg.parse(strUI);
 
