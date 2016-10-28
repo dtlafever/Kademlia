@@ -27,7 +27,7 @@ UserInterface::UserInterface(){
 void UserInterface::runUI(){
 
   int recNum;
-  UDPSocket UIsocket(UIPORT);
+  UDPSocket UIsocket(UIPORT, "UI.log");
   
   string newMessage;
   string receivedMessage;

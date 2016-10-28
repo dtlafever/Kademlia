@@ -106,7 +106,7 @@ Node::Node(uint32_t nodeID, uint32_t contactID, uint32_t contactIP) : RT(nodeID)
   vector<MsgTimer> timeOut;
 	
   // Create socket
-  UDPSocket socket(UIPORT);
+  UDPSocket socket(UIPORT, "Add.log");
 	
   // Create Contact triple and add it to the queue
   Triple contactTriple (contactIP, contactID, UIPORT);
@@ -174,7 +174,7 @@ void Node::startListener(){
 	
   int32_t recNum = -1;
 	
-  UDPSocket socket(MAINPORT);
+  UDPSocket socket(MAINPORT, "main.log");
   //ASSERT: connect socket to our main port
 	
   Triple KClosest[K];
@@ -288,7 +288,7 @@ void Node::startRefresher()
   uint32_t i =0, j =0;
 	
   // Creating the socket for the refresher
-  UDPSocket socket(REFRESHERPORT);
+  UDPSocket socket(REFRESHERPORT, "refresh.log");
 	
   // Incoming Message as a string
   std::string incoming;
@@ -453,7 +453,7 @@ void Node::startUIListener() {
   Message recvMsg;
   int32_t recvlenUI;
 	
-  UDPSocket socketUI(UIPORT);
+  UDPSocket socketUI(UIPORT, "UI.log");
 	
   while (!exit)
     {
@@ -462,6 +462,7 @@ void Node::startUIListener() {
       recvlenUI = socketUI.recvMessage(strUI);
       if (recvlenUI > 0)
 	{
+	  printf("%s\n", strUI.c_str());
 	  //Update the ip for the UI
 	  int ipUI = socketUI.getRemoteIP();
 			
