@@ -4,6 +4,10 @@
 #include "RoutingTable.h"
 #include "MsgTimer.h"
 #include "UDPSocket.h"
+#include "SnapShot.h"
+#include "JoinNetworkQueue.h"
+#include "MsgTimer.h"
+#include "constants.h"
 
 #define UI_TIMEOUT 0
 #define PINGER_TIMEOUT 1
@@ -32,17 +36,24 @@ class Node
   //Pre: msg, queue, and timeOut were declared in the constructor below
   //Post: the id of the node sending msg is removed from timeOut
   //      if our id is in closest times, return true, false other wise
-  void Node::handleKClosMsg(Message msg, vector<MsgTimer>& timeOut,
-			    JoinNewtorkQueue& queue);
-	
-	void sendUpToAlphaPing(KBucket & curKBucket, UDPSocket & sock);
+	void handleKClosMsg(Message & msg, vector<MsgTimer>& timeOut,
+		JoinNetworkQueue& queue, uint32_t & IP);
 
-	//PRE: the snapshot we are currently using, as well as the socket to 
-	//     send messages on.
+	//PRE: a node ID we want to remove from the list
+	//POST: finds the node ID in the list and removes from timeout,
+	//      if it exist in the list.
+	void removeFromUITimeout(uint32_t ID);
+
+	void sendUpToAlphaPing(KBucket & curKBucket, UDPSocket & socket, uint32_t & i, uint32_t & j);
+
+//PRE: the snapshot we are currently using, as well as the socket to 
+//     send messages on.
 	//POST: sends up to ALPHA nodes FINDVALUE and then add them to
 	//      the timer queue.
 	void sendUpToAlphaKClos(SnapShot & ss, UDPSocket & sock);
-  
+	
+	void clearTimeOut(vector<MsgTimer>& timer);
+	
  public:
 
   //Pre: id is a valid node id that is not yet taken
