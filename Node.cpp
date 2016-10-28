@@ -5,6 +5,7 @@
 #include "JoinNetworkQueue.h"
 #include "MsgTimer.h"
 #include "string.h"
+#include <thread>
 
 //Node Construction, Node Listener,
 //Refresher and Update, User Interface, Sending
@@ -23,7 +24,7 @@ Node::Node(uint32_t id) : RT(id){
 //Post: the id of the node sending msg is removed from timeOut
 //      if our id is in closest times, return true, false other wise
 
-/// TODO: return value problem??? 
+/// TODO: return value problem???
 void Node::handleKClosMsg(Message & msg, vector<MsgTimer>& timeOut,
 													JoinNetworkQueue& queue, uint32_t & IP) {
 	bool isMyIDInMsg = false;
@@ -113,10 +114,7 @@ Node::Node(uint32_t id, uint32_t contactID, uint32_t contactIP) : RT(id)
   timeOut.push_back(timer);
 	
 	/// TODO: Should we add the contact triple to the nodesToAsk???
-	Triple contactTriple;
-	contactTriple.address = contactIP;
-	contactTriple.node = contactID;
- 	contactTriple.port = UIPORT;
+	Triple contactTriple (contactIP, contactID, UIPORT);
 	
   JoinNetworkQueue nodesToAsk(contactTriple);
 	
@@ -161,12 +159,12 @@ void Node::startListener(){
   //       right one.
   //       WHENEVER WE SEND K CLOSEST, SEND TO 6667
 	
-  thread PingThread = thread(startRefresher);
-  thread UIThread = thread(startUIListener);
+  thread PingThread = thread(&Node::startRefresher, this);
+  thread UIThread = thread(&Node::startUIListener, this);
   //ASSERT: Create the two threads for handling Pings and
   //        for handling UIs
 	
-  Message sendMessageOBJ();
+  Message sendMessageOBJ;
   //ASSERT: empty message object to send later
 	
   std::string sendString; //the message we will fill up and send
@@ -175,27 +173,26 @@ void Node::startListener(){
   int senderIP;//the IP of the node we're receiving a msg from
   uint32_t senderID; //the ID of the node we're receiving a msg from
 	
-  uint32_t recNum;
+  uint32_t recNum = -1;
 	
   UDPSocket socket(MAINPORT);
   //ASSERT: connect socket to our main port
-	
-  Message sendMessageOBJ();
-  //ASSERT: empty message object to send later
   
   Triple KClosest[K];
   int closestSize; //size of nodes after we fill with K closest
   //ASSERT: Declare a Triple array of size K to send to FINDNODE
   //        and FINDVALUE requests
 
-  while(listening){
+  while(!exit)
+	{
     recNum = socket.recvMessage(receiveString);
 	  
-    if(recNum > 0){
+    if(recNum > 0)
+		{
       Message receivedMessageOBJ(receiveString);
       senderIP = socket.getRemoteIP();
       senderID = receivedMessageOBJ.getNodeID();
-      Triple sendTriple(senderIP, MAINPORT, senderID);
+      Triple sendTriple (senderIP, senderID, MAINPORT);
 
       uint32_t aKey;
       //ASSERT: to be extracted from each message.
@@ -401,12 +398,14 @@ void Node::startRefresher()
 				// Checking if anything timed out and remove it.
 				if(timeouts[PINGER_TIMEOUT][i].timedOut())
 				{
+					RT.deleteNode(timeouts[PINGER_TIMEOUT][i].getID());
 					timeouts[PINGER_TIMEOUT].erase(timeouts[PINGER_TIMEOUT].begin()+i);
 					i--;
 				}
 				
 				if (timeouts[REFRESH_TIMEOUT][j].timedOut())
 				{
+					RT.deleteNode(timeouts[PINGER_TIMEOUT][i].getID());
 					timeouts[REFRESH_TIMEOUT].erase(timeouts[REFRESH_TIMEOUT].begin()+j);
 					j--;
 				}
@@ -416,7 +415,6 @@ void Node::startRefresher()
 		}
 		
 	}
-    }
 	
   socket.close();
 }
