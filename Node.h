@@ -35,7 +35,13 @@ class Node
   void Node::handleKClosMsg(Message msg, vector<MsgTimer>& timeOut,
 			    JoinNewtorkQueue& queue);
 	
+	
 	void sendUpToAlphaPing(KBucket & curKBucket, UDPSocket & sock);
+
+	//PRE: a node ID we want to remove from the list
+	//POST: finds the node ID in the list and removes from timeout,
+	//      if it exist in the list.
+	void removeFromUITimeout(uint32_t ID);
 
 	//PRE: the snapshot we are currently using, as well as the socket to 
 	//     send messages on.

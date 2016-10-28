@@ -353,12 +353,12 @@ void Node::startRefresher()
 //      READS: FIND_VALUE_UI, STORE_UI, KCLOS, FIND_VALUE_RESP
 //      SENDS: FIND_VALUE, FIND_NODE, STORE
 //			TO UI: FIND_VALUE_RESP_POSITIVE, FIND_VALUE_RESP_NEGATIVE, STORE_RESP
-void startUIListener() {
+void Node::startUIListener() {
 	SnapShot snapSnot;
 	MsgType curMsg;
 	
 	std::string strUI;
-	Message msgUI;
+	Message recvMsg;
 	uint32_t recvlenUI;
 	
 	UDPSocket socketUI(UIPORT);
@@ -369,10 +369,11 @@ void startUIListener() {
 		if (recvlenUI > 0) {
 			//Update the ip for the UI
 			int ipUI = socketUI.getRemoteIP();
-			msgUI.parse(strUI);
+			recvMsg.parse(strUI);
 			
-			if (msgUI.getMsgType() == FINDVALUE) {
-				curMsg = msgUI;
+			//========== FIND VALUE ====================
+			if (recvMsg.getMsgType() == FINDVALUE) {
+				curMsg.setType(recvMsg.getMsgType);
 				if (std::find(keys.begin(), keys.end(), curMsg.getID())
 						!= keys.end()) {
 					//ASSERT: we have the value, send confirm message
@@ -383,7 +384,7 @@ void startUIListener() {
 					//ASSERT: we did not find the value, lets check
 					//        the rest of the network
 					Triple kClos[K];
-					int size = getKClosetNodes(curMsg.getID(), kClos);
+					int size = getKClosetNodes(sendMsg.getID(), kClos);
 					//ASSERT: kClos contains the K closest nodes that we
 					//        know about it.
 					snapSnot.addClosest(kClos, size);
@@ -397,14 +398,15 @@ void startUIListener() {
 						sendUpToAlphaKClos(SnapShot, socketUI);
 					}
 				}
-			}else if (msgUI.getMsgType() == STORE) {
-				curMsg = msgUI;
+				//========== STORE ====================
+			}else if (recvMsg.getMsgType() == STORE) {
+				curMsg.setType(recvMsg.getMsgType);
 				Triple kClos[K];
 				int size = getKClosetNodes(curMsg.getID(), kClos);
 				if (size == 0) {
 					//ASSERT: special case where we are the only node in network,
 					//        so we store the key
-					keys.push_back(msgUI.getID());
+					keys.push_back(recvMsg.getID());
 					Message sendMsg(STORERESP);
 					socketUI.sendMessage(sendMsg.toString(), ipUI, UIPORT);
 				}
@@ -412,12 +414,110 @@ void startUIListener() {
 					snapSnot.addClosest(kClos, size);
 					sendUpToAlphaKClos(SnapShot, socketUI);
 				}
-			}else if (msgUI.getMsgType() == KCLOSEST){
-				//ASSERT: this is a response from a node
-				for (int i = 0; i < timeouts[UI_TIMEOUT].size(); i++) {
-					if(timeouts[UI_TIMEOUT][i].getNodeID() == )
+				//========== KCLOSEST ====================
+			}else if (recvMsg.getMsgType() == KCLOSEST){
+				//ASSERT: this is a response from a node.
+				removeFromUITimeout(recvMsg.getNodeID());
+
+				Triple kClos[K];
+				int size = recvMsg.getKClos(kClos);
+				snapSnot.addClosest(kClos, size);
+
+				//********** STORE *****************
+				if (curMsg.getMsgType() == STORE) {
+					//Add to refresh vector
+					Triple refresh;
+					refresh.address = socketUI.getRemoteIP();
+					refresh.node = recvMsg.getNodeID();
+					refresherVector.push_back(refresh);
+
+					if (!snapShot.nextExist()) {
+						//ASSERT: we have found the K closest, send store messages
+						Message sendMsg(STORE);
+						for (int i = 0; i < snapSnot.getSize(); i++) {
+							socketUI.sendMessage(sendMsg.toString(), 
+								snapSnot.getElementIP(), MAINPORT);
+						}
+					}else{
+						//ASSERT: we are not done searching for kClos
+						sendUpToAlphaKClos(snapShot, socketUI);
+					}
+					//********** FIND VALUE *****************
+				}else if (curMsg.getMsgType() == FINDVALUE){
+					if (!snapShot.nextExist()) {
+						//ASSERT: we have found the K closest and no value,
+						//        send UI that wouldn't couldnt find it.
+						Message sendMsg(FVRESPN);
+						socketUI.sendMessage(sendMsg.toString(), ipUI, UIPORT);
+					}
+					else {
+						//ASSERT: we are not done searching for kClos
+						sendUpToAlphaKClos(snapShot, socketUI);
+					}
+				}
+				//========== FVRESP ====================
+			}else if (recvMsg.getMsgType() == FVRESP){
+				//ASSERT: we have the value, send confirm message
+				removeFromUITimeout(recvMsg.getNodeID());
+
+				//Add to refresh vector
+				Triple refresh;
+				refresh.address = socketUI.getRemoteIP();
+				refresh.node = recvMsg.getNodeID();
+				refresherVector.push_back(refresh);
+
+				Message sendMsg(FVRESPP);
+				socketUI.sendMessage(sendMsg.toString(), ipUI, UIPORT);
+			}
+
+			for (int i = 0; i < timeouts[UI_TIMEOUT].size(); i++) {
+				if (timeouts[UI_TIMEOUT][i].timedOut()) {
+					//ASSERT: this node timed out, remove from queue
+					RT.deleteNode(timeouts[UI_TIMEOUT][i].getNodeID());
+					timesouts[UI_TIMEOUT].erase(i);
+					i--;
+
+					//Now we need to continue depending on what we are on
+					if (curMsg.getMsgType() == STORE) {
+						if (!snapShot.nextExist()) {
+							//ASSERT: we have found the K closest, send store messages
+							Message sendMsg(STORE);
+							for (int i = 0; i < snapSnot.getSize(); i++) {
+								socketUI.sendMessage(sendMsg.toString(),
+									snapSnot.getElementIP(), MAINPORT);
+							}
+						}
+						else {
+							//ASSERT: we are not done searching for kClos
+							sendUpToAlphaKClos(snapShot, socketUI);
+						}
+					}else if(curMsg.getMsgType() == FINDVALUE){
+						if (!snapShot.nextExist()) {
+							//ASSERT: we have found the K closest and no value,
+							//        send UI that wouldn't couldnt find it.
+							Message sendMsg(FVRESPN);
+							socketUI.sendMessage(sendMsg.toString(), ipUI, UIPORT);
+						}
+						else {
+							//ASSERT: we are not done searching for kClos
+							sendUpToAlphaKClos(snapShot, socketUI);
+						}
+					}
 				}
 			}
+		}
+	}
+}
+
+//PRE: a node ID we want to remove from the list
+//POST: finds the node ID in the list and removes from timeout,
+//      if it exist in the list.
+void Node::removeFromUITimeout(uint32_t ID) {
+	bool foundNode = false;
+	for (int i = 0; i < (timeouts[UI_TIMEOUT].size()) && (!foundNode); i++) {
+		if (timeouts[UI_TIMEOUT][i].getNodeID() == ID) {
+			timeouts[UI_TIMEOUT].erase(i);
+			foundNode = true;
 		}
 	}
 }
