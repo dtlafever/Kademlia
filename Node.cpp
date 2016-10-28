@@ -32,7 +32,6 @@ bool Node::joined()
 
 void Node::handleKClosMsg(Message & msg, vector<MsgTimer>& timeOut,
 			  JoinNetworkQueue& queue, uint32_t & IP) {
-  bool isMyIDInMsg = false;
   bool found = false;
   int index = 0;
 
@@ -44,7 +43,7 @@ void Node::handleKClosMsg(Message & msg, vector<MsgTimer>& timeOut,
     //ASSERT: where we don't want to add ourselves to the kBucket
     RT.updateTable(senderID, senderIP);
   }
-
+  
   MsgTimer curTimer (RESPONDTIME_UI, senderID, senderIP);
 
   while (!found && (index < timeOut.size()))
@@ -52,33 +51,27 @@ void Node::handleKClosMsg(Message & msg, vector<MsgTimer>& timeOut,
       curTimer = timeOut[index];
 
       if (curTimer.getNodeID() == senderID) // If it is the same ID
-      	{
-      	  found = true;
-      	  timeOut.erase(timeOut.begin() + index);
-      	}
+	{
+	  found = true;
+	  timeOut.erase(timeOut.begin() + index);
+	}
       index++;
 
     } //the sender node is now removed from the time out vector
 
-  if (msg.includes(ID))// If this node knows us
-    {
-      isMyIDInMsg = true;
-    }
-
-  // Continue adding in the nodes we have not asked yet
-  Triple closestK[K];
-  int size = msg.getKClos(closestK);
-
-  for (int index = 0; (index < size); ++index)
-    {
+  // if (msg.includes(ID))// If this node knows us
+  //   {
+  //     inNetwork = true;
+  //   }
+  //else{
+    // Continue adding in the nodes we have not asked yet
+    Triple closestK[K];
+    int size = msg.getKClos(closestK);
+    
+    for (int index = 0; (index < size); ++index){
       queue.add(closestK[index]);
     }
-  if (!inNetwork) //no need to check if we're already in network
-    {
-      inNetwork = isMyIDInMsg;
-    }
-
-
+    //}
 }
 
 //Pre: timer is from the constructor
@@ -104,30 +97,19 @@ Node::Node(uint32_t nodeID, uint32_t contactID, uint32_t contactIP) : RT(nodeID)
   ID = nodeID; // update this node's nodeID
   RT.updateTable(contactID, contactIP); // Insert contact node in routing table
   inNetwork = false; //at this point, no other node knows about us
-
+  bool recvContact = false;
+  
   // Create a vector for timeouts
   vector<MsgTimer> timeOut;
 
   // Create socket
   UDPSocket socket(UIPORT, "Add.log");
 
-  //can return true if we recieve contact message or
-  //contact has timed out
-  bool recvContactResp = false;
-
   // Create Contact triple and add it to the queue
   Triple contactTriple (contactIP, contactID, UIPORT);
-  JoinNetworkQueue nodesToAsk;
+  JoinNetworkQueue nodesToAsk(contactTriple);
 
-  // Send a FINDNODE message to the next node.
-  Message toSend(FINDNODE, ID, ID);
-  socket.sendMessage(toSend.toString(), contactTriple.address, UIPORT);
-
-  // Add a timeout
-  MsgTimer timer(RESPONDTIME_UI, contactTriple.node, contactTriple.address);
-  timeOut.push_back(timer);
-
-  while ((nodesToAsk.hasNext() && !RT.isFull()) || (!recvContactResp))
+  while (!recvContact || (nodesToAsk.hasNext() && !inNetwork))
     {
       // Try to receive a message
       string response;
@@ -137,18 +119,28 @@ Node::Node(uint32_t nodeID, uint32_t contactID, uint32_t contactIP) : RT(nodeID)
       if (msgSize != -1)
 	{
 	  Message msg(response);
-	  msg.setNodeID(ID);
-	  if(msg.getNodeID() == contactID){
-	    //ASSERT: we have recieved at least the contact response
-	    recvContactResp = true;
-	  }
 
 	  if (msg.getMsgType() == KCLOSEST)
 	    {
-	      handleKClosMsg(msg, timeOut, nodesToAsk, contactIP);
+	      if (msg.getNodeID() == contactID){
+		recvContact = true;
+		
+		//ASSERT: contact node responds, but no one else in the network
+		Triple closestK[K];
+		int size = msg.getKClos(closestK);
+
+		if(size == 0){
+		  //ASSERT: nothing in the KClos, but recieved response so
+		  //        we are in the network. Just only 1 node in the
+		  //        network.
+		  inNetwork = true;
+		}
+	      }else{
+		handleKClosMsg(msg, timeOut, nodesToAsk, contactIP);
+	      }
 	    } //Done Dealing with a received message
 	}
-
+      
       if(nodesToAsk.hasNext()){
 	// Get next Triple to ask
 	Triple nextToAsk = nodesToAsk.getNext();
@@ -164,11 +156,15 @@ Node::Node(uint32_t nodeID, uint32_t contactID, uint32_t contactIP) : RT(nodeID)
 
       clearTimeOut(timeOut);
 
-      if((timeOut.size() == 0) && !recvContactResp){
+      if((timeOut.size() == 0) && !recvContact){
 	//ASSERT: contact never responded
-	recvContactResp = true;
+	recvContact = true;
+	printf("Contact Node Timed out.\n");
       }
     }
+  if(recvContact){
+    inNetwork = true;
+  }
 }
 
 //--------------------------------Node Listener----------------------------
