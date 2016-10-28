@@ -2,7 +2,7 @@
 #define INCLUDED_JoinNetworkQueue
 
 #include <vector>
-#include "../../constants.h"
+#include "constants.h"
 // maybe other stuff included
 
 class JoinNetworkQueue {

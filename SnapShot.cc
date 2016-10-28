@@ -21,6 +21,14 @@ Quint SnapShot::getElement(int i) const {
 	return closest[i];
 }
 
+uint32_t SnapShot::getSize() const {
+	return size;
+}
+
+uint32_t SnapShot::getElementIP(int i) const {
+	return closest[i].node;
+}
+
 //PRE: the nodeID we want to set our member data compareID
 //POST: changes the quint.compareID to nodeID
 void SnapShot::setCompareID(uint32_t nodeID) {
