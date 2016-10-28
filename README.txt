@@ -56,7 +56,9 @@ Test Cases:
      14. Suppose that node 3 has initalized FindNode to find node 11 when node
      	 11 does not exist in the network. Return a fail after querying every
 	 node.
+     15. 
 
+Note: It would probably be best to use K = 2 as a test. 
 
 For a network with 10 nodes (ie, ids are between 0 and 9), this is what
 the network should look like:
