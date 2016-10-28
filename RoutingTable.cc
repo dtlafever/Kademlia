@@ -26,7 +26,7 @@ Triple* RoutingTable::createTriple(uint32_t id, uint32_t address) {
   Triple* newTriple = new Triple;
   newTriple->address = address;
   newTriple->node = id;
-  newTriple->port = UDPPORT;
+  newTriple->port = MAINPORT;
   return (newTriple);
 }
 
