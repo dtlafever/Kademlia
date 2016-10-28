@@ -49,7 +49,7 @@ void Message::parse (std::string message)
 	msg ="";
 	
 	// Getting the sender ID
-	if((index=message.find(" "))!= -1)
+	if((index=message.find_first_of(" "))!= -1)
 	{
 		// Reading the nodeID
 		std::string s = message.substr(0, index+1);
@@ -205,6 +205,8 @@ std::string Message::toString(MsgType type, uint32_t nodeID, uint32_t ID, bool U
 	sprintf(temp, "%d", nodeID); // convert to string
 	msg+= std::string(temp)+ " ";
 	
+	std::cout << msg <<std::endl;
+	
 	switch (type)
 	{
 		case PING:
@@ -232,6 +234,8 @@ std::string Message::toString(MsgType type, uint32_t nodeID, uint32_t ID, bool U
 			{
 				sprintf(temp, "%d", ID); // convert to string
 				msg += msgStrings[FINDVALUE]+ std::string(temp);
+				std::cout << msg <<std::endl;
+
 			}
 			break;
 			
@@ -307,7 +311,7 @@ std::string Message::toString()
 {
 	std::string m = "";
 	
-	m=toString(msgType, ID, isUI);
+	m=toString(msgType, nodeID, ID, isUI);
 	
 	return m;
 }
