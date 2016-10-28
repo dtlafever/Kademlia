@@ -513,6 +513,7 @@ void Node::startUIListener() {
 	      {
 		MsgType type = recvMsg.getMsgType();
 		curMsg.setType(type);
+		curMsg.setID(recvMsg.getID());
 		if (std::find(keys.begin(), keys.end(), recvMsg.getID())!= keys.end())
 		  {
 		    //ASSERT: we have the value, send confirm message
@@ -547,7 +548,7 @@ void Node::startUIListener() {
 	      {
 		// Set the current message to the received request from the UI
 		curMsg.setType(recvMsg.getMsgType());
-
+		curMsg.setID(recvMsg.getID());
 		// Get KClosest nodes to the key
 		Triple kClos[K];
 		int size = RT.getKClosestNodes(curMsg.getID(), kClos);
@@ -732,7 +733,8 @@ void Node::sendUpToAlphaKClos(SnapShot & ss, UDPSocket & sock, uint32_t msgID, M
 {
 
   Message sendMsg(mType, ID, msgID);
-
+  printf("sendMsg: %s\n", sendMsg.toString().c_str());
+  
   for (int i = 0; (i < ALPHA) && (ss.nextExist()); i++)
     {
       Triple nextNode;
