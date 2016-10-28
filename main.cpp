@@ -20,6 +20,7 @@ int main(int argc, char * argv[]){
   uint32_t myID = atoi(argv[MY_ID]);
   if (argc == CREATE_NETWORK) {
     Node newNode(myID);
+    printf("We have started a network.\n");
     newNode.startListener();
   }
   else if (argc == JOIN_NETWORK) {
@@ -28,6 +29,7 @@ int main(int argc, char * argv[]){
     uint32_t contactIP = getIPInt(strIP);
     Node newNode(myID, contactID, contactIP);
     if (newNode.joined()) {
+      printf("We have joined a network.\n");
       newNode.startListener();
     }
     else{

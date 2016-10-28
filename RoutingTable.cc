@@ -73,7 +73,7 @@ int RoutingTable::findKBucket(uint32_t id) {
   uint32_t myDist = findDist(myId, id);
   uint32_t tempt = myDist;
   int twoPower = 0;
-  while (tempt != 1) {
+  while (tempt != 1 && tempt != 0 ) {
     tempt = tempt / 2;
     twoPower++;
   }
