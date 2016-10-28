@@ -134,6 +134,8 @@ Node::Node(uint32_t nodeID, uint32_t contactID, uint32_t contactIP) : RT(nodeID)
 		  //        we are in the network. Just only 1 node in the
 		  //        network.
 		  inNetwork = true;
+		}else{
+		  handleKClosMsg(msg, timeOut, nodesToAsk, contactIP);
 		}
 	      }else{
 		handleKClosMsg(msg, timeOut, nodesToAsk, contactIP);
