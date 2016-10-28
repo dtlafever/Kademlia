@@ -108,3 +108,35 @@ After Node7 joins:
       Node7: RT[0] = 6, RT[1] = 3, 2, RT[2] = 0, 1, 2, 3 (which one 1st)
 
       blah blah blah, that whole pattern thing continues
+
+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+Johnathan's Test Corner
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
