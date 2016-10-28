@@ -361,8 +361,10 @@ void Message::setKClos ( Triple clos [K], uint32_t s)
 
 uint32_t Message::getKClos(Triple *clos)
 {
-	clos = kclos;
-	return size;
+  for(int i=0; i < size; i++){
+    clos[i] = kclos[i];
+  }
+  return size;
 
 }
 

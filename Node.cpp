@@ -31,7 +31,7 @@ bool Node::joined()
 //      if our id is in closest times, return true, false other wise
 
 void Node::handleKClosMsg(Message & msg, vector<MsgTimer>& timeOut,
-			  JoinNetworkQueue& queue, uint32_t & IP) {
+			  JoinNetworkQueue& queue, uint32_t IP) {
   bool found = false;
   int index = 0;
 
@@ -149,7 +149,8 @@ Node::Node(uint32_t nodeID, uint32_t contactID, uint32_t contactIP) : RT(nodeID)
       
       if(nodesToAsk.hasNext()){
 	// Get next Triple to ask
-	Triple nextToAsk = nodesToAsk.getNext();
+	Triple nextToAsk;
+	nodesToAsk.getNext(nextToAsk);
 
 	// Send a FINDNODE message to the next node.
 	Message toSend(FINDNODE, ID, ID);

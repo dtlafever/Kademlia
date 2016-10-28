@@ -39,7 +39,7 @@ class Node
   //Post: the id of the node sending msg is removed from timeOut
   //      if our id is in closest times, return true, false other wise
 	void handleKClosMsg(Message & msg, vector<MsgTimer>& timeOut,
-		JoinNetworkQueue& queue, uint32_t & IP);
+		JoinNetworkQueue& queue, uint32_t IP);
 
 	//PRE: a node ID we want to remove from the list
 	//POST: finds the node ID in the list and removes from timeout,
