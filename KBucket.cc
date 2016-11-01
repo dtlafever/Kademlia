@@ -53,6 +53,7 @@ bool KBucket::isNodeInBucket(uint32_t id) {
     if (currTriple->node == id) {
       found = true;
     }
+		index ++;
   }
   return (found);
 }

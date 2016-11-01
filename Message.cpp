@@ -205,7 +205,7 @@ std::string Message::toString(MsgType type, uint32_t nodeID, uint32_t ID, bool U
 
 	// Adding the Node ID.
 	char temp[32];
-	sprintf(temp, "%d", nodeID); // convert to string
+	sprintf(temp, "%u", nodeID); // convert to string
 	msg+= std::string(temp)+ " ";
 
 	//std::cout << msg <<std::endl;
@@ -219,7 +219,7 @@ std::string Message::toString(MsgType type, uint32_t nodeID, uint32_t ID, bool U
 		case STORE:
 			if(ID != -1)
 			{
-				sprintf(temp, "%d", ID); // convert to string
+				sprintf(temp, "%u", ID); // convert to string
 				msg += msgStrings[STORE]+ std::string(temp);
 			}
 			break;
@@ -227,7 +227,7 @@ std::string Message::toString(MsgType type, uint32_t nodeID, uint32_t ID, bool U
 		case FINDNODE:
 			if (ID != -1)
 			{
-				sprintf(temp, "%d", ID); // convert to string
+				sprintf(temp, "%u", ID); // convert to string
 				msg += msgStrings[FINDNODE]+ std::string(temp);
 			}
 			break;
@@ -235,7 +235,7 @@ std::string Message::toString(MsgType type, uint32_t nodeID, uint32_t ID, bool U
 		case FINDVALUE:
 			if(ID != -1)
 			{
-				sprintf(temp, "%d", ID); // convert to string
+				sprintf(temp, "%u", ID); // convert to string
 				msg += msgStrings[FINDVALUE]+ std::string(temp);
 				std::cout << msg <<std::endl;
 
@@ -246,7 +246,7 @@ std::string Message::toString(MsgType type, uint32_t nodeID, uint32_t ID, bool U
 			msg += msgStrings[KCLOSEST];
 
 			// Adding the size of the array to the message
-			sprintf(temp, "%d", size);
+			sprintf(temp, "%u", size);
 			msg += std::string(temp);
 
 			/// iterate over all elements of kclosest and put them in the message.
@@ -259,15 +259,15 @@ std::string Message::toString(MsgType type, uint32_t nodeID, uint32_t ID, bool U
 
 				// Adding the IP
 				char temp [32];
-				sprintf(temp, "%d", kclos[i].address); // convert to string
+				sprintf(temp, "%u", kclos[i].address); // convert to string
 				msg += std::string (temp) + " ";
 
 				// Adding the UDP Port
-				sprintf(temp, "%d", kclos[i].port); // convert to string
+				sprintf(temp, "%u", kclos[i].port); // convert to string
 				msg += std::string (temp)+" ";
 
 				// Adding the Node ID
-				sprintf(temp, "%d", kclos[i].node); // convert to string
+				sprintf(temp, "%u", kclos[i].node); // convert to string
 				msg += std::string (temp);
 			}
 			msg += "\n";

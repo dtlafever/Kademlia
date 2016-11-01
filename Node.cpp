@@ -69,7 +69,8 @@ void Node::handleKClosMsg(Message & msg, vector<MsgTimer>& timeOut,
     int size = msg.getKClos(closestK);
     
     for (int index = 0; (index < size); ++index){
-      queue.add(closestK[index]);
+			if(closestK[index].node != ID)
+      	queue.add(closestK[index]);
     }
     //}
 }
@@ -173,6 +174,7 @@ Node::Node(uint32_t nodeID, uint32_t contactID, uint32_t contactIP) : RT(nodeID)
   if(recvContact){
     inNetwork = true;
   }
+	cout << "hi ";
 }
 
 //--------------------------------Node Listener----------------------------
