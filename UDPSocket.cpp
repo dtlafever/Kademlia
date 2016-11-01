@@ -68,7 +68,7 @@ void UDPSocket::sendMessage(const std::string s, const int host,
 	  throw SocketException("Could not send message.");
 	}
 	else {
-	  fileLog << "Sent Message '" << s << "'." << std::endl;
+	  fileLog << "Sent Message '" << s << " "<< host <<"'." << std::endl;
 	}
 }
 
