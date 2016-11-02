@@ -110,8 +110,8 @@ Node::Node(uint32_t nodeID, uint32_t contactID, uint32_t contactIP) : RT(nodeID)
   Triple contactTriple (contactIP, contactID, UIPORT);
   JoinNetworkQueue nodesToAsk(contactTriple);
 
-  while (!recvContact || (timeOut.size() > 0 && !inNetwork)
-	 || (nodesToAsk.hasNext() && !inNetwork))
+  while ((timeOut.size() > 0 )
+	 || (nodesToAsk.hasNext() ))
     {
       // Try to receive a message
       string response;
@@ -164,16 +164,16 @@ Node::Node(uint32_t nodeID, uint32_t contactID, uint32_t contactIP) : RT(nodeID)
       }
 
       clearTimeOut(timeOut);
-
+			if(recvContact){
+    inNetwork = true;
+			}
       if((timeOut.size() == 0) && !recvContact){
 	//ASSERT: contact never responded
-	recvContact = true;
+//	recvContact = true;
 	printf("Contact Node Timed out.\n");
       }
     }
-  if(recvContact){
-    inNetwork = true;
-  }
+
 	cout << "hi ";
 }
 
