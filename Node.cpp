@@ -490,7 +490,7 @@ void Node::startUIListener() {
   std::string strUI;
   Message recvMsg(NONE, ID);
   int recvlenUI;
-
+	int ipUI =0;
 
   UDPSocket socketUI(UIPORT, "UI.log");
 
@@ -503,13 +503,18 @@ void Node::startUIListener() {
 	{
 	  
 	  //Update the ip for the UI
-	  int ipUI = socketUI.getRemoteIP();
+		
+	  int senderIP = socketUI.getRemoteIP();
 
-	  printf("%s from %u\n", strUI.c_str(), ipUI);
+	  printf("%s from %u\n", strUI.c_str(), senderIP);
 	  
 	  // Parsing incoming string
 	  recvMsg.parse(strUI);
-
+		
+		// Get UI IP
+		if(recvMsg.getUI())
+			ipUI = senderIP;
+		
 	  switch (recvMsg.getMsgType())
 	    {
 	    case FINDVALUE:
@@ -604,10 +609,16 @@ void Node::startUIListener() {
 			  socketUI.sendMessage(sendMsg.toString(),
 					       snapShot.getElementIP(i), MAINPORT);
 			}
+						// Send Store Resp to UI
+						
+						Message UIansw (STORERESP, ID);
+						socketUI.sendMessage(UIansw.toString(), ipUI, UIPORT);
+						
 		      }else{
 			//ASSERT: we are not done searching for kClos
 			sendUpToAlphaKClos(snapShot, socketUI, curMsg.getID(), FINDNODE);
 		      }
+
 		    }
 		    break;
 		  case FINDVALUE:
@@ -656,10 +667,11 @@ void Node::startUIListener() {
 	    Message sendMsg(KCLOSEST, ID);
 	    sendMsg.setKClos(kClos, closestSize);
 
-	    socketUI.sendMessage(sendMsg.toString(), ipUI, UIPORT);
+			// REspond with KCLOSEST
+	    socketUI.sendMessage(sendMsg.toString(), senderIP, UIPORT);
 
 	    Triple sendTriple;
-	    sendTriple.address = ipUI;
+	    sendTriple.address = senderIP;
 	    sendTriple.port = UIPORT;
 	    sendTriple.node = recvMsg.getNodeID();
 	    refresherVector.push_back(sendTriple);
