@@ -48,7 +48,7 @@ void Message::parse (std::string message)
 
 	msgType = NONE;
 	msg ="";
-
+	
 	if(msg == "")
 		Message::msg = message;
 
@@ -73,6 +73,9 @@ void Message::parse (std::string message)
 	{
 		isUI = true;
 		message.erase(message.begin()+index, message.begin()+index+2);
+	}
+	else {
+		isUI = false;
 	}
 
 	if (message.find(msgStrings[PING]) != -1)
