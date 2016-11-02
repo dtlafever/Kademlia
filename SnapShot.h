@@ -52,6 +52,7 @@ class SnapShot{
 
 	 uint32_t getSize() const;
 	 uint32_t getElementIP(int i) const;
+	 Quint getElementQuint(int i) const;
 
 	 uint32_t getCompareID();
 	 void setCompareID(uint32_t nodeID);

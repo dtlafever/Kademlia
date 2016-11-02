@@ -18,6 +18,10 @@ uint32_t SnapShot::getSize() const {
 	return size;
 }
 
+Quint SnapShot::getElementQuint(int i) const {
+  return closest[i];
+}
+
 uint32_t SnapShot::getElementIP(int i) const {
 	return closest[i].address;
 }
@@ -57,12 +61,14 @@ SnapShot::SnapShot() {
 }
 
 //COPY CONSTRUCTOR
-///TODO: fix
+//TODO: still broken
 SnapShot::SnapShot(SnapShot & ss) {
   creatorID = ss.getCreatorID();
   compareID = ss.getCompareID();
-
-	size = ss.getSize();
+  size = ss.getSize();
+  //for (int i=0; i < ss.getSize(); i++){
+    //copyQuint(closest[i], ss.getElementQuint(i));
+  //}
 }
 
 //PRE: an array of triples up to nodeSize.
