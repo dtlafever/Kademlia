@@ -45,6 +45,7 @@ class SnapShot{
 
   Quint closest [K];
   uint32_t compareID;
+	uint32_t creatorID;
   int size;
   
  public:
@@ -54,10 +55,13 @@ class SnapShot{
 
 	 void setCompareID(uint32_t nodeID);
 
+	 uint32_t getCreatorID();
+	 void setCreatorID(uint32_t nodeID);
+
 	 //PRE: an array of triples up to nodeSize.
 	 //     We are assuming the nodes array is sorted
 	 //POST: Triples from node placed into pair array
-  SnapShot(Triple nodes[], uint32_t nodesSize, uint32_t NodeId);
+  SnapShot(Triple nodes[], uint32_t nodesSize, uint32_t NodeId, uint32_t creatorNodeID);
 
 	//PRE: the nodeID we want to set our member data compareID
 	//POST: changes the quint.compareID to nodeID
