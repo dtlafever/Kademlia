@@ -7,6 +7,7 @@
 #include "KBucket.h"
 #include "constants.h"
 #include <stdint.h>
+#include <fstream>
 #include <mutex>
 
 class RoutingTable {
@@ -15,6 +16,7 @@ class RoutingTable {
   
   uint32_t myId;
   KBucket table[NUMBITS];
+	std::ofstream logOut;
 
   //Pre: id1 and id2 are two identifiers
   //Post: RV = id1 XOR id2
@@ -38,6 +40,10 @@ class RoutingTable {
   //Post: RV = true if node was added to the table
   //           false otherwise
   bool addNode(uint32_t node, uint32_t address);
+	
+	// add = false -> deleting node
+	// add = true -> adding node
+	void log (int &i , Triple curNode, bool add = false) ;
   
  public:
   
@@ -83,7 +89,7 @@ class RoutingTable {
   //Pre: 0 <= index < NUMBITS
   //Post: RV = table[index]
   KBucket operator [] (int index);
-
+	
 };
 
 #endif
