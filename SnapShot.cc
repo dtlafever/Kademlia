@@ -19,7 +19,13 @@ uint32_t SnapShot::getSize() const {
 }
 
 uint32_t SnapShot::getElementIP(int i) const {
-	return closest[i].node;
+	return closest[i].address;
+}
+
+//PRE:
+//POST: returns the compareID
+uint32_t SnapShot::getCompareID(){
+  return compareID;
 }
 
 //PRE: the nodeID we want to set our member data compareID
@@ -53,6 +59,9 @@ SnapShot::SnapShot() {
 //COPY CONSTRUCTOR
 ///TODO: fix
 SnapShot::SnapShot(SnapShot & ss) {
+  creatorID = ss.getCreatorID();
+  compareID = ss.getCompareID();
+
 	size = ss.getSize();
 }
 
@@ -74,9 +83,19 @@ SnapShot::SnapShot(Triple nodes[], uint32_t nodesSize, uint32_t nodeID, uint32_t
   }
 }
 
-SnapShot::SnapShot(uint32_t nodeID) {
-	compareID = nodeID;
-	size = 0;
+//PRE: the nodeID we want to set our member data creatorID
+//POST: changes the creatorID
+SnapShot::SnapShot(uint32_t creatorNodeID){
+  creatorID = creatorNodeID;
+  size = 0;
+}
+
+//PRE: takes a creatorID and compareID to change our member data
+//POST: changes the quint.compareID to nodeID and creatorID
+SnapShot::SnapShot(uint32_t compareNodeID, uint32_t creatorNodeID){
+  creatorID = creatorNodeID;
+  compareID = compareNodeID;
+  size = 0;
 }
 
 //PRE: a k closest array already in closest to least closest order,
