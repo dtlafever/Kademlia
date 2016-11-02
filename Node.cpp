@@ -484,6 +484,7 @@ void Node::startRefresher()
 //			TO UI: FIND_VALUE_RESP_POSITIVE, FIND_VALUE_RESP_NEGATIVE, STORE_RESP
 void Node::startUIListener() {
   SnapShot snapShot;
+	snapShot.setCreatorID(ID);
   Message curMsg(NONE, ID);
 
   std::string strUI;
@@ -596,8 +597,10 @@ void Node::startUIListener() {
 
 		      if (!snapShot.nextExist()) {
 			//ASSERT: we have found the K closest, send store messages
-			Message sendMsg(STORE, ID);
-			for (int i = 0; i < snapShot.getSize(); i++) {
+			Message sendMsg(STORE, ID, curMsg.getID());
+						
+			for (int i = 0; i < snapShot.getSize(); i++)
+			{
 			  socketUI.sendMessage(sendMsg.toString(),
 					       snapShot.getElementIP(i), MAINPORT);
 			}
