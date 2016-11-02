@@ -28,7 +28,7 @@ class UDPSocket : private Socket {
   //PRE: a message, host ip, and the port
   //POST: sends the message to that host.
   //      throws error if couldn't send
-  void sendMessage(const std::string s, const int host,
+  void sendMessage(const std::string s, const uint32_t host,
 		   const uint32_t port);
 
   //PRE: the buffer we want to store the message in
