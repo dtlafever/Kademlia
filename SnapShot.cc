@@ -61,7 +61,7 @@ SnapShot::SnapShot(SnapShot & ss) {
 //POST: Triples from node placed into pair array
 SnapShot::SnapShot(Triple nodes[], uint32_t nodesSize, uint32_t nodeID, uint32_t creatorNodeID){
 	compareID = nodeID;
-  creatorID = createNodeID;
+  creatorID = creatorNodeID;
   for(int i = 0; i < nodesSize; i++){
     copyQuintFromTriple(closest[i], nodes[i]);
     if(nodes[i].node == creatorID){
@@ -89,7 +89,7 @@ void SnapShot::addClosest(Triple * kClos, uint32_t kClosSize){
   //        we don't have k closest yet in the snapshot
   while ((size < K) && (curKClosIndex < kClosSize)) {
     copyQuintFromTriple(closest[size], kClos[curKClosIndex]);
-    if(kClos[i].node == creatorID){
+    if(kClos[curKClosIndex].node == creatorID){
       closest[i].queried = true;
     }else{
       closest[i].queried = false;
