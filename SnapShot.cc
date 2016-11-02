@@ -90,9 +90,9 @@ void SnapShot::addClosest(Triple * kClos, uint32_t kClosSize){
   while ((size < K) && (curKClosIndex < kClosSize)) {
     copyQuintFromTriple(closest[size], kClos[curKClosIndex]);
     if(kClos[curKClosIndex].node == creatorID){
-      closest[i].queried = true;
+      closest[size].queried = true;
     }else{
-      closest[i].queried = false;
+      closest[size].queried = false;
     }
 	closest[size].compareID = compareID;
     size++;
