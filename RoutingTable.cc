@@ -1,12 +1,11 @@
 //Justin Giguere
 //Routing Table cc file
 
-#include "KBucket.h"
-#include "constants.h"
 #include "RoutingTable.h"
 #include <stdint.h>
 #include <iostream>
 #include <stdio.h>
+#include <fstream>
 
 using namespace std;
 
@@ -18,6 +17,7 @@ using namespace std;
 //Post: table is an array of K kBuckets, that are each empty
 RoutingTable::RoutingTable(uint32_t id) {
   myId = id;
+	logOut.open("bucket.log", std::ofstream::out | std::ofstream::app);
 }
 
 //Pre: id and address represents a new node not seen before
@@ -109,10 +109,13 @@ bool RoutingTable::addNode(uint32_t node, uint32_t address) {
   Triple* newTriple = createTriple(node, address);
   if (currBucket->getNumTriples() == K) {  //the bucket is full
     //printf("Rout addNode: bucketOverFlow \n");
+		log(nthBucket, *currTriple);
     currBucket->deleteNode(currTriple->node);
+
   }
   else {
     //printf("Rout addNode: bucket not full \n");
+		log(nthBucket, *newTriple, true);
     currBucket->addNode(newTriple);
     added = true;
   }
@@ -139,6 +142,7 @@ bool RoutingTable::updateTable(uint32_t nodeID, uint32_t address) {
     success = true;
   }
   else {
+		log(nthBucket, Triple(address, nodeID, UIPORT));
     success = addNode(nodeID, address);
   }
   return (success);
@@ -182,4 +186,18 @@ void RoutingTable::printTable() {
     printf("nthBucket: %d \n", index);
     table[index].printBucket();
   }
+}
+
+void RoutingTable::log(int &i, Triple curNode, bool add)
+{
+	if(add)
+	{
+		logOut<<"Inserted Node - ";
+	}
+	else
+	{
+		logOut<<"Deleted Node - ";
+	}
+	
+	logOut <<"port :"<< curNode.port <<" \t node : " << curNode.node << " \t address: "<< curNode.address <<endl;
 }

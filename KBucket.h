@@ -104,7 +104,7 @@ class KBucket {
   void operator= (KBucket& otherBucket);
 	
 	void copyKBucket(KBucket &otherBucket);
-
+	
 };
 
 #endif

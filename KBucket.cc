@@ -127,16 +127,13 @@ uint32_t KBucket::findDist(uint32_t id1, uint32_t id2) {
 void KBucket::addNode(Triple* node) {
   //  printf("inside of addNode, before lock \n");
   lockBucket();
-  /*
-  printf("inside of addNode, just locked \n");
-  this_thread::sleep_for(chrono::seconds(20));  //For testing the mutex lock
-  */
   bucket[numTriples] = node;
   //In this regard, the tail is where the 1st NULL is at
   numTriples++;
   unlockBucket();
 }
 
+// TODO: Check this function. Is this still used?
 //Pre: nodes is in smallest distance order, currNode has a home in nodes
 //     index is where that home is
 //     nodes is an array of triples, curNode is a pointer to a triple
