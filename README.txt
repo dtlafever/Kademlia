@@ -5,7 +5,7 @@ An implementation of the peer to peer network that is based on
 
 Our implementation comes in two programs. One runs a node of the network,
     while the other runs the user interface. These are respectully called
-    userInterface and node.
+    UserInterface and node.
 
 To make these two, just simply type make userInterface and node. When
    desired, remove all .o and the two programs with make clean.
@@ -17,106 +17,81 @@ NOTE: the node program expects either 1 or 3 arguments. The 1st is the node's
 
 Test Cases:
 
-     1. Node 0 joins the network with a contact. Node 0 fails to join
-     2. Node 0 joins the network. Node 0 starts the network and has
+--JOINING A NETWORK--
+
+     =. Node 0 joins the network with a contact. Node 0 fails to join
+     	-the contact that you specify doesn't exist
+	     -prints out "failed to join network" and quits
+
+     =. Node 0 joins the network. Node 0 starts the network and has
      	an empty routing table.
-     3. Node 0 exists within the network. Node 1 joins the network with
-     	a contact that is not node 0. Node 1 fails to join the network.
-	Node 0's routing table is still empty.
-     4. Node 0 exists within the network. Node 1 joins the network with 0 as
+	-just one node, by itself
+	      -prints "joined the network"
+	      
+     =. Node 0 exists within the network. Node 1 joins the network with 0 as
      	a contact. Node 1 successfully joins with 0 in it's Routing Table. And
 	Node 0 has node 1 in node 0's routing table.
-     5. Node 0 and Node 1 exists within the network. A new node also known
-     	as 0 joins. It fails to join.
-     6. Suppose that enough nodes are in the network such that every
+	     (KIMI WROTE IT)
+
+     =. Suppose that enough nodes are in the network such that every
      	node's Routing table is full. All such nodes are still alive.
 	A new node n attempts to join, it fails to join.
-     7. Suppose that some node n is in the network. Further suppose that
-     	n is dead. After a few moments n should not exist in any Routing Table.
-     8. Suppose that for 0 <= i < 10 that node i exists within the network.
-     	Let k be a key where k = 7. Suppose that node 5 is storing k.
-	Then nodes 2, 3, 4, 6, and 7 contains k.
-     9. Suppose that 10 nodes exist in the network as above. And suppose that
+	  -the node will stil join the network, but the only k-buckets being filled
+	   are it's own. since the other RTs are full, the node will be placed in others.	 
+
+==================================================================================================
+
+---COMMUNICATING BETWEEN NODES---
+
+     =. Suppose that for 0 <= i < 10 that node i exists within the network.
+     	Suppose that K = 5.
+	Let key = 7. Suppose that node 5 is storing the key.
+	    -Then Nodes 7,6,5,4,3 will receive the store request and will store the key,
+	     because they are the k closest to the given key.
+
+     =. Suppose that 10 nodes exist in the network as above. And suppose that
      	no nodes contains the key 4. Then node n calling find value for 4
 	will fail.
-     10. Suppose that 10 nodes exist in the network as above. And suppose that
+	     -Node n will query all given nodes, and is unable to find the key 4.
+	     -the UI listener will send a failed Find Value response through the socket.
+	     -The UI process will print "Failure".
+
+     =. Suppose that 10 nodes exist in the network as above. And suppose that
      	 key 5 exists within the network. Node n calling for key 5 will succed
 	 (we really don't care which node gives us the value).
-     11. Suppose that nodes 0 and 1 exists in the network where node 1 is
-     	 storing the key 5. Further suppose that node0 is trying to find the
+	     -The UI listener will send a success Find Value response through the socket.
+	     -The UI process will print "Success".
+
+	
+     =. Suppose that nodes 0 and 1 exists in the network where node 1 is
+     	 storing the key 5. Further suppose that node 0 is trying to find the
 	 value associated with key 5 and that during the process, node 1 dies.
 	 The find value should fail.
-     12. Suppose that node 0 exists in the network. And suppose that two nodes
-     	 are trying to join the network at the same time with the same id
-	 (for example, 1). One of the two nodes started first, call the first
-	 one 1-A and the second one 1-B. 1-A succeeds in joining the network,
-	 and 1-B fails in joining the network.
-     13. Suppose node 0 is expecting a response from node 5. Node 5 dies,
+	     -If K >= 2, then the key 5 would have been stored in Node 0 itself.
+	      So it will find the key in itself and send a success Find Value response.
+	     -If K = 1, then Node 0 will not have the key and thus send KCLOSEST requests,
+	      but it will not receive a response because Node 1 has died. Therefore
+	      Node 0 will send a failure Find Value response.
+
+==================================================================================================
+
+---REFRESHING AND TIMEOUTS---
+
+     =. Suppose that some node n is in the network. Further suppose that
+     	n is dead.
+	  -at most after an hour, it should not exist in any Routing Table
+	  (INGY'S REFRESHER)
+
+     =. Suppose node 0 is expecting a response from node 5. Node 5 dies,
      	 node 5 is ultimately removed from node 0's routing table.
-     14. Suppose that node 3 has initalized FindNode to find node 11 when node
-     	 11 does not exist in the network. Return a fail after querying every
-	 node.
-     15. 
+	      -Node 0 can't get to Node 5, the request times out and it moves on
+	      -The Refresher will remove Node 5 from all the routing tables.
 
-Note: It would probably be best to use K = 2 as a test. 
-
-For a network with 10 nodes (ie, ids are between 0 and 9), this is what
-the network should look like:
-
-After Node 0 joins: The Routing Table of Node 0 is empty
-After Node 1 joins:
-      Node0: RT[0] = 1
-      Node1: RT[0] = 0
-After Node2 joins:
-      Node0: RT[0] = 1, RT[1] = 2
-      Node1: RT[0] = 0, RT[1] = 2
-      Node2: RT[1] = 0, 1 (order depends on which node responded back 1st)
-After Node3 joins:
-      Node0: RT[0] = 1, RT[1] = 2, 3
-      Node1: RT[0] = 0, RT[1] = 2, 3
-      Node2: RT[0] = 3, RT[1] = 0, 1
-      Node3: RT[0] = 2, RT[1] = 0, 1
-After Node4 joins:
-      Node0: RT[0] = 1, RT[1] = 2, 3, RT[2] = 4
-      Node1: RT[0] = 0, RT[1] = 2, 3, RT[2] = 4
-      Node2: RT[0] = 3, RT[1] = 0, 1, RT[2] = 4
-      Node3: RT[0] = 2, RT[1] = 0, 1, RT[2] = 4
-      Node4: RT[2] = 0, 1, 2, 3 (depends on which ones responded first)
-After Node5 joins:
-      Node0: RT[0] = 1, RT[1] = 2, 3, RT[2] = 4, 5
-      Node1: RT[0] = 0, RT[1] = 2, 3, RT[2] = 4, 5
-      Node2: RT[0] = 3, RT[1] = 0, 1, RT[2] = 4, 5
-      Node3: RT[0] = 2, RT[1] = 0, 1, RT[2] = 4, 5
-      Node4: RT[0] = 5, RT[2] = 0, 1, 2, 3
-      Node5: RT[0] = 4, RT[2] = 0, 1, 2, 3 (which one responded first)
-After Node6 joins:
-      Node0: RT[0] = 1, RT[1] = 2, 3, RT[2] = 4, 5, 6
-      Node1: RT[0] = 0, RT[1] = 2, 3, RT[2] = 4, 5, 6
-      Node2: RT[0] = 3, RT[1] = 0, 1, RT[2] = 4, 5, 6
-      Node3: RT[0] = 2, RT[1] = 0, 1, RT[2] = 4, 5, 6
-      Node4: RT[0] = 5, RT[1] = 6, RT[2] = 0, 1, 2, 3
-      Node5: RT[0] = 4, RT[1] = 6, RT[2] = 0, 1, 2, 3
-      Node6: RT[1] = 2, 3, RT[2] = 0, 1, 2, 3 (which one responded first)
-After Node7 joins:
-      Node0: RT[0] = 1, RT[1] = 2, 3, RT[2] = 4, 5, 6, 7
-      Node1: RT[0] = 0, RT[1] = 2, 3, RT[2] = 4, 5, 6, 7
-      Node2: RT[0] = 3, RT[1] = 0, 1, RT[2] = 4, 5, 6, 7
-      Node3: RT[0] = 2, RT[1] = 0, 1, RT[2] = 4, 5, 6, 7
-      Node4: RT[0] = 5, RT[1] = 6, 7, RT[2] = 0, 1, 2, 3
-      Node5: RT[0] = 4, RT[1] = 6, 7, RT[2] = 0, 1, 2, 3
-      Node6: RT[0] = 7, RT[1] = 2, 3, RT[2] = 0, 1, 2, 3
-      Node7: RT[0] = 6, RT[1] = 3, 2, RT[2] = 0, 1, 2, 3 (which one 1st)
-
-      blah blah blah, that whole pattern thing continues
+     =. Suppose Node 5 sends the response after Node 0 times out the request.
+     	  -Node 0 drops the response because it doesn't match any request in the Timer Queue.
 
 
-
-
-
-
-
-
-KIMI Corner
+KIMI'S Corner
 
 =============================================
 Suppose as the UI we try to contact a Node,
@@ -207,8 +182,6 @@ Node B (ID = 4) uses Node A (ID = 3) as it's contact
 -Node B will refresh it's routing table since it got a response from Node A.
 
 Node B is now successfully in the network!
-
-
 *********************************************************
 
 =============================================
@@ -344,16 +317,21 @@ A node wants to join the network, and has a contact.
    If the K-bucket is not full, compare it to the distance of buckets 2^i-1 and 2^i+1. Go to the bucket
    with the closer distance until you have K nodes.
    Once it has K nodes (or as many as it can get) it will send the list back to JoinNode.
--ConNode will then place JoinNode in the right K-bucket.
+-ConNode will then place JoinNode in the right K-bucket of it's routing table.
 
--JoinNode will receive a list of the K closest nodes given it's ID. 
+-JoinNode will receive a list of the K closest nodes given it's ID.
+  JoinNode will continuously send FINDNODE request with JoinNode's ID,
+  It will keep track of every node it has queried
+  Eventually, either JoinNode will find itself, or there is nobody left to send
+  FINDNODE requests to.
+
+-JoinNode will stop sending requests and terminate the lookup since it has successfully joined the
+ network.
 
 
-
-
-
-
-
+====================================
+REFRESHER TEST CASES
+====================================
 
 
 
