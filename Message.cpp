@@ -190,7 +190,7 @@ void Message::parse (std::string message)
 	}
 	else
 	{
-		printf("Parsing error: unrecognized type in string %s", msg);
+		printf("Parsing error: unrecognized type in string %s", msg.c_str());
 	}
 
 	if(msgType == NONE)

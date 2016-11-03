@@ -50,11 +50,11 @@ void Node::handleKClosMsg(Message & msg, vector<MsgTimer>& timeOut,
     {
       curTimer = timeOut[index];
 
-      if (curTimer.getNodeID() == senderID) // If it is the same ID
-	{
-	  found = true;
-	  timeOut.erase(timeOut.begin() + index);
-	}
+      if (curTimer.getNodeIP() == senderIP) // If it is the same ID
+			{
+				found = true;
+				timeOut.erase(timeOut.begin() + index);
+			}
       index++;
 
     } //the sender node is now removed from the time out vector
@@ -127,24 +127,24 @@ Node::Node(uint32_t nodeID, uint32_t contactID, uint32_t contactIP) : RT(nodeID)
 
 	  if (msg.getMsgType() == KCLOSEST)
 	    {
-	      if (msg.getNodeID() == contactID){
-		recvContact = true;
-		
-		//ASSERT: contact node responds, but no one else in the network
-		Triple closestK[K];
-		int size = msg.getKClos(closestK);
+	      if (msg.getNodeID() == contactID)
+				{
+					recvContact = true;
+					
+					//ASSERT: contact node responds, but no one else in the network
+					Triple closestK[K];
+					int size = msg.getKClos(closestK);
 
-		if(size == 0){
-		  //ASSERT: nothing in the KClos, but recieved response so
-		  //        we are in the network. Just only 1 node in the
-		  //        network.
-		  inNetwork = true;
-		}else{
-		  handleKClosMsg(msg, timeOut, nodesToAsk, IP);
-		}
-	      }else{
-		handleKClosMsg(msg, timeOut, nodesToAsk, IP);
-	      }
+					if(size == 0){
+						//ASSERT: nothing in the KClos, but recieved response so
+						//        we are in the network. Just only 1 node in the
+						//        network.
+						inNetwork = true;
+					}
+							}
+
+					handleKClosMsg(msg, timeOut, nodesToAsk, IP);
+
 	    } //Done Dealing with a received message
 	}
       
@@ -780,7 +780,7 @@ void Node::sendUpToAlphaPing(KBucket &curKBucket, UDPSocket &socket, uint32_t & 
 	  if(j>=curKBucket.getNumTriples()) // Check if we have reached the end of the Kbucket
 	    {
 	      i++; // Go to next KBucket
-	      RT[i].copyKBucket(curKBucket);
+				curKBucket = RT[i];
 	      // Start at first element of the KBucket.
 	      j =0;
 	    }
