@@ -12,6 +12,9 @@
 #define MAINPORT 6666
 #define UIPORT 6667
 #define REFRESHERPORT 6668
+
+#define TPORT 6669
+
 #define NUMBITS 32
 #define ALPHA 3
 #define RESPONDTIME_UI 10 //in seconds, the time to wait before we consider a message timed out
