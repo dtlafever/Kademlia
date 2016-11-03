@@ -614,7 +614,7 @@ void Node::startUIListener() {
 			// Send Store Resp to UI
 						
 			Message UIansw (STORERESP, ID);
-			socketUI.sendMessage(UIansw.toString(), ipUI, UIPORT);
+			socketUI.sendMessage(UIansw.toString(), ipUI, TPORT);
 						
 		      }else{
 			//ASSERT: we are not done searching for kClos
