@@ -88,7 +88,7 @@ class RoutingTable {
 	
   //Pre: 0 <= index < NUMBITS
   //Post: RV = table[index]
-  KBucket operator [] (int index);
+  KBucket& operator [] (int index);
 	
 };
 

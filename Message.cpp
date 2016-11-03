@@ -47,10 +47,8 @@ void Message::parse (std::string message)
 	int index = -1;
 
 	msgType = NONE;
-	msg ="";
-	
-	if(msg == "")
-		Message::msg = message;
+
+	Message::msg = message;
 
 	// Getting the sender ID
 	index=message.find_first_of(" ");
@@ -67,6 +65,7 @@ void Message::parse (std::string message)
 	{
 		printf( "Error in message, nodeID of sender not found\n");
 	}
+	
 	index = -1;
 	index=message.find("UI");
 	if (index!= -1)
@@ -189,7 +188,10 @@ void Message::parse (std::string message)
 	{
 		msgType = STORERESP;
 	}
-
+	else
+	{
+		printf("Parsing error: unrecognized type in string %s", msg);
+	}
 
 	if(msgType == NONE)
 		msg = "";
