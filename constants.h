@@ -18,7 +18,7 @@
 #define RESPONDTIME_PING 1 // in seconds, the time before we consider that a PING request has timed out.
 #define DELAY_DURATION chrono::duration<int, std::milli> delay(RESPONDTIME)
 
-#define PINGTIME 36 //in seconds, the time to wait before
+#define PINGTIME 15 //in seconds, the time to wait before
 
 //pinging a node
 #define MAXRECV 500

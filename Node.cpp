@@ -455,14 +455,14 @@ void Node::startRefresher()
 				for ( i=0, j=0; i<timeouts[PINGER_TIMEOUT].size() || j<timeouts[REFRESH_TIMEOUT].size(); ++i, ++j)
 					{
 						// Checking if anything timed out and remove it.
-						if(timeouts[PINGER_TIMEOUT][i].timedOut())
+						if(i<timeouts[PINGER_TIMEOUT].size() && timeouts[PINGER_TIMEOUT][i].timedOut())
 							{
 								RT.deleteNode(timeouts[PINGER_TIMEOUT][i].getNodeID());
 								timeouts[PINGER_TIMEOUT].erase(timeouts[PINGER_TIMEOUT].begin()+i);
 								i--;
 							}
 
-						if (timeouts[REFRESH_TIMEOUT][j].timedOut())
+						if (j<timeouts[REFRESH_TIMEOUT].size() && timeouts[REFRESH_TIMEOUT][j].timedOut())
 							{
 								RT.deleteNode(timeouts[PINGER_TIMEOUT][i].getNodeID());
 								timeouts[REFRESH_TIMEOUT].erase(timeouts[REFRESH_TIMEOUT].begin()+j);
@@ -773,42 +773,44 @@ void Node::sendUpToAlphaKClos(SnapShot & ss, UDPSocket & sock, uint32_t msgID, M
 
 void Node::sendUpToAlphaPing(KBucket &curKBucket, UDPSocket &socket, uint32_t & i, uint32_t & j, MsgTimer & lastRefresh, bool & refresh)
 {
-  while (timeouts[REFRESH_TIMEOUT].size()<ALPHA)
+  while (timeouts[REFRESH_TIMEOUT].size()<ALPHA && refresh)
     {
-      if(j>=curKBucket.getNumTriples()) // Check if we have reached the end of the Kbucket
-	{
-	  if(j>=curKBucket.getNumTriples()) // Check if we have reached the end of the Kbucket
-	    {
-	      i++; // Go to next KBucket
-				curKBucket = RT[i];
-	      // Start at first element of the KBucket.
-	      j =0;
-	    }
+      while(j>=curKBucket.getNumTriples() && refresh) // Check if we have reached the end of the Kbucket
+			{
 
-	  if(i>= NUMBITS) // If we did all the KBuckets, reset
-	    {
-	      i=j=0; // Reset indices
+				if(i>= NUMBITS-1) // If we did all the KBuckets, reset
+				{
+					i=0; // Reset indices
+					
+					// seet last refresh timepoint to Now
+					lastRefresh.resetTimer();
+					refresh = false;
+				}
+				else
+				{
+					i++; // Go to next KBucket
+					curKBucket = RT[i];
+					// Start at first element of the KBucket.
+					j =0;
+				}
+			}
 
-	      // seet last refresh timepoint to Now
-	      lastRefresh.resetTimer();
-	      refresh = false;
-	    }
+			if(refresh)
+			{
+				// get next element in curKBucket and increment j
+				Triple curTriple = curKBucket[j++];
 
-	  // get next element in curKBucket and increment j
-	  Triple curTriple = curKBucket[j++];
+				if( curTriple.node != ID)
+					{
+						// Send PING
+						Message pingr(PING, ID);
+						socket.sendMessage (pingr.toString(), curTriple.address, REFRESHERPORT);
 
-	  if( curTriple.node != ID)
-	    {
-	      // Send PING
-	      Message pingr(PING, ID);
-	      socket.sendMessage (pingr.toString(), curTriple.address, REFRESHERPORT);
+						// Updating timeouts
+						MsgTimer timer (RESPONDTIME_PING, curTriple.node, curTriple.address);
+						timeouts[REFRESH_TIMEOUT].push_back(timer);
+					}
+			}
 
-	      // Updating timeouts
-	      MsgTimer timer (RESPONDTIME_PING, curTriple.node, curTriple.address);
-	      timeouts[REFRESH_TIMEOUT].push_back(timer);
-	    }
-
-	}
-    }
-
+		}
 }
