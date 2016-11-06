@@ -244,7 +244,8 @@ void Node::startListener(){
 	  senderIP = socket.getRemoteIP();
 	  senderID = receivedMessageOBJ.getNodeID();
 	  Triple sendTriple (senderIP, senderID, MAINPORT);
-			
+		
+		printf("%s from %u\n", receiveString.c_str(), senderIP);
 	  uint32_t aKey;
 	  //ASSERT: to be extracted from each message.
 			
@@ -466,7 +467,7 @@ void Node::startRefresher()
 				timeouts[PINGER_TIMEOUT].push_back(timer);
 				
 			}
-			refresherVector.erase(refresherVector.begin()); // Remove from the vector, the node was refreshed
+			else refresherVector.erase(refresherVector.begin()); // Remove from the vector, the node was refreshed
 		}
 		
 		/// Check PING timeouts
