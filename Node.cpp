@@ -648,7 +648,7 @@ void Node::startUIListener() {
 						//ASSERT: we have found the K closest and no value,
 						//        send UI that wouldn't couldnt find it.
 						Message sendMsg(FVRESPN, ID);
-						socketUI.sendMessage(sendMsg.toString(), ipUI, UIPORT);
+						socketUI.sendMessage(sendMsg.toString(), ipUI, TPORT);
 					}
 					else {
 						//ASSERT: we are not done searching for kClos

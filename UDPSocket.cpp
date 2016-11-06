@@ -1,22 +1,24 @@
 #include "UDPSocket.h"
 #include "SocketException.h"
 #include "constants.h"
+#include <unistd.h>
 
 //PRE: the port we want to listen
 //POST: creates the socket and binds to the specified port.
 //      throws error if could not create or bind
 UDPSocket::UDPSocket(uint32_t port, std::string fileName)
 {
+  gethostname(hostName, MAX_CHAR);
   fN = fileName;
   fileLog.open(fileName, std::ofstream::out | std::ofstream::app);
   fileLog << "--------START NETWORK--------" << std::endl;
   if (!Socket::create(UDP)) {
-    fileLog << "Could not create server socket." << std::endl;
+    fileLog << hostName << ": Could not create server socket." << std::endl;
     throw SocketException("Could not create server socket.");
   }
   
   if (!Socket::bind(port)) {
-    fileLog << "Could not bind port.\n" << std::endl;
+    fileLog << hostName << ": Could not bind port.\n" << std::endl;
     throw SocketException("Could not bind port.");
   }
   
@@ -34,12 +36,12 @@ UDPSocket::~UDPSocket()
 void UDPSocket::open(uint32_t port) {
   Socket::close();
   if (!Socket::create(UDP)) {    
-    fileLog << "Could not create server socket." << std::endl;
+    fileLog << hostName << ": Could not create server socket." << std::endl;
     throw SocketException("Could not create server socket.");
   }
   
   if (!Socket::bind(port)) {
-    fileLog << "Could not bind port." << std::endl;
+    fileLog << hostName << ": Could not bind port." << std::endl;
     throw SocketException("Could not bind port.");
   }
 }
@@ -50,11 +52,11 @@ void UDPSocket::open(uint32_t port) {
 void UDPSocket::sendMessage(const std::string s, const std::string host,
 						const uint32_t port) {
   if (!Socket::sendTo(s, host, port)) {
-    fileLog << "Could not send message '" << s << "'." << std::endl;
+    fileLog << hostName << ": Could not send message '" << s << "'." << std::endl;
     throw SocketException("Could not send message.");
   }
   else {
-    fileLog << "Sent Message '" << s << "'." << std::endl;
+    fileLog << hostName << ": Sent Message '" << s << "'." << std::endl;
   }
 }
 
@@ -64,11 +66,11 @@ void UDPSocket::sendMessage(const std::string s, const std::string host,
 void UDPSocket::sendMessage(const std::string s, const uint32_t host,
 	const uint32_t port) {
 	if (!Socket::sendTo(s, host, port)) {
-	  fileLog << "Could not send message '" << s << "'." << std::endl;
+	  fileLog << hostName << ": Could not send message '" << s << "'." << std::endl;
 	  throw SocketException("Could not send message.");
 	}
 	else {
-	  fileLog << "Sent Message '" << s << " "<< host <<"'." << std::endl;
+	  fileLog << hostName << ": Sent Message '" << s << " "<< host <<"'." << std::endl;
 	}
 }
 
@@ -78,7 +80,7 @@ void UDPSocket::sendMessage(const std::string s, const uint32_t host,
 int UDPSocket::recvMessage(std::string& s) {
   int length = Socket::recvFrom(s);
   if (length > 0) {
-    fileLog << "Recieved Message '" << s << "'." << std::endl;
+    fileLog << hostName << ": Recieved Message '" << s << "'." << std::endl;
   }
   
   return (length);

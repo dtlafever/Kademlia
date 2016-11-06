@@ -5,6 +5,8 @@
 #include <fstream>
 #include <string>
 
+#define MAX_CHAR 50
+
 class UDPSocket : private Socket {
  public:
   //PRE: the port we want to listen
@@ -50,6 +52,7 @@ class UDPSocket : private Socket {
  private:
   std::ofstream fileLog;
   std::string fN;
+  char hostName[MAX_CHAR];
 };
 
 #endif // !UDPSocket_class
