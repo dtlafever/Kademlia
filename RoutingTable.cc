@@ -103,7 +103,6 @@ KBucket& RoutingTable::operator [] (int index) {
 bool RoutingTable::addNode(uint32_t node, uint32_t address) {
   int nthBucket = findKBucket(node);
   KBucket* currBucket = &(table[nthBucket]);
-  Triple* currTriple = currBucket->getHead();
   bool added = false;
   Triple* newTriple = createTriple(node, address);
 

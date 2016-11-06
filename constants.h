@@ -15,7 +15,7 @@
 
 #define TPORT 6669
 
-#define NUMBITS 32
+#define NUMBITS 2
 #define ALPHA 3
 #define RESPONDTIME_UI 10 //in seconds, the time to wait before we consider a message timed out
 #define RESPONDTIME_PING 1 // in seconds, the time before we consider that a PING request has timed out.

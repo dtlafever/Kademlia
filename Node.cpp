@@ -464,7 +464,7 @@ void Node::startRefresher()
 
 						if (j<timeouts[REFRESH_TIMEOUT].size() && timeouts[REFRESH_TIMEOUT][j].timedOut())
 							{
-								RT.deleteNode(timeouts[PINGER_TIMEOUT][i].getNodeID());
+								RT.deleteNode(timeouts[REFRESH_TIMEOUT][i].getNodeID());
 								timeouts[REFRESH_TIMEOUT].erase(timeouts[REFRESH_TIMEOUT].begin()+j);
 								j--;
 							}
