@@ -14,7 +14,6 @@
 #define JOIN_NETWORK 4
 
 #define CONFIG_FILE "CONFIG"
-#define MAX_CHAR 80
 #define NUM_VARS 3
 
 //Pre: argc = 2 or 4, if 4 then argv[2], argv[3] represents an existing node

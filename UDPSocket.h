@@ -5,7 +5,7 @@
 #include <fstream>
 #include <string>
 
-#define MAX_CHAR 50
+#define MAX_CHAR 80
 
 class UDPSocket : private Socket {
  public:
