@@ -18,10 +18,10 @@
 #define NUMBITS 4
 #define ALPHA 3
 #define RESPONDTIME_UI 10 //in seconds, the time to wait before we consider a message timed out
-#define RESPONDTIME_PING 1 // in seconds, the time before we consider that a PING request has timed out.
+#define RESPONDTIME_PING 10 // in seconds, the time before we consider that a PING request has timed out.
 #define DELAY_DURATION chrono::duration<int, std::milli> delay(RESPONDTIME)
 
-#define PINGTIME 60 //in seconds, the time to wait before refreshing the routing table
+#define PINGTIME 300 //in seconds, the time to wait before refreshing the routing table
 
 //pinging a node
 #define MAXRECV 500
