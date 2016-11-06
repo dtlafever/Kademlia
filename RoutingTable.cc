@@ -90,9 +90,8 @@ uint32_t RoutingTable::findDist(uint32_t id1, uint32_t id2) {
 
 //Pre: 0 <= index < NUMBITS
 //Post: RV =  a deep copy of table[index]
-KBucket RoutingTable::operator [] (int index) {
-  KBucket copy = table[index];
-  return (copy);
+KBucket& RoutingTable::operator [] (int index) {
+  return table[index];
 }
 
 //-----------------------Modifying Table-----------------------------------
@@ -107,18 +106,14 @@ bool RoutingTable::addNode(uint32_t node, uint32_t address) {
   Triple* currTriple = currBucket->getHead();
   bool added = false;
   Triple* newTriple = createTriple(node, address);
-  if (currBucket->getNumTriples() == K) {  //the bucket is full
-    //printf("Rout addNode: bucketOverFlow \n");
-		log(nthBucket, *currTriple);
-    currBucket->deleteNode(currTriple->node);
 
-  }
-  else {
-    //printf("Rout addNode: bucket not full \n");
-		log(nthBucket, *newTriple, true);
+  if(currBucket->getNumTriples() < K){
+    //ASSERT: the bucket is not full, add to it
+    log(nthBucket, *newTriple, true);
     currBucket->addNode(newTriple);
     added = true;
   }
+
   return (added);
 }
 
@@ -142,8 +137,7 @@ bool RoutingTable::updateTable(uint32_t nodeID, uint32_t address) {
     success = true;
   }
   else {
-		log(nthBucket, Triple(address, nodeID, UIPORT));
-    success = addNode(nodeID, address);
+	    success = addNode(nodeID, address);
   }
   return (success);
 }

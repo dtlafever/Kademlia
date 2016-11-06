@@ -11,6 +11,7 @@
 
 using namespace std;
 
+#define NODE_TIMEOUT 16000
 
 //default constructor
 //PRE: Main.cc is running
@@ -27,7 +28,7 @@ UserInterface::UserInterface(){
 void UserInterface::runUI(){
 
   int recNum;
-  UDPSocket UIsocket(UIPORT, "UI.log");
+  UDPSocket UIsocket(TPORT, "UI.log");
   
   string newMessage;
   string receivedMessage;
@@ -218,7 +219,7 @@ void UserInterface::handleMessage(string newMsg){
 bool UserInterface::checkTimeout(){
   bool timedOut = false;
   
-  chrono::duration<int, milli> respondTime(8000);
+  chrono::duration<int, milli> respondTime(NODE_TIMEOUT);
   chrono::system_clock::time_point timeOut = timeStamp + respondTime;
   if(chrono::system_clock::now() < timeOut){
     timedOut = false;

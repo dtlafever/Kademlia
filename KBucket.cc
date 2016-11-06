@@ -170,10 +170,10 @@ void KBucket::getKClosestNodes(uint32_t target, Triple* nodeHolder, int& size) {
     while ((!found) and (insertDex < size)) {
       uint32_t compareDist = findDist(target, nodeHolder[insertDex].node);
       if (currDist > compareDist) {
-	insertDex++;
+					insertDex++;
       }
       else {
-	found = true; //currDist is bigger than the preivous compareDist
+				found = true; //currDist is bigger than the preivous compareDist
       }
     }
     if ((insertDex < K) and (!found)) {
@@ -226,7 +226,7 @@ void KBucket::deleteNode(uint32_t nodeID) {
   lockBucket();
   int index = 0;
   bool found = false;
-  Triple* toDie;
+  Triple* toDie= NULL;
   while (!found) {
     toDie = bucket[index];
     if (nodeID == toDie->node) {
@@ -273,21 +273,3 @@ void KBucket::operator= (KBucket& otherBucket) {
   otherBucket.unlockBucket();
 }
 
-
-void KBucket::copyKBucket(KBucket &otherBucket)
-{
-	lockBucket();
-	otherBucket.lockBucket();
-	numTriples = otherBucket.numTriples;
-	for (int index = 0; (index < numTriples); index++) {
-		Triple* tripleCopy = new Triple;
-		Triple original = otherBucket[index];
-		tripleCopy->node = original.node;
-		tripleCopy->address = original.address;
-		tripleCopy->port = original.port;
-		bucket[index] = tripleCopy;
-	}
-	unlockBucket();
-	otherBucket.unlockBucket();
-
-}
