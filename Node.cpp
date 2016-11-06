@@ -454,12 +454,15 @@ void Node::startRefresher()
 			// try to update in table then ping if necessary
 			if ((refresherVector[0].node != ID)&&!RT.updateTable(refresherVector[0].node, refresherVector[0].address))
 			{
+				// Get LRU node
+				Triple tripleToRefresh = RT.getOldestNode(refresherVector[0].node);
+				
 				// PING
 				Message msg(PING, ID);
-				socket.sendMessage(msg.toString(), refresherVector[0].address, REFRESHERPORT);
+				socket.sendMessage(msg.toString(), tripleToRefresh.address, REFRESHERPORT);
 				
 				// Add to the timeouts
-				MsgTimer timer(RESPONDTIME_PING, refresherVector[0].node, refresherVector[0].address);
+				MsgTimer timer(RESPONDTIME_PING, tripleToRefresh.node, tripleToRefresh.address);
 				timeouts[PINGER_TIMEOUT].push_back(timer);
 				
 			}
@@ -648,7 +651,7 @@ void Node::startUIListener() {
 						//ASSERT: we have found the K closest and no value,
 						//        send UI that wouldn't couldnt find it.
 						Message sendMsg(FVRESPN, ID);
-						socketUI.sendMessage(sendMsg.toString(), ipUI, UIPORT);
+						socketUI.sendMessage(sendMsg.toString(), ipUI, TPORT);
 					}
 					else {
 						//ASSERT: we are not done searching for kClos
