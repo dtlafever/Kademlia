@@ -103,9 +103,9 @@ void Node::clearTimeOut(vector<MsgTimer>& timer)
 //      inNetwork = true if FindNode on ourselves succeds, false otherwise
 Node::Node(uint32_t nodeID, uint32_t contactID, uint32_t contactIP) : RT(nodeID)
 {
-	if(nodeID > pow(2, NUMBITS))
+	if(contactID >= pow(2, NUMBITS))
 	{
-		printf("Invalid ID : %u \n", nodeID);
+		printf("Invalid ID : %u \n", contactID);
 		inNetwork = false;
 	}
 	else
