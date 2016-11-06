@@ -170,10 +170,10 @@ void KBucket::getKClosestNodes(uint32_t target, Triple* nodeHolder, int& size) {
     while ((!found) and (insertDex < size)) {
       uint32_t compareDist = findDist(target, nodeHolder[insertDex].node);
       if (currDist > compareDist) {
-	insertDex++;
+					insertDex++;
       }
       else {
-	found = true; //currDist is bigger than the preivous compareDist
+				found = true; //currDist is bigger than the preivous compareDist
       }
     }
     if ((insertDex < K) and (!found)) {

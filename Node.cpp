@@ -341,115 +341,115 @@ void Node::startRefresher()
 			
       /// Check and Handle new message
       if (socket.recvMessage(incoming) != -1) // if it returns 0 then no message was received
-	{
-	  IP=socket.getRemoteIP();
-	  printf("%s from %u\n", incoming.c_str(), IP);
-	  msg.parse(incoming);
+			{
+				IP=socket.getRemoteIP();
+				printf("%s from %u\n", incoming.c_str(), IP);
+				msg.parse(incoming);
 
-	  switch(msg.getMsgType())
-	    {
-	    case PING: // We are receiving a ping request
-	      {
-		Message pingr(PINGRESP, this->ID);
-		socket.sendMessage (pingr.toString(), IP, REFRESHERPORT);
-	      }
-	      break;
+				switch(msg.getMsgType())
+					{
+					case PING: // We are receiving a ping request
+						{
+				Message pingr(PINGRESP, this->ID);
+				socket.sendMessage (pingr.toString(), IP, REFRESHERPORT);
+						}
+						break;
 
-	    case PINGRESP:
-	      {
-		//check timeouts & clear timeouts using IP.
-		// Is there a case where we could have pinged the same IP more than once and have more than one timeout corresponding
-		// We update the older one (the one at the beginning of the vector
+					case PINGRESP:
+						{
+				//check timeouts & clear timeouts using IP.
+				// Is there a case where we could have pinged the same IP more than once and have more than one timeout corresponding
+				// We update the older one (the one at the beginning of the vector
 
-		bool found = false;
+				bool found = false;
 
-		// Check in timeouts for other threads & refresher
-		int m, n;
-		for (m =0, n=0; (m<timeouts[PINGER_TIMEOUT].size() || n<timeouts[REFRESH_TIMEOUT].size()) && !found; ++m, ++n)
-		  {
-		    // Checking in other threads timeouts
-		    if(m<timeouts[PINGER_TIMEOUT].size() && timeouts[PINGER_TIMEOUT][m].getNodeIP() == IP) // If we found a timeout with the same IP
-		      {
-			// erase element in vector
-			timeouts[PINGER_TIMEOUT].erase(timeouts[PINGER_TIMEOUT].begin()+m);
-			found = true; // Update flag
-			m--;
-		      }
+				// Check in timeouts for other threads & refresher
+				int m, n;
+				for (m =0, n=0; (m<timeouts[PINGER_TIMEOUT].size() || n<timeouts[REFRESH_TIMEOUT].size()) && !found; ++m, ++n)
+					{
+						// Checking in other threads timeouts
+						if(m<timeouts[PINGER_TIMEOUT].size() && timeouts[PINGER_TIMEOUT][m].getNodeIP() == IP) // If we found a timeout with the same IP
+							{
+					// erase element in vector
+					timeouts[PINGER_TIMEOUT].erase(timeouts[PINGER_TIMEOUT].begin()+m);
+					found = true; // Update flag
+					m--;
+							}
 
-		    // Checking in timeouts for refresher
-		    if(!found && n<timeouts[REFRESH_TIMEOUT].size() && timeouts[REFRESH_TIMEOUT][n].getNodeIP() == IP) // If we found a timeout with the same IP
-		      {
-			// erase element in vector
-			timeouts[REFRESH_TIMEOUT].erase(timeouts[REFRESH_TIMEOUT].begin()+n);
-			found = true; // Update flag
-			n--;
-		      }
+						// Checking in timeouts for refresher
+						if(!found && n<timeouts[REFRESH_TIMEOUT].size() && timeouts[REFRESH_TIMEOUT][n].getNodeIP() == IP) // If we found a timeout with the same IP
+							{
+					// erase element in vector
+					timeouts[REFRESH_TIMEOUT].erase(timeouts[REFRESH_TIMEOUT].begin()+n);
+					found = true; // Update flag
+					n--;
+							}
 
-		    //Refreshing nodes in updateTable if possible
-		    if(msg.getNodeID() != ID)
-		      RT.updateTable(msg.getNodeID(), IP);
-		  }
+						//Refreshing nodes in updateTable if possible
+						if(msg.getNodeID() != ID)
+							RT.updateTable(msg.getNodeID(), IP);
+					}
 
-		if(!found)
-		  {
-		    if( msg.getNodeID() != ID)
-		      RT.updateTable(msg.getNodeID(),IP);
-		  }
-	      }
-	      break;
+				if(!found)
+					{
+						if( msg.getNodeID() != ID)
+							RT.updateTable(msg.getNodeID(),IP);
+					}
+						}
+						break;
 
-	    default:
-	      printf("Unrecognized message received: %s\n", incoming.c_str());
-	      break;
-	    }
-	}
-			
-			
-      /// Currently refreshing the routingTable
-      if(refresh)
-	{
-	  // check if we can send more PINGs
-	  if(timeouts[REFRESH_TIMEOUT].size()<ALPHA)
-	    // send more messages such that a max of alpha are sent.
-	    sendUpToAlphaPing(curKBucket, socket, i, j, lastRefresh, refresh);
+					default:
+						printf("Unrecognized message received: %s\n", incoming.c_str());
+						break;
+					}
+			}
+					
+					
+			/// Currently refreshing the routingTable
+			if(refresh)
+			{
+				// check if we can send more PINGs
+				if(timeouts[REFRESH_TIMEOUT].size()<ALPHA)
+					// send more messages such that a max of alpha are sent.
+					sendUpToAlphaPing(curKBucket, socket, i, j, lastRefresh, refresh);
 
-	}
+			}
 
-      /// Check if we are currently refreshing and if it is time to refresh
-      if(!refresh && lastRefresh.timedOut())
-	{
-	  refresh = true; // start refreshing
-	  i=j=0; // reset indices
+			/// Check if we are currently refreshing and if it is time to refresh
+			if(!refresh && lastRefresh.timedOut())
+			{
+				refresh = true; // start refreshing
+				i=j=0; // reset indices
 
-	  // Retrieve the first KBucket
-	  ///TODO: check this again
-	  curKBucket = RT[i];
+				// Retrieve the first KBucket
+				///TODO: check this again
+				curKBucket = RT[i];
 
-	  // Send the first alpha messages
-	  sendUpToAlphaPing(curKBucket, socket, i, j, lastRefresh, refresh);
+				// Send the first alpha messages
+				sendUpToAlphaPing(curKBucket, socket, i, j, lastRefresh, refresh);
 
-	}
+			}
 
-      /// Update elements in the refreshor vector
-      for (int i=0; refresherVector.size()>0 && i<ALPHA; ++i)
-	{
-	  // try to update in table then ping if necessary
-	  if ((refresherVector[0].node != ID)&&!RT.updateTable(refresherVector[0].node, refresherVector[0].address))
-	    {
-	      // PING
-	      Message msg(PING, ID);
-	      socket.sendMessage(msg.toString(), refresherVector[0].address, REFRESHERPORT);
+			/// Update elements in the refreshor vector
+			for (int i=0; refresherVector.size()>0 && i<ALPHA; ++i)
+			{
+					// try to update in table then ping if necessary
+					if ((refresherVector[0].node != ID)&&!RT.updateTable(refresherVector[0].node, refresherVector[0].address))
+						{
+							// PING
+							Message msg(PING, ID);
+							socket.sendMessage(msg.toString(), refresherVector[0].address, REFRESHERPORT);
 
-	      // Add to the timeouts
-	      MsgTimer timer(RESPONDTIME_PING, refresherVector[0].node, refresherVector[0].address);
-	      timeouts[PINGER_TIMEOUT].push_back(timer);
+							// Add to the timeouts
+							MsgTimer timer(RESPONDTIME_PING, refresherVector[0].node, refresherVector[0].address);
+							timeouts[PINGER_TIMEOUT].push_back(timer);
 
-	    }
-	  refresherVector.erase(refresherVector.begin()); // Remove from the vector, the node was refreshed
-	}
+						}
+					refresherVector.erase(refresherVector.begin()); // Remove from the vector, the node was refreshed
+			}
 
-      /// Check PING timeouts
-      {
+			/// Check PING timeouts
+			{
 				int i=0, j=0;
 				// Check in timeouts for other threads & refresher
 				for ( i=0, j=0; i<timeouts[PINGER_TIMEOUT].size() || j<timeouts[REFRESH_TIMEOUT].size(); ++i, ++j)
@@ -469,6 +469,7 @@ void Node::startRefresher()
 								j--;
 							}
 					}
+				// End of ping timeouts
 			}
 			
       // End of While Loop
@@ -502,7 +503,7 @@ void Node::startUIListener() {
       //Listening on UI socket
       recvlenUI = socketUI.recvMessage(strUI);
       if (recvlenUI > 0)
-	{
+			{
 	  
 	  //Update the ip for the UI
 		
@@ -723,8 +724,12 @@ void Node::startUIListener() {
 		      }
 		  }
 	      }
+				// End of timeouts loop
 	    }
+		
 	}
+			
+			// End of while loop
     }
 }
 //PRE: a node ID we want to remove from the list
