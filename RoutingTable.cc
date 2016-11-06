@@ -107,7 +107,7 @@ bool RoutingTable::addNode(uint32_t node, uint32_t address) {
   bool added = false;
   Triple* newTriple = createTriple(node, address);
 
-  if(curBucket->getNumTriples() < K){
+  if(currBucket->getNumTriples() < K){
     //ASSERT: the bucket is not full, add to it
     log(nthBucket, *newTriple, true);
     currBucket->addNode(newTriple);
