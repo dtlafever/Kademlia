@@ -244,7 +244,8 @@ void Node::startListener(){
 	  senderIP = socket.getRemoteIP();
 	  senderID = receivedMessageOBJ.getNodeID();
 	  Triple sendTriple (senderIP, senderID, MAINPORT);
-			
+		
+		printf("%s from %u\n", receiveString.c_str(), senderIP);
 	  uint32_t aKey;
 	  //ASSERT: to be extracted from each message.
 			
@@ -454,16 +455,19 @@ void Node::startRefresher()
 			// try to update in table then ping if necessary
 			if ((refresherVector[0].node != ID)&&!RT.updateTable(refresherVector[0].node, refresherVector[0].address))
 			{
+				// Get LRU node
+				Triple tripleToRefresh = RT.getOldestNode(refresherVector[0].node);
+				
 				// PING
 				Message msg(PING, ID);
-				socket.sendMessage(msg.toString(), refresherVector[0].address, REFRESHERPORT);
+				socket.sendMessage(msg.toString(), tripleToRefresh.address, REFRESHERPORT);
 				
 				// Add to the timeouts
-				MsgTimer timer(RESPONDTIME_PING, refresherVector[0].node, refresherVector[0].address);
+				MsgTimer timer(RESPONDTIME_PING, tripleToRefresh.node, tripleToRefresh.address);
 				timeouts[PINGER_TIMEOUT].push_back(timer);
 				
 			}
-			refresherVector.erase(refresherVector.begin()); // Remove from the vector, the node was refreshed
+			else refresherVector.erase(refresherVector.begin()); // Remove from the vector, the node was refreshed
 		}
 		
 		/// Check PING timeouts
