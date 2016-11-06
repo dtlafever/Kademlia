@@ -8,14 +8,14 @@
 #define DEBUG true
 
 #define MAXTHREADS 15 //maximum number of threads
-#define K 5
+#define K 2
 #define MAINPORT 6666
 #define UIPORT 6667
 #define REFRESHERPORT 6668
 
 #define TPORT 6669
 
-#define NUMBITS 2
+#define NUMBITS 4
 #define ALPHA 3
 #define RESPONDTIME_UI 10 //in seconds, the time to wait before we consider a message timed out
 #define RESPONDTIME_PING 1 // in seconds, the time before we consider that a PING request has timed out.
