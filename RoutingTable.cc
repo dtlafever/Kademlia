@@ -106,18 +106,26 @@ bool RoutingTable::addNode(uint32_t node, uint32_t address) {
   Triple* currTriple = currBucket->getHead();
   bool added = false;
   Triple* newTriple = createTriple(node, address);
-  if (currBucket->getNumTriples() == K) {  //the bucket is full
-    //printf("Rout addNode: bucketOverFlow \n");
-		log(nthBucket, *currTriple);
-    currBucket->deleteNode(currTriple->node);
+  // if (currBucket->getNumTriples() == K) {  //the bucket is full
+  //   //printf("Rout addNode: bucketOverFlow \n");
+	// 	log(nthBucket, *currTriple);
+  //   currBucket->deleteNode(currTriple->node);
 
-  }
-  else {
-    //printf("Rout addNode: bucket not full \n");
-		log(nthBucket, *newTriple, true);
+  // }
+  // else {
+  //   //printf("Rout addNode: bucket not full \n");
+	// 	log(nthBucket, *newTriple, true);
+  //   currBucket->addNode(newTriple);
+  //   added = true;
+  // }
+
+  if(curBucket->getNumTriples() < K){
+    //ASSERT: the bucket is not full, add to it
+    log(nthBucket, *newTriple, true);
     currBucket->addNode(newTriple);
     added = true;
   }
+
   return (added);
 }
 
