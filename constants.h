@@ -12,13 +12,16 @@
 #define MAINPORT 6666
 #define UIPORT 6667
 #define REFRESHERPORT 6668
+
+#define TPORT 6669
+
 #define NUMBITS 32
 #define ALPHA 3
 #define RESPONDTIME_UI 10 //in seconds, the time to wait before we consider a message timed out
 #define RESPONDTIME_PING 1 // in seconds, the time before we consider that a PING request has timed out.
 #define DELAY_DURATION chrono::duration<int, std::milli> delay(RESPONDTIME)
 
-#define PINGTIME 3600 //in seconds, the time to wait before
+#define PINGTIME 15 //in seconds, the time to wait before
 
 //pinging a node
 #define MAXRECV 500

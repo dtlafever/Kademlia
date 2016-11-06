@@ -226,7 +226,7 @@ void KBucket::deleteNode(uint32_t nodeID) {
   lockBucket();
   int index = 0;
   bool found = false;
-  Triple* toDie;
+  Triple* toDie= NULL;
   while (!found) {
     toDie = bucket[index];
     if (nodeID == toDie->node) {
@@ -273,21 +273,3 @@ void KBucket::operator= (KBucket& otherBucket) {
   otherBucket.unlockBucket();
 }
 
-
-void KBucket::copyKBucket(KBucket &otherBucket)
-{
-	lockBucket();
-	otherBucket.lockBucket();
-	numTriples = otherBucket.numTriples;
-	for (int index = 0; (index < numTriples); index++) {
-		Triple* tripleCopy = new Triple;
-		Triple original = otherBucket[index];
-		tripleCopy->node = original.node;
-		tripleCopy->address = original.address;
-		tripleCopy->port = original.port;
-		bucket[index] = tripleCopy;
-	}
-	unlockBucket();
-	otherBucket.unlockBucket();
-
-}

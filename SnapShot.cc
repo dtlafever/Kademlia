@@ -18,8 +18,18 @@ uint32_t SnapShot::getSize() const {
 	return size;
 }
 
+Quint SnapShot::getElementQuint(int i) const {
+  return closest[i];
+}
+
 uint32_t SnapShot::getElementIP(int i) const {
-	return closest[i].node;
+	return closest[i].address;
+}
+
+//PRE:
+//POST: returns the compareID
+uint32_t SnapShot::getCompareID(){
+  return compareID;
 }
 
 //PRE: the nodeID we want to set our member data compareID
@@ -31,33 +41,67 @@ void SnapShot::setCompareID(uint32_t nodeID) {
 	}
 }
 
+//PRE: 
+//POST: returns the creatorID
+uint32_t SnapShot::getCreatorID(){
+  return creatorID;
+}
+
+//PRE: the nodeID we want to change to 
+//POST: changes the creatorID to equal nodeID
+void SnapShot::setCreatorID(uint32_t nodeID){
+  creatorID = nodeID;
+}
+
 //DEFAULT CONSTRUCTOR
 SnapShot::SnapShot() {
 	compareID = 0;
+  creatorID = 0;
 	size = 0;
 }
 
 //COPY CONSTRUCTOR
+//TODO: still broken
 SnapShot::SnapShot(SnapShot & ss) {
-	size = ss.getSize();
+  creatorID = ss.getCreatorID();
+  compareID = ss.getCompareID();
+  size = ss.getSize();
+  //for (int i=0; i < ss.getSize(); i++){
+    //copyQuint(closest[i], ss.getElementQuint(i));
+  //}
 }
 
 //PRE: an array of triples up to nodeSize.
 //     We are assuming the nodes array is sorted
 //POST: Triples from node placed into pair array
-SnapShot::SnapShot(Triple nodes[], uint32_t nodesSize, uint32_t nodeID){
+SnapShot::SnapShot(Triple nodes[], uint32_t nodesSize, uint32_t nodeID, uint32_t creatorNodeID){
 	compareID = nodeID;
+  creatorID = creatorNodeID;
   for(int i = 0; i < nodesSize; i++){
     copyQuintFromTriple(closest[i], nodes[i]);
-    closest[i].queried = false;
+    if(nodes[i].node == creatorID){
+      closest[i].queried = true;
+    }else{
+      closest[i].queried = false;
+    }
     closest[i].compareID = nodeID;
     size++;
   }
 }
 
-SnapShot::SnapShot(uint32_t nodeID) {
-	compareID = nodeID;
-	size = 0;
+//PRE: the nodeID we want to set our member data creatorID
+//POST: changes the creatorID
+SnapShot::SnapShot(uint32_t creatorNodeID){
+  creatorID = creatorNodeID;
+  size = 0;
+}
+
+//PRE: takes a creatorID and compareID to change our member data
+//POST: changes the quint.compareID to nodeID and creatorID
+SnapShot::SnapShot(uint32_t compareNodeID, uint32_t creatorNodeID){
+  creatorID = creatorNodeID;
+  compareID = compareNodeID;
+  size = 0;
 }
 
 //PRE: a k closest array already in closest to least closest order,
@@ -70,7 +114,11 @@ void SnapShot::addClosest(Triple * kClos, uint32_t kClosSize){
   //        we don't have k closest yet in the snapshot
   while ((size < K) && (curKClosIndex < kClosSize)) {
     copyQuintFromTriple(closest[size], kClos[curKClosIndex]);
-    closest[size].queried = false;
+    if(kClos[curKClosIndex].node == creatorID){
+      closest[size].queried = true;
+    }else{
+      closest[size].queried = false;
+    }
 	closest[size].compareID = compareID;
     size++;
     curKClosIndex++;
@@ -87,7 +135,11 @@ void SnapShot::addClosest(Triple * kClos, uint32_t kClosSize){
       //ASSERT: change last item to our new one and re sort
       
       copyQuintFromTriple(closest[size - 1], kClos[curKClosIndex]);
-      closest[size - 1].queried = false;
+      if(kClos[curKClosIndex].node == creatorID){
+        closest[size - 1].queried = true;
+      }else{
+        closest[size - 1].queried = false;
+      }
 			closest[size - 1].compareID = compareID;
       sort(closest, closest + size, sortByDistance);
     }

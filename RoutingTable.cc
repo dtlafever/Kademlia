@@ -90,9 +90,8 @@ uint32_t RoutingTable::findDist(uint32_t id1, uint32_t id2) {
 
 //Pre: 0 <= index < NUMBITS
 //Post: RV =  a deep copy of table[index]
-KBucket RoutingTable::operator [] (int index) {
-  KBucket copy = table[index];
-  return (copy);
+KBucket& RoutingTable::operator [] (int index) {
+  return table[index];
 }
 
 //-----------------------Modifying Table-----------------------------------

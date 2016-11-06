@@ -16,6 +16,8 @@ int main() {
   t2.port = 6667;
   t2.node = -32;
 
+  Triple dummy;
+
   bool added = false;
 
   JoinNetworkQueue j(t);
@@ -23,11 +25,13 @@ int main() {
   cerr << "added: " << added << endl;
   added = j.add(t);
   cerr << "added again: " << added << endl;
-  cerr << j.hasNext() << endl;
-  cerr << j.getNext().node << endl;
-  cerr << j.hasNext() << endl;
-  cerr << j.getNext().node << endl;
-  cerr << j.hasNext() << endl;
+  cerr << "hasNext1: " << j.hasNext() << endl;
+  j.getNext(dummy);
+  cerr << "dummy1: " << dummy.node << endl;
+  cerr << "hasNext2: " << j.hasNext() << endl;
+  j.getNext(dummy);
+  cerr << "dummy2: " << (int)dummy.node << endl;
+  cerr << "hasNext3: " << j.hasNext() << endl;
   added = j.add(t2);
   cerr << "final addition: " << added << endl;
   return 0;

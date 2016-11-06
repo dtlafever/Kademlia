@@ -102,9 +102,7 @@ class KBucket {
   //Pre: This bucket is empty, it is unlocked
   //Post: This bucket is a deep copy of bucket
   void operator= (KBucket& otherBucket);
-	
-	void copyKBucket(KBucket &otherBucket);
-	
+		
 };
 
 #endif
