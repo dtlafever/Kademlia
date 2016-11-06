@@ -141,8 +141,7 @@ bool RoutingTable::updateTable(uint32_t nodeID, uint32_t address) {
     success = true;
   }
   else {
-		log(nthBucket, Triple(address, nodeID, UIPORT), true);
-    success = addNode(nodeID, address);
+	    success = addNode(nodeID, address);
   }
   return (success);
 }
