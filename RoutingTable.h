@@ -44,7 +44,11 @@ class RoutingTable {
 	// add = false -> deleting node
 	// add = true -> adding node
 	void log (int &i , Triple curNode, bool add = false) ;
-  
+	
+	void log(int &i, uint32_t nodeID, bool add= false);
+	
+	void logError(string msg);
+
  public:
   
   //Pre: id refers to a valid node object

@@ -44,7 +44,7 @@ MsgType Message::getMsgType() const
 
 void Message::parse (std::string message)
 {
-	int index = -1;
+	unsigned long index = -1;
 
 	msgType = NONE;
 

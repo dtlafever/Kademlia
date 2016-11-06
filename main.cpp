@@ -20,8 +20,15 @@ int main(int argc, char * argv[]){
   uint32_t myID = atoi(argv[MY_ID]);
   if (argc == CREATE_NETWORK) {
     Node newNode(myID);
-    printf("We have started a network.\n");
-    newNode.startListener();
+//		if(newNode.joined())
+//		{
+			printf("We have started a network.\n");
+			newNode.startListener();
+//		}
+//		else{
+//			//ERROR OUT (start error)
+//			printf("This node has failed to start the network \n");
+//		}
   }
   else if (argc == JOIN_NETWORK) {
     uint32_t contactID = atoi(argv[CONTACT_ID]);
