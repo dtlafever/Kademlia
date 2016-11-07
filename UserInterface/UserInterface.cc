@@ -42,39 +42,41 @@ void UserInterface::runUI(){
   
   while(isRunning){
     receivedMessage = "";
-    //ASSERT: clear the message each time
+		input = "";
+		//ASSERT: clear the message each time
     try{
-     
+			
       cout << "> ";
-      getline(cin, input);
-      strcpy(command, input.c_str());
-      //ASSERT: get the input and place in char
-      
-      newMessage = parseInput(command);
-      
-      if(isRunning){
 
-	timeStamp = chrono::system_clock::now();
-	//ASSERT: we're sending a new message so we reset the timeStamp
-	
-	UIsocket.sendMessage(newMessage, IPaddress, UIPORT);
-	//ASSERT: send the message to the node we are connecting to
-	
-	recNum = -1;
-	while(recNum < 0 && isRunning){
-	  if(checkTimeout()){
-	    //ASSERT: the Listener did not respond to us so we end
-	    //        the process
+			getline(cin, input);
+			strcpy(command, input.c_str());
+			//ASSERT: get the input and place in char
+		
+			newMessage = parseInput(command);
 
-	    cout << "Error: Request timed out. Please re-enter an IP: ";
-	    getline(cin, IPaddress);
-	    UIsocket.open(UIPORT);
+      if(isRunning && input != ""){
 
-	    timeStamp = chrono::system_clock::now();
+			timeStamp = chrono::system_clock::now();
+			//ASSERT: we're sending a new message so we reset the timeStamp
+			
+			UIsocket.sendMessage(newMessage, IPaddress, UIPORT);
+			//ASSERT: send the message to the node we are connecting to
+			
+			recNum = -1;
+			while(recNum < 0 && isRunning){
+				if(checkTimeout()){
+					//ASSERT: the Listener did not respond to us so we end
+					//        the process
 
-	    recNum = 1;
-	    //end the loop
-	  }
+					cout << "Error: Request timed out. Please re-enter an IP: ";
+					getline(cin, IPaddress);
+					UIsocket.open(UIPORT);
+
+					timeStamp = chrono::system_clock::now();
+
+					recNum = 1;
+					//end the loop
+				}
 	  else{
 	    //ASSERT: Keep attempting to listen as we haven't timed out yet
 	    recNum = UIsocket.recvMessage(receivedMessage);

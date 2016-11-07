@@ -569,6 +569,7 @@ void Node::startUIListener() {
 	Message recvMsg(NONE, ID);
 	int recvlenUI;
 	int ipUI =0;
+	bool respondedToUI = false;
 	
 	UDPSocket socketUI(UIPORT, "UI.log");
 	
@@ -599,6 +600,7 @@ void Node::startUIListener() {
 			{
 				case FINDVALUE:
 				{
+					respondedToUI = false;
 					MsgType type = recvMsg.getMsgType();
 					curMsg.setType(type);
 					curMsg.setID(recvMsg.getID());
@@ -618,12 +620,14 @@ void Node::startUIListener() {
 		    //ASSERT: kClos contains the K closest nodes that we
 				//        know about.
 		    snapShot.addClosest(kClos, size);
-		    if (!snapShot.nextExist())
+		    if (!snapShot.nextExist() && !respondedToUI)
 				{
 					//ASSERT: there is no k clos to check,
 					//        send fail message to UI
 					Message sendMsg(FVRESPN, ID);
 					socketUI.sendMessage(sendMsg.toString(), ipUI, TPORT);
+					respondedToUI= true;
+					
 				}
 				else
 				{
@@ -640,24 +644,25 @@ void Node::startUIListener() {
 					// Get KClosest nodes to the key
 					Triple kClos[K];
 					int size = RT.getKClosestNodes(curMsg.getID(), kClos);
+					respondedToUI = false;
 					
 					// If there are no close nodes, there are no nodes.
 					if (size == 0)
 					{
-		    //ASSERT: special case where we are the only node in network,
-				//        so we store the key
-				mLock.lock();
-		    keys.push_back(recvMsg.getID());
-				mLock.unlock();
+						//ASSERT: special case where we are the only node in network,
+						//        so we store the key
+						mLock.lock();
+						keys.push_back(recvMsg.getID());
+						mLock.unlock();
 
-		    // Respond to UI
-		    Message sendMsg(STORERESP, ID);
-		    socketUI.sendMessage(sendMsg.toString(), ipUI, TPORT);
+						// Respond to UI
+						Message sendMsg(STORERESP, ID);
+						socketUI.sendMessage(sendMsg.toString(), ipUI, TPORT);
 					}
 					else // Try to find the KClosest to the Key
 					{
-		    snapShot.addClosest(kClos, size);
-		    sendUpToAlphaKClos(snapShot, socketUI, curMsg.getID(), FINDNODE);
+						snapShot.addClosest(kClos, size);
+						sendUpToAlphaKClos(snapShot, socketUI, curMsg.getID(), FINDNODE);
 					}
 				}
 					break;
@@ -683,7 +688,7 @@ void Node::startUIListener() {
 					refresherVector.push_back(make_pair(refresh, Triple()));
 					mLock.unlock();
 					
-					if (!snapShot.nextExist()) {
+					if (!snapShot.nextExist()&& !respondedToUI) {
 						//ASSERT: we have found the K closest, send store messages
 						Message sendMsg(STORE, ID, curMsg.getID());
 						
@@ -696,6 +701,7 @@ void Node::startUIListener() {
 						
 						Message UIansw (STORERESP, ID);
 						socketUI.sendMessage(UIansw.toString(), ipUI, TPORT);
+						respondedToUI = true;
 						
 					}else{
 						//ASSERT: we are not done searching for kClos
@@ -706,11 +712,12 @@ void Node::startUIListener() {
 							break;
 						case FINDVALUE:
 		    {
-					if (!snapShot.nextExist()) {
+					if (!snapShot.nextExist() && !respondedToUI) {
 						//ASSERT: we have found the K closest and no value,
 						//        send UI that wouldn't couldnt find it.
 						Message sendMsg(FVRESPN, ID);
 						socketUI.sendMessage(sendMsg.toString(), ipUI, TPORT);
+						respondedToUI = true;
 					}
 					else {
 						//ASSERT: we are not done searching for kClos
@@ -738,8 +745,12 @@ void Node::startUIListener() {
 					refresherVector.push_back(make_pair(refresh, Triple()));
 					mLock.unlock();
 
-					Message sendMsg(FVRESPP, ID);
-					socketUI.sendMessage(sendMsg.toString(), ipUI, UIPORT);
+					if(!respondedToUI)
+					{
+						Message sendMsg(FVRESPP, ID);
+						socketUI.sendMessage(sendMsg.toString(), ipUI, UIPORT);
+						respondedToUI = true;
+					}
 				}
 					break;
 				case FINDNODE:
@@ -780,7 +791,7 @@ void Node::startUIListener() {
 				//Now we need to continue depending on what we are on
 				if (curMsg.getMsgType() == STORE)
 		  {
-				if (!snapShot.nextExist()) {
+				if (!snapShot.nextExist() && !respondedToUI) {
 					//ASSERT: we have found the K closest, send store messages
 					Message sendMsg(STORE, ID);
 					for (int i = 0; i < snapShot.getSize(); i++)
@@ -790,6 +801,7 @@ void Node::startUIListener() {
 
 					Message UIMsg(STORERESP, curMsg.getID());
 					socketUI.sendMessage(UIMsg.toString(), ipUI, TPORT);
+					respondedToUI = true;
 				}
 				else {
 					//ASSERT: we are not done searching for kClos
@@ -797,12 +809,13 @@ void Node::startUIListener() {
 				}
 			}else if(curMsg.getMsgType() == FINDVALUE)
 			{
-				if (!snapShot.nextExist())
+				if (!snapShot.nextExist() && !respondedToUI)
 				{
 					//ASSERT: we have found the K closest and no value,
 					//        send UI that wouldn't couldnt find it.
 					Message sendMsg(FVRESPN, curMsg.getID());
 					socketUI.sendMessage(sendMsg.toString(), ipUI, UIPORT);
+					respondedToUI = true;
 				}
 				else
 				{
