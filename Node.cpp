@@ -788,8 +788,8 @@ void Node::startUIListener() {
 						socketUI.sendMessage(sendMsg.toString(), snapShot.getElementIP(i), MAINPORT);
 					}
 
-					Message sendMsg(STORERESP, curMsg.getID());
-					socketUI.sendMessage(sendMsg.toString(), ipUI, TPORT);
+					Message UIMsg(STORERESP, curMsg.getID());
+					socketUI.sendMessage(UIMsg.toString(), ipUI, TPORT);
 				}
 				else {
 					//ASSERT: we are not done searching for kClos
