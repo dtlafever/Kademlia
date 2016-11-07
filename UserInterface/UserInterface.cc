@@ -199,8 +199,6 @@ string UserInterface::findKey(uint32_t ID){
 //      to determine whether our request was a success
 //      or failure.
 void UserInterface::handleMessage(string newMsg){
-  cout << "NewMSG: " << newMsg << endl;
-
   Message receivedMsg(newMsg);
   
   if(receivedMsg.getMsgType() == STORERESP){
@@ -228,10 +226,16 @@ bool UserInterface::checkTimeout(){
   
   chrono::duration<int, milli> respondTime(NODE_TIMEOUT);
   chrono::system_clock::time_point timeOut = timeStamp + respondTime;
+  //ASSERT: the amount of time we wait including the point in time the
+  //        node we're communicating with times out
+  
   if(chrono::system_clock::now() < timeOut){
+    //ASSERT: we have yet to time out
     timedOut = false;
   }
   else{
+    //ASSERT: the node we're trying to listen to has
+    //        timed out.
     timedOut = true;
   }
   return(timedOut);
