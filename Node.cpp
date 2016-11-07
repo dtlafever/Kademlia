@@ -646,8 +646,10 @@ void Node::startUIListener() {
 					{
 		    //ASSERT: special case where we are the only node in network,
 				//        so we store the key
+				mLock.lock();
 		    keys.push_back(recvMsg.getID());
-						
+				mLock.unlock();
+
 		    // Respond to UI
 		    Message sendMsg(STORERESP, ID);
 		    socketUI.sendMessage(sendMsg.toString(), ipUI, TPORT);
@@ -785,6 +787,9 @@ void Node::startUIListener() {
 					{
 						socketUI.sendMessage(sendMsg.toString(), snapShot.getElementIP(i), MAINPORT);
 					}
+
+					Message sendMsg(STORERESP, curMsg.getID());
+					socketUI.sendMessage(sendMsg.toString(), ipUI, TPORT);
 				}
 				else {
 					//ASSERT: we are not done searching for kClos
