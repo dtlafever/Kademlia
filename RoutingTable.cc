@@ -218,6 +218,7 @@ void RoutingTable::printTable() {
 
 void RoutingTable::log(int &i, Triple curNode, bool add)
 {
+	gethostname(hostName, MAX_CHAR);
 	if(add)
 	{
 		logOut<< hostName << ": Inserted Node - ";
@@ -232,6 +233,7 @@ void RoutingTable::log(int &i, Triple curNode, bool add)
 
 void RoutingTable::log(int &i, uint32_t nodeID, bool add)
 {
+	gethostname(hostName, MAX_CHAR);
 	if(add)
 	{
 		logOut<< hostName << ": Inserted Node - ";
@@ -246,5 +248,6 @@ void RoutingTable::log(int &i, uint32_t nodeID, bool add)
 
 void RoutingTable::logError(string msg)
 {
+	gethostname(hostName, MAX_CHAR);
 	logOut << hostName << ": ERROR :  "<< msg;
 }
