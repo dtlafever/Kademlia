@@ -537,9 +537,11 @@ void Node::startUIListener() {
 	  recvMsg.parse(strUI);
 			
 	  // Get UI IP
-	  if(recvMsg.getUI())
+	  if(recvMsg.getUI()){
+			snapShot.clear();
 			ipUI = senderIP;
-			
+		}
+
 	  switch (recvMsg.getMsgType())
 			{
 				case FINDVALUE:
@@ -783,6 +785,7 @@ void Node::sendUpToAlphaKClos(SnapShot & ss, UDPSocket & sock, uint32_t msgID, M
 	
 	for (int i = 0; (i < ALPHA) && (ss.nextExist()); i++)
 	{
+		printf("In for loop\n");
 		Triple nextNode;
 		ss.getNext(nextNode);
 		
