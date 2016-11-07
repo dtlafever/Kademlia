@@ -801,7 +801,7 @@ void Node::startUIListener() {
 				{
 					//ASSERT: we have found the K closest and no value,
 					//        send UI that wouldn't couldnt find it.
-					Message sendMsg(FVRESPN);
+					Message sendMsg(FVRESPN, curMsg.getID());
 					socketUI.sendMessage(sendMsg.toString(), ipUI, UIPORT);
 				}
 				else
