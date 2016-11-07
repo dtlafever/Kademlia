@@ -71,7 +71,7 @@ void UDPSocket::sendMessage(const std::string s, const uint32_t host,
 	  throw SocketException("Could not send message.");
 	}
 	else {
-	  fileLog << hostName << ": Sent Message '" << s << " "<< host <<"'." << std::endl;
+	  fileLog << hostName << ": Sent Message '" << s << " "<< IP_toString(host) <<"'." << std::endl;
 	}
 }
 
@@ -96,6 +96,12 @@ int UDPSocket::getRemoteIP() {
 //same as above except return the string formatted IP and butts
 std::string UDPSocket::getRemoteIP(int dummy){
   return (Socket::getRemoteIP(dummy));
+}
+
+//PRE: an integer IP
+//POST: returns the string version of IP
+std::string UDPSocket::IP_toString(uint32_t ip){
+  return (Socket::IP_toString(ip));
 }
 
 //PRE: takes a file name as input

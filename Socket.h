@@ -80,6 +80,10 @@ class Socket
   //same as above except return the string formatted IP and butts
   std::string getRemoteIP(int dummy);
   
+  //PRE: an integer IP
+  //POST: returns the string version of IP
+  std::string IP_toString(uint32_t ip);
+
  private:
 
   //Error flag
