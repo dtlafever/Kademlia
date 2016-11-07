@@ -10,6 +10,8 @@
 #include <fstream>
 #include <mutex>
 
+#define MAX_CHAR 80
+
 class RoutingTable {
 
  private:
@@ -17,16 +19,12 @@ class RoutingTable {
   uint32_t myId;
   KBucket table[NUMBITS];
 	std::ofstream logOut;
+  char hostName[MAX_CHAR];
 
   //Pre: id1 and id2 are two identifiers
   //Post: RV = id1 XOR id2
-  uint32_t findDist(uint32_t id1, uint32_t id2);
+  uint32_t findDist(uint32_t id1, uint32_t id2) const ;
 	
-  //Pre: id is some valid node or key
-  //Post: RV = the nth kBucket such that
-  //      d = findDist(id) where 2^n <= d < 2^n+1
-  int findKBucket(uint32_t id);
-
   //Pre: id and address represents a new node not seen before
   //Post: RV = Triple object representing this new node
   Triple* createTriple(uint32_t id, uint32_t address);
@@ -44,7 +42,11 @@ class RoutingTable {
 	// add = false -> deleting node
 	// add = true -> adding node
 	void log (int &i , Triple curNode, bool add = false) ;
-  
+	
+	void log(int &i, uint32_t nodeID, bool add= false);
+	
+	void logError(string msg);
+
  public:
   
   //Pre: id refers to a valid node object
@@ -89,6 +91,13 @@ class RoutingTable {
   //Pre: 0 <= index < NUMBITS
   //Post: RV = table[index]
   KBucket& operator [] (int index);
+	
+	//Pre: id is some valid node or key
+	//Post: RV = the nth kBucket such that
+	//      d = findDist(id) where 2^n <= d < 2^n+1
+	int findKBucket(uint32_t id) const ;
+
+	
 	
 };
 

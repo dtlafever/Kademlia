@@ -321,8 +321,6 @@ Node B will send a "success" message to the UI.
 
 The UI will print a "success" message to the user.
 
-===========
-
 
 ==================================================================================================
 

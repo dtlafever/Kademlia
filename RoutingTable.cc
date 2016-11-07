@@ -5,9 +5,13 @@
 #include <stdint.h>
 #include <iostream>
 #include <stdio.h>
+#include <cmath>
 #include <fstream>
+#include <unistd.h>
 
 using namespace std;
+
+#define LOG_FILE "Logs/bucket.log"
 
 //Tags: Creatation, Check and Find, Modifying, Getting Stuff, Print Table
 
@@ -16,8 +20,10 @@ using namespace std;
 //Pre: id is the nodeID who owns this RoutingTable
 //Post: table is an array of K kBuckets, that are each empty
 RoutingTable::RoutingTable(uint32_t id) {
+	gethostname(hostName, MAX_CHAR);
   myId = id;
-	logOut.open("bucket.log", std::ofstream::out | std::ofstream::app);
+	logOut.open(LOG_FILE, std::ofstream::out | std::ofstream::app);
+	logOut << hostName << ": --------START NETWORK--------" << std::endl;
 }
 
 //Pre: id and address represents a new node not seen before
@@ -36,7 +42,9 @@ Triple* RoutingTable::createTriple(uint32_t id, uint32_t address) {
 //Post: RV = true if id is in the table, otherwise false
 bool RoutingTable::isNodeInTable(uint32_t id) {
   int nthBucket = findKBucket(id);
-  bool inTable = table[nthBucket].isNodeInBucket(id);
+	bool inTable = false;
+	if(nthBucket != -1)
+  	 inTable = table[nthBucket].isNodeInBucket(id);
   return (inTable);
 }
 
@@ -69,7 +77,9 @@ bool RoutingTable::isFull() {
 
 //Pre: id is some valid node or key
 //Post: RV = the nth kBucket such that d = findDist(id) where 2^n <= d < 2^n+1
-int RoutingTable::findKBucket(uint32_t id) {
+int RoutingTable::findKBucket(uint32_t id) const {
+	if(id > pow(2, NUMBITS) - 1)
+		return -1;
   uint32_t myDist = findDist(myId, id);
   uint32_t tempt = myDist;
   int twoPower = 0;
@@ -84,7 +94,7 @@ int RoutingTable::findKBucket(uint32_t id) {
 
 //Pre: id1 and id2 are two identifiers
 //Post: RV = id1 XOR id2
-uint32_t RoutingTable::findDist(uint32_t id1, uint32_t id2) {
+uint32_t RoutingTable::findDist(uint32_t id1, uint32_t id2) const{
   return (id1 ^ id2);
 }
 
@@ -102,16 +112,28 @@ KBucket& RoutingTable::operator [] (int index) {
 //           false otherwise
 bool RoutingTable::addNode(uint32_t node, uint32_t address) {
   int nthBucket = findKBucket(node);
-  KBucket* currBucket = &(table[nthBucket]);
-  bool added = false;
-  Triple* newTriple = createTriple(node, address);
+	bool added = false;
 
-  if(currBucket->getNumTriples() < K){
-    //ASSERT: the bucket is not full, add to it
-    log(nthBucket, *newTriple, true);
-    currBucket->addNode(newTriple);
-    added = true;
-  }
+	if(nthBucket != -1)
+	{
+		KBucket* currBucket = &(table[nthBucket]);
+		Triple* newTriple = createTriple(node, address);
+
+		if(currBucket->getNumTriples() < K){
+			//ASSERT: the bucket is not full, add to it
+			log(nthBucket, *newTriple, true);
+			currBucket->addNode(newTriple);
+			added = true;
+		}
+	}
+	else
+	{
+		string s = "Invalid Node ID, cannot be stored in ";
+		char temp[50];
+		sprintf(temp, "%u", NUMBITS);
+		s+= string(temp) + " bits\n";
+		logError(s);
+	}
 
   return (added);
 }
@@ -120,7 +142,11 @@ bool RoutingTable::addNode(uint32_t node, uint32_t address) {
 //Post: Removes the respected Triple from the table
 void RoutingTable::deleteNode(uint32_t nodeID) {
   int nthBucket = findKBucket(nodeID);
-  table[nthBucket].deleteNode(nodeID);
+	if(nthBucket != -1)
+	{
+		log(nthBucket, nodeID);
+		table[nthBucket].deleteNode(nodeID);
+	}
 }
 
 //Pre: nodeID is a valid id, address is where nodeID is from
@@ -129,15 +155,19 @@ void RoutingTable::deleteNode(uint32_t nodeID) {
 //      RV = true if success, false otherwise
 bool RoutingTable::updateTable(uint32_t nodeID, uint32_t address) {
   int nthBucket = findKBucket(nodeID);
-  bool inTable = isNodeInTable(nodeID);
-  bool success;
-  if (inTable) {
-    table[nthBucket].adjustNode(nodeID);
-    success = true;
-  }
-  else {
-	    success = addNode(nodeID, address);
-  }
+	bool success = false;
+
+	if (nthBucket != -1)
+	{
+		bool inTable = isNodeInTable(nodeID);
+		if (inTable) {
+			table[nthBucket].adjustNode(nodeID);
+			success = true;
+		}
+		else {
+				success = addNode(nodeID, address);
+		}
+	}
   return (success);
 }
 
@@ -161,12 +191,17 @@ int RoutingTable::getKClosestNodes(uint32_t target, Triple* closeNodes) {
 //Post: RV = a copy of the oldest node in k
 Triple RoutingTable::getOldestNode(uint32_t id) {
   int nthBucket = findKBucket(id);
-  Triple* leastRecentNode = table[nthBucket].getHead();
-  Triple copy;
-  copy.node = leastRecentNode->node;
-  copy.address = leastRecentNode->address;
-  copy.port = leastRecentNode->port;
-  return (copy);
+	if(nthBucket != -1)
+	 {
+		Triple* leastRecentNode = table[nthBucket].getHead();
+		Triple copy;
+		copy.node = leastRecentNode->node;
+		copy.address = leastRecentNode->address;
+		copy.port = leastRecentNode->port;
+		updateTable(leastRecentNode->node, leastRecentNode->address);
+		return (copy);
+	 }
+	else return Triple();
 }
 
 //----------------------Print Table------------------------------
@@ -183,14 +218,38 @@ void RoutingTable::printTable() {
 
 void RoutingTable::log(int &i, Triple curNode, bool add)
 {
+	gethostname(hostName, MAX_CHAR);
 	if(add)
 	{
-		logOut<<"Inserted Node - ";
+		logOut<< hostName << ": Inserted Node - ";
 	}
 	else
 	{
-		logOut<<"Deleted Node - ";
+		logOut<< hostName << ": Deleted Node - ";
 	}
 	
 	logOut <<"port :"<< curNode.port <<" \t node : " << curNode.node << " \t address: "<< curNode.address <<endl;
 }
+
+void RoutingTable::log(int &i, uint32_t nodeID, bool add)
+{
+	gethostname(hostName, MAX_CHAR);
+	if(add)
+	{
+		logOut<< hostName << ": Inserted Node - ";
+	}
+	else
+	{
+		logOut<< hostName << ": Deleted Node - ";
+	}
+	
+	logOut << "port : ---- \t node : " << nodeID << " \t address: ----"<<endl;
+}
+
+void RoutingTable::logError(string msg)
+{
+	gethostname(hostName, MAX_CHAR);
+	logOut << hostName << ": ERROR :  "<< msg;
+}
+
+
