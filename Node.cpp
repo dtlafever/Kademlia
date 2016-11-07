@@ -202,19 +202,62 @@ Node::Node(uint32_t nodeID, uint32_t contactID, uint32_t contactIP) : RT(nodeID)
 
 //Functions used to breka up the listener
 
-//Store a 
-void mainStore(uint32_t aKey, Triple sendTriple, Message recivedMessageOBJ){
-  aKey = receivedMessageOBJ.getID();
+//Store a given key into our keys
+void Node::mainStore(uint32_t aKey, Triple & sendTriple){
+
   if (find(keys.begin(), keys.end(), aKey) == keys.end()){
     mLock.lock();
     keys.push_back(aKey);
     cout << "Keys" << std::endl;
-    for (int i=0; i < keys.size();i ++){
+    for (int i=0; i < keys.size();i++){
       cout << keys[i] << std::endl;
     }
     refresherVector.push_back(make_pair(sendTriple, Triple()));
     mLock.unlock();
   }
+}
+
+//get our KClosest and send it off to the sender
+void Node::mainFindNode(uint32_t aKey, Triple & sendTriple, uint32_t senderIP, UDPSocket & socket){
+	Triple KClosest[K];
+  int closestSize = RT.getKClosestNodes(aKey, KClosest); 
+	Message sendMessageOBJ(NONE, ID);
+				
+	sendMessageOBJ.setKClos(KClosest, closestSize);
+	sendMessageOBJ.setType(KCLOSEST);
+	sendMessageOBJ.setNodeID(ID);
+				
+	socket.sendMessage(sendMessageOBJ.toString(), senderIP, UIPORT);
+	mLock.lock();
+	refresherVector.push_back(make_pair(sendTriple, Triple()));
+	mLock.unlock();
+}
+
+//return FVRESP if we have the key, oterhwise send Kclosest
+void Node::mainFindValue(uint32_t aKey, Triple & sendTriple, uint32_t senderIP, UDPSocket & socket){
+	Triple KClosest[K];
+  int closestSize = RT.getKClosestNodes(aKey, KClosest);
+	Message sendMessageOBJ(NONE, ID);
+
+	if (find(keys.begin(), keys.end(), aKey) != keys.end())
+		{
+			//ASSERT: we found the key
+			sendMessageOBJ.setType(FVRESP);
+			sendMessageOBJ.setNodeID(ID);
+			socket.sendMessage(sendMessageOBJ.toString(), senderIP, MAINPORT);
+		}
+	else {
+		//ASSERT: we could not find in the key
+		closestSize = RT.getKClosestNodes(aKey, KClosest);
+		sendMessageOBJ.setKClos(KClosest, closestSize);
+					
+		sendMessageOBJ.setType(KCLOSEST);
+		sendMessageOBJ.setNodeID(ID);
+		socket.sendMessage(sendMessageOBJ.toString(), senderIP, UIPORT);
+	}
+	mLock.lock();
+	refresherVector.push_back(make_pair(sendTriple, Triple()));
+	mLock.unlock();
 }
 
 //Handles messages from other Nodes.
@@ -234,9 +277,6 @@ void Node::startListener(){
   //ASSERT: Create the two threads for handling Pings and
   //        for handling UIs
 	
-  Message sendMessageOBJ(NONE, ID);
-  //ASSERT: empty message object to send later
-	
   std::string sendString; //the message we will fill up and send
   std::string receiveString; //the message we will receive
 	
@@ -248,14 +288,9 @@ void Node::startListener(){
   UDPSocket socket(MAINPORT, "main.log");
   //ASSERT: connect socket to our main port
 	
-  Triple KClosest[K];
-  int closestSize; //size of nodes after we fill with K closest
-  //ASSERT: Declare a Triple array of size K to send to FINDNODE
-  //        and FINDVALUE requests
-	
+  	
   while(!exit)
     {
-      //printf("Main Listener\n");
       recNum = socket.recvMessage(receiveString);
 		
       if(recNum > 0)
@@ -266,7 +301,7 @@ void Node::startListener(){
 	  Triple sendTriple (senderIP, senderID, MAINPORT);
 		
 	  printf("%s from %s\n", receiveString.c_str(), IP_toString(senderIP).c_str());
-	  uint32_t aKey;
+	  uint32_t aKey = receivedMessageOBJ.getID();
 	  //ASSERT: to be extracted from each message.
 			
 	  switch (receivedMessageOBJ.getMsgType())
@@ -274,56 +309,21 @@ void Node::startListener(){
 	    case STORE:
 	      {
 		//ASSERT: A node wants to store
-		mainStore(aKey, sendTriple, receivedMessageOBJ);
+		mainStore(aKey, sendTriple);
 	      }
 	      break;
 					
 	    case FINDNODE:
 	      {
 		//ASSERT: A node wants k closest nodes
-		aKey = receivedMessageOBJ.getID();
-					
-		closestSize = RT.getKClosestNodes(aKey, KClosest);
-		sendMessageOBJ.setKClos(KClosest, closestSize);
-					
-		sendMessageOBJ.setType(KCLOSEST);
-		sendMessageOBJ.setNodeID(ID);
-					
-		sendString = sendMessageOBJ.toString();
-		socket.sendMessage(sendString, senderIP, UIPORT);
-		mLock.lock();
-		refresherVector.push_back(make_pair(sendTriple, Triple()));
-		mLock.unlock();
+		mainFindNode(aKey, sendTriple, senderIP, socket);
 	      }
 	      break;
 					
 	    case FINDVALUE:
 	      {
 		//ASSERT: A node is trying to find a key
-		aKey = receivedMessageOBJ.getID();
-					
-		if (find(keys.begin(), keys.end(), aKey) != keys.end())
-		  {
-		    //ASSERT: we found the key
-		    sendMessageOBJ.setType(FVRESP);
-		    sendMessageOBJ.setNodeID(ID);
-		    sendString = sendMessageOBJ.toString();
-		    socket.sendMessage(sendString, senderIP, MAINPORT);
-		  }
-		else {
-		  //ASSERT: we could not find in the key
-		  closestSize = RT.getKClosestNodes(aKey, KClosest);
-		  sendMessageOBJ.setKClos(KClosest, closestSize);
-						
-		  sendMessageOBJ.setType(KCLOSEST);
-		  sendMessageOBJ.setNodeID(ID);
-						
-		  sendString = sendMessageOBJ.toString();
-		  socket.sendMessage(sendString, senderIP, UIPORT);
-		}
-		mLock.lock();
-		refresherVector.push_back(make_pair(sendTriple, Triple()));
-		mLock.unlock();
+		mainFindValue(aKey, sendTriple, senderIP, socket);
 	      }
 	      break;
 					

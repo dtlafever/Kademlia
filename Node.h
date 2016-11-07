@@ -80,6 +80,15 @@ class Node
 
   bool joined();
 
+	//Store a given key into our keys
+	void mainStore(uint32_t aKey, Triple & sendTriple);
+
+	//get our KClosest and send it off to the sender
+	void mainFindNode(uint32_t aKey, Triple & sendTriple, uint32_t senderIP, UDPSocket & socket);
+
+	//return FVRESP if we have the key, oterhwise send Kclosest
+	void mainFindValue(uint32_t aKey, Triple & sendTriple, uint32_t senderIP, UDPSocket & socket);
+
   //Handles messages from other Nodes.
   //Everything is constant time
   //MAIN: port 6666
