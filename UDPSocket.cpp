@@ -71,7 +71,7 @@ void UDPSocket::sendMessage(const std::string s, const uint32_t host,
 	  throw SocketException("Could not send message.");
 	}
 	else {
-	  fileLog << hostName << ": Sent Message '" << s << " "<< IP_toString(host) <<"'." << std::endl;
+	  fileLog << hostName << ": Sent Message '" << s << "' to "<< IP_toString(host) <<"." << std::endl;
 	}
 }
 
