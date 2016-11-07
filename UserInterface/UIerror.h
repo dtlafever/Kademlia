@@ -15,6 +15,8 @@ class UIerror {
  public:
   UIerror (char * errorMsg);
 
+  //PRE: Object defined
+  //POST: Prints out the error message
   void print_error () { cout << msg << endl; };
 
 };
