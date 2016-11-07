@@ -197,10 +197,10 @@ void SnapShot::clear() {
 }
 
 void SnapShot::print(){
-  printf("I: N | A | P | Q | C\n");
+  printf("I:\t N\t | A\t | P\t | Q\t | C\n");
   printf("--------------------\n");
   for (int i = 0; i < size; i++){
-  printf("%d: %d | %d | %d | %d | %d\n", i,
+  printf("%d\t: %d\t | %d\t | %d\t | %d\t | %d\n", i,
 	 closest[i].node, closest[i].address,
 	 closest[i].port, closest[i].queried,
 	 closest[i].compareID);

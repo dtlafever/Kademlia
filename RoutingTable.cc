@@ -7,8 +7,11 @@
 #include <stdio.h>
 #include <cmath>
 #include <fstream>
+#include <unistd.h>
 
 using namespace std;
+
+#define LOG_FILE "Logs/bucket.log"
 
 //Tags: Creatation, Check and Find, Modifying, Getting Stuff, Print Table
 
@@ -17,8 +20,10 @@ using namespace std;
 //Pre: id is the nodeID who owns this RoutingTable
 //Post: table is an array of K kBuckets, that are each empty
 RoutingTable::RoutingTable(uint32_t id) {
+	gethostname(hostName, MAX_CHAR);
   myId = id;
-	logOut.open("bucket.log", std::ofstream::out | std::ofstream::app);
+	logOut.open(LOG_FILE, std::ofstream::out | std::ofstream::app);
+	logOut << hostName << ": --------START NETWORK--------" << std::endl;
 }
 
 //Pre: id and address represents a new node not seen before
@@ -213,13 +218,14 @@ void RoutingTable::printTable() {
 
 void RoutingTable::log(int &i, Triple curNode, bool add)
 {
+	gethostname(hostName, MAX_CHAR);
 	if(add)
 	{
-		logOut<<"Inserted Node - ";
+		logOut<< hostName << ": Inserted Node - ";
 	}
 	else
 	{
-		logOut<<"Deleted Node - ";
+		logOut<< hostName << ": Deleted Node - ";
 	}
 	
 	logOut <<"port :"<< curNode.port <<" \t node : " << curNode.node << " \t address: "<< curNode.address <<endl;
@@ -227,19 +233,21 @@ void RoutingTable::log(int &i, Triple curNode, bool add)
 
 void RoutingTable::log(int &i, uint32_t nodeID, bool add)
 {
+	gethostname(hostName, MAX_CHAR);
 	if(add)
 	{
-		logOut<<"Inserted Node - ";
+		logOut<< hostName << ": Inserted Node - ";
 	}
 	else
 	{
-		logOut<<"Deleted Node - ";
+		logOut<< hostName << ": Deleted Node - ";
 	}
 	
-	logOut <<"port : ---- \t node : " << nodeID << " \t address: ----"<<endl;
+	logOut << "port : ---- \t node : " << nodeID << " \t address: ----"<<endl;
 }
 
 void RoutingTable::logError(string msg)
 {
-	logOut << "ERROR :  "<< msg;
+	gethostname(hostName, MAX_CHAR);
+	logOut << hostName << ": ERROR :  "<< msg;
 }

@@ -10,6 +10,8 @@
 #include <fstream>
 #include <mutex>
 
+#define MAX_CHAR 80
+
 class RoutingTable {
 
  private:
@@ -17,6 +19,7 @@ class RoutingTable {
   uint32_t myId;
   KBucket table[NUMBITS];
 	std::ofstream logOut;
+  char hostName[MAX_CHAR];
 
   //Pre: id1 and id2 are two identifiers
   //Post: RV = id1 XOR id2

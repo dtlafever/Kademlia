@@ -12,7 +12,6 @@
 #define MAINPORT 6666
 #define UIPORT 6667
 #define REFRESHERPORT 6668
-
 #define TPORT 6669
 
 #define NUMBITS 4

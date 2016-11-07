@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "Socket.h"
+#include <cstring>
 
 #define MY_ID 1
 #define CONTACT_ID 2
@@ -11,6 +12,9 @@
 
 #define CREATE_NETWORK 2
 #define JOIN_NETWORK 4
+
+#define CONFIG_FILE "CONFIG"
+#define NUM_VARS 3
 
 //Pre: argc = 2 or 4, if 4 then argv[2], argv[3] represents an existing node
 //     argv[1] is a valid node id not yet taken
