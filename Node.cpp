@@ -36,7 +36,7 @@ bool Node::joined()
 	return inNetwork;
 }
 
-//Pre: msg, queue, and timeOut were declared in the constructor below
+//Pre: msg, queue, and time were declared in the constructor below
 //Post: the id of the node sending msg is removed from timeOut
 //      if our id is in closest times, return true, false other wise
 
@@ -139,7 +139,7 @@ Node::Node(uint32_t nodeID, uint32_t contactID, uint32_t contactIP) : RT(nodeID)
 			if (msgSize != -1)
 			{
 				uint32_t IP = socket.getRemoteIP();
-				printf("%s\n from %u\n", response.c_str(), IP_toString(IP));
+				printf("%s\n from %s\n", response.c_str(), IP_toString(IP).c_str());
 				
 				Message msg(response);
 				
@@ -174,7 +174,7 @@ Node::Node(uint32_t nodeID, uint32_t contactID, uint32_t contactIP) : RT(nodeID)
 				// Send a FINDNODE message to the next node.
 				Message toSend(FINDNODE, ID, ID);
 				socket.sendMessage(toSend.toString(), nextToAsk.address, UIPORT);
-				printf("%s to %u\n", toSend.toString().c_str(), IP_toString(nextToAsk.address);
+				printf("%s to %s\n", toSend.toString().c_str(), IP_toString(nextToAsk.address).c_str());
 				
 				// Add a timeout
 				MsgTimer timer(RESPONDTIME_UI, nextToAsk.node, nextToAsk.address);
@@ -248,7 +248,7 @@ void Node::startListener(){
 	  senderID = receivedMessageOBJ.getNodeID();
 	  Triple sendTriple (senderIP, senderID, MAINPORT);
 		
-		printf("%s from %u\n", receiveString.c_str(), IP_toString(senderIP));
+		printf("%s from %s\n", receiveString.c_str(), IP_toString(senderIP).c_str());
 	  uint32_t aKey;
 	  //ASSERT: to be extracted from each message.
 			
@@ -260,6 +260,7 @@ void Node::startListener(){
 					aKey = receivedMessageOBJ.getID();
 					if (find(keys.begin(), keys.end(), aKey) == keys.end()){
 						keys.push_back(aKey);
+						//mLock.lock();
 						refresherVector.push_back(make_pair(sendTriple, Triple()));
 					}
 				}
@@ -365,7 +366,7 @@ void Node::startRefresher()
 		if (socket.recvMessage(incoming) != -1) // if it returns 0 then no message was received
 		{
 			IP=socket.getRemoteIP();
-			printf("%s from %u\n", incoming.c_str(), IP_toString(IP));
+			printf("%s from %s\n", incoming.c_str(), IP_toString(IP).c_str());
 			msg.parse(incoming);
 			
 			switch(msg.getMsgType())
@@ -569,7 +570,7 @@ void Node::startUIListener() {
 			
 	  int senderIP = socketUI.getRemoteIP();
 			
-	  printf("%s from %u\n", strUI.c_str(), IP_toString(senderIP));
+	  printf("%s from %s\n", strUI.c_str(), IP_toString(senderIP).c_str());
 	  
 	  // Parsing incoming string
 	  recvMsg.parse(strUI);

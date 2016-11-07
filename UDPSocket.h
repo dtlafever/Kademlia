@@ -12,7 +12,7 @@
 //POST: returns the string version of IP
 static std::string IP_toString(uint32_t ip){
   char buf[MAXRECV + 1];
-  std:string s = "";
+  std::string s = "";
   memset(buf, 0, MAXRECV + 1);
 
   inet_ntop(AF_INET, &ip, buf, INET_ADDRSTRLEN);

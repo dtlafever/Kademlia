@@ -33,7 +33,7 @@ class Node
 	// Counters for nodes that we need to refresh
 	uint32_t refreshCounters [NUMBITS];
   bool exit = false;
-	mutex outputLock;
+	mutex mLock;
 
 	// Index 0 is a vector of MsgTimer to keep track of the timeouts for the UI thread.
 	// Index 1 is reserved for messages that the PINGer sends for other threads.
