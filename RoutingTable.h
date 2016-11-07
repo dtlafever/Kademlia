@@ -23,13 +23,8 @@ class RoutingTable {
 
   //Pre: id1 and id2 are two identifiers
   //Post: RV = id1 XOR id2
-  uint32_t findDist(uint32_t id1, uint32_t id2);
+  uint32_t findDist(uint32_t id1, uint32_t id2) const ;
 	
-  //Pre: id is some valid node or key
-  //Post: RV = the nth kBucket such that
-  //      d = findDist(id) where 2^n <= d < 2^n+1
-  int findKBucket(uint32_t id);
-
   //Pre: id and address represents a new node not seen before
   //Post: RV = Triple object representing this new node
   Triple* createTriple(uint32_t id, uint32_t address);
@@ -96,6 +91,13 @@ class RoutingTable {
   //Pre: 0 <= index < NUMBITS
   //Post: RV = table[index]
   KBucket& operator [] (int index);
+	
+	//Pre: id is some valid node or key
+	//Post: RV = the nth kBucket such that
+	//      d = findDist(id) where 2^n <= d < 2^n+1
+	int findKBucket(uint32_t id) const ;
+
+	
 	
 };
 

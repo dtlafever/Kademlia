@@ -3,6 +3,7 @@
 #include "UIerror.h"
 #include "../Message.hpp"
 #include "../UDPSocket.h"
+#include "../SocketException.h"
 
 #include <stdlib.h>
 #include <string.h>
@@ -91,6 +92,8 @@ void UserInterface::runUI(){
     }
     catch(UIerror & error){
       error.print_error();
+    }catch(SocketException & e){
+      cout << e.description() << endl;
     }
   }
 }
