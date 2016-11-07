@@ -306,20 +306,6 @@ std::string Socket::getRemoteIP(int dummy){
   return(s);
 }
 
-//PRE: an integer IP
-//POST: returns the string version of IP
-std::string Socket::IP_toString(uint32_t ip){
-  char buf[MAXRECV + 1];
-  std:string s = "";
-  memset(buf, 0, MAXRECV + 1);
-
-  inet_ntop(AF_INET, &ip, buf, INET_ADDRSTRLEN);
-
-  s = buf;
-
-  return(s);
-}
-
 //PRE: take the name of the host and the host's port
 //POST: connects our socket with the server's socket.
 //      Returns true if we successfully connected. false otherwise

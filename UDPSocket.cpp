@@ -98,12 +98,6 @@ std::string UDPSocket::getRemoteIP(int dummy){
   return (Socket::getRemoteIP(dummy));
 }
 
-//PRE: an integer IP
-//POST: returns the string version of IP
-std::string UDPSocket::IP_toString(uint32_t ip){
-  return (Socket::IP_toString(ip));
-}
-
 //PRE: takes a file name as input
 //POST: sets and opens that file.
 void UDPSocket::setFileName(std::string fileName){

@@ -136,7 +136,7 @@ Node::Node(uint32_t nodeID, uint32_t contactID, uint32_t contactIP) : RT(nodeID)
 			if (msgSize != -1)
 			{
 				uint32_t IP = socket.getRemoteIP();
-				printf("%s\n from %u\n", response.c_str(), IP);
+				printf("%s\n from %u\n", response.c_str(), IP_toString(IP));
 				
 				Message msg(response);
 				
@@ -171,7 +171,7 @@ Node::Node(uint32_t nodeID, uint32_t contactID, uint32_t contactIP) : RT(nodeID)
 				// Send a FINDNODE message to the next node.
 				Message toSend(FINDNODE, ID, ID);
 				socket.sendMessage(toSend.toString(), nextToAsk.address, UIPORT);
-				printf("%s to %u\n", toSend.toString().c_str(), nextToAsk.address);
+				printf("%s to %u\n", toSend.toString().c_str(), IP_toString(nextToAsk.address);
 				
 				// Add a timeout
 				MsgTimer timer(RESPONDTIME_UI, nextToAsk.node, nextToAsk.address);
@@ -245,7 +245,7 @@ void Node::startListener(){
 	  senderID = receivedMessageOBJ.getNodeID();
 	  Triple sendTriple (senderIP, senderID, MAINPORT);
 		
-		printf("%s from %u\n", receiveString.c_str(), senderIP);
+		printf("%s from %u\n", receiveString.c_str(), IP_toString(senderIP));
 	  uint32_t aKey;
 	  //ASSERT: to be extracted from each message.
 			
@@ -362,7 +362,7 @@ void Node::startRefresher()
 		if (socket.recvMessage(incoming) != -1) // if it returns 0 then no message was received
 		{
 			IP=socket.getRemoteIP();
-			printf("%s from %u\n", incoming.c_str(), IP);
+			printf("%s from %u\n", incoming.c_str(), IP_toString(IP));
 			msg.parse(incoming);
 			
 			switch(msg.getMsgType())
@@ -531,7 +531,7 @@ void Node::startUIListener() {
 			
 	  int senderIP = socketUI.getRemoteIP();
 			
-	  printf("%s from %u\n", strUI.c_str(), senderIP);
+	  printf("%s from %u\n", strUI.c_str(), IP_toString(senderIP));
 	  
 	  // Parsing incoming string
 	  recvMsg.parse(strUI);
@@ -785,7 +785,6 @@ void Node::sendUpToAlphaKClos(SnapShot & ss, UDPSocket & sock, uint32_t msgID, M
 	
 	for (int i = 0; (i < ALPHA) && (ss.nextExist()); i++)
 	{
-		printf("In for loop\n");
 		Triple nextNode;
 		ss.getNext(nextNode);
 		

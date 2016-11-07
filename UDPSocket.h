@@ -8,6 +8,20 @@
 #define MAX_CHAR 80
 #define LOG_DIR "Logs/"
 
+//PRE: an integer IP
+//POST: returns the string version of IP
+static std::string IP_toString(uint32_t ip){
+  char buf[MAXRECV + 1];
+  std:string s = "";
+  memset(buf, 0, MAXRECV + 1);
+
+  inet_ntop(AF_INET, &ip, buf, INET_ADDRSTRLEN);
+
+  s = buf;
+
+  return(s);
+}
+
 class UDPSocket : private Socket {
  private:
   std::ofstream fileLog;
