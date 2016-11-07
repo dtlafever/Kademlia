@@ -77,7 +77,7 @@ bool RoutingTable::isFull() {
 
 //Pre: id is some valid node or key
 //Post: RV = the nth kBucket such that d = findDist(id) where 2^n <= d < 2^n+1
-int RoutingTable::findKBucket(uint32_t id) {
+int RoutingTable::findKBucket(uint32_t id) const {
 	if(id > pow(2, NUMBITS) - 1)
 		return -1;
   uint32_t myDist = findDist(myId, id);
@@ -94,7 +94,7 @@ int RoutingTable::findKBucket(uint32_t id) {
 
 //Pre: id1 and id2 are two identifiers
 //Post: RV = id1 XOR id2
-uint32_t RoutingTable::findDist(uint32_t id1, uint32_t id2) {
+uint32_t RoutingTable::findDist(uint32_t id1, uint32_t id2) const{
   return (id1 ^ id2);
 }
 
@@ -198,7 +198,7 @@ Triple RoutingTable::getOldestNode(uint32_t id) {
 		copy.node = leastRecentNode->node;
 		copy.address = leastRecentNode->address;
 		copy.port = leastRecentNode->port;
-
+		updateTable(leastRecentNode->node, leastRecentNode->address);
 		return (copy);
 	 }
 	else return Triple();
@@ -251,3 +251,5 @@ void RoutingTable::logError(string msg)
 	gethostname(hostName, MAX_CHAR);
 	logOut << hostName << ": ERROR :  "<< msg;
 }
+
+
