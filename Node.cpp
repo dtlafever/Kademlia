@@ -259,9 +259,14 @@ void Node::startListener(){
 					//ASSERT: A node wants to store
 					aKey = receivedMessageOBJ.getID();
 					if (find(keys.begin(), keys.end(), aKey) == keys.end()){
+						mLock.lock();
 						keys.push_back(aKey);
-						//mLock.lock();
+						cout << "Keys" << std::endl;
+						for (int i=0; i < keys.size();i ++){
+							cout << keys[i] << std::endl;
+						}
 						refresherVector.push_back(make_pair(sendTriple, Triple()));
+						mLock.unlock();
 					}
 				}
 					break;
@@ -279,8 +284,9 @@ void Node::startListener(){
 					
 					sendString = sendMessageOBJ.toString();
 					socket.sendMessage(sendString, senderIP, UIPORT);
-					
+					mLock.lock();
 					refresherVector.push_back(make_pair(sendTriple, Triple()));
+					mLock.unlock();
 				}
 					break;
 					
@@ -308,8 +314,9 @@ void Node::startListener(){
 						sendString = sendMessageOBJ.toString();
 						socket.sendMessage(sendString, senderIP, UIPORT);
 					}
-					
+					mLock.lock();
 					refresherVector.push_back(make_pair(sendTriple, Triple()));
+					mLock.unlock();
 				}
 					break;
 					
@@ -399,7 +406,9 @@ void Node::startRefresher()
 							if (index != -1)
 							{
 								// erase it from the refresherVector
+								mLock.lock();
 								refresherVector.erase(refresherVector.begin()+index);
+								mLock.unlock();
 								// get the Kbucket index
 								int32_t kbindex = RT.findKBucket(timeouts[PINGER_TIMEOUT][m].getNodeID());
 		
@@ -480,8 +489,10 @@ void Node::startRefresher()
 					
 					// Get LRU node from the appropriate kbucket
 					Triple tripleToRefresh = RT.getOldestNode(refresherVector[i].first.node);
+					mLock.lock();
 					refresherVector[i].second = tripleToRefresh;
-					
+					mLock.unlock();
+
 					// PING
 					Message msg(PING, ID);
 					socket.sendMessage(msg.toString(), tripleToRefresh.address, REFRESHERPORT);
@@ -511,7 +522,10 @@ void Node::startRefresher()
 					if (index != -1)
 					{
 						// erase it from the refresherVector
+						mLock.lock();
 						refresherVector.erase(refresherVector.begin()+index);
+						mLock.unlock();
+						
 						// get the Kbucket index
 						int32_t kbindex = RT.findKBucket(timeouts[PINGER_TIMEOUT][i].getNodeID());
 						
@@ -663,8 +677,9 @@ void Node::startUIListener() {
 					Triple refresh;
 					refresh.address = socketUI.getRemoteIP();
 					refresh.node = recvMsg.getNodeID();
+					mLock.lock();
 					refresherVector.push_back(make_pair(refresh, Triple()));
-					
+					mLock.unlock();
 					
 					if (!snapShot.nextExist()) {
 						//ASSERT: we have found the K closest, send store messages
@@ -717,8 +732,10 @@ void Node::startUIListener() {
 					Triple refresh;
 					refresh.address = socketUI.getRemoteIP();
 					refresh.node = recvMsg.getNodeID();
+					mLock.lock();
 					refresherVector.push_back(make_pair(refresh, Triple()));
-					
+					mLock.unlock();
+
 					Message sendMsg(FVRESPP, ID);
 					socketUI.sendMessage(sendMsg.toString(), ipUI, UIPORT);
 				}
@@ -740,7 +757,9 @@ void Node::startUIListener() {
 					sendTriple.address = senderIP;
 					sendTriple.port = UIPORT;
 					sendTriple.node = recvMsg.getNodeID();
+					mLock.lock();
 					refresherVector.push_back(make_pair(sendTriple, Triple()));
+					mLock.unlock();
 				}
 					break;
 				default:
