@@ -15,12 +15,24 @@ NOTE: the node program expects either 1 or 3 arguments. The 1st is the node's
       and address describing an existing node in the network, these two are
       optional.
 
+
+
+
+
+
+
+
+
+
+
 Test Cases:
 
+---------------------
 --JOINING A NETWORK--
+---------------------
 
 =======================================================================
-TESTED SUCCESS. NODE JOINS WITH A CONTACT THAT DOESN'T EXIST
+NODE JOINS WITH A CONTACT THAT DOESN'T EXIST
 
  -Node 0 joins the network with a contact.
  -input:
@@ -31,7 +43,7 @@ TESTED SUCCESS. NODE JOINS WITH A CONTACT THAT DOESN'T EXIST
 	This node has failed to join the network
 
 =======================================================================
-TESTED SUCCESS. SINGULAR NODE STARTS A NETWORK
+SINGULAR NODE STARTS A NETWORK
 
  -Node 0 joins the network. Node 0 starts the network and has
   an empty routing table.
@@ -41,7 +53,7 @@ TESTED SUCCESS. SINGULAR NODE STARTS A NETWORK
 	We have started the network.
 
 =======================================================================
-TESTED SUCCESS. NODE 1 JOINS WITH NODE 0 AS CONTACT
+NODE 1 JOINS WITH NODE 0 AS CONTACT
 
  -Node 0 exists in a network. Node 1 attempts to join with 0 as contact.
  -input:
@@ -50,23 +62,11 @@ TESTED SUCCESS. NODE 1 JOINS WITH NODE 0 AS CONTACT
 	We have joined a network.
 
 =======================================================================
-
-
-
-DID WE TEST THIS ONE?
-     =. Suppose that enough nodes are in the network such that every
-     	node's Routing table is full. All such nodes are still alive.
-	A new node n attempts to join, it fails to join.
-	  -the node will stil join the network, but the only k-buckets being filled
-	   are it's own. since the other RTs are full, the node will be placed in others.	 
-
-
 ADDING SECOND NODE
-IN BETTER DETAIL = TESTED SUCCESSFULLY
-============================================
+
 Suppose we have Node B and we want to join the network
 Node B (ID = 4) uses Node A (ID = 3) as it's contact
-============================================
+
 
 -Node B must have a contact to join. It provides the ID of Node A
 -Node B calculates the distance between itself and Node A.
@@ -84,17 +84,15 @@ Node B (ID = 4) uses Node A (ID = 3) as it's contact
 
 Node B is now successfully in the network!
 
-
-
+=======================================================================
 ADDING THIRD NODE
-IN BETTER DETAIL = TESTED SUCCESSFULLY
-========================================
+
 Suppose ALPHA = 3 and K = 5
 
 Node A (ID = 3) and Node B (ID = 4) are in the network.
 
 Node C (ID = 2) wants to join the network and uses Node A as a contact.
-========================================
+
 
 -Node C must have a contact to join. It provides the ID of Node A
 -Node C calculates the distance between itself and Node A.
@@ -124,58 +122,20 @@ Node C (ID = 2) wants to join the network and uses Node A as a contact.
 
 Node C is now in the network!
 
-========================================
 
 
-GENERAL CASE
-=======
+-------------------------------
+--COMMUNICATING BETWEEN NODES--
+-------------------------------
 
-Suppose there are N nodes in the network, such that N < 2^32.
-A node wants to join the network, and has a contact.
-
-=======
-
--The joining node J must have a contact in order to join. It provides the ID of the Contact Node.
--JoinNode gets D = distance(JoinNode, ConNode), where 0 < D < (2^32) - 1
--JoinNode places ConNode into the tail of the appropriate K-bucket, where 2^i <= D < 2^i+1
-
--JoinNode must populate itself and the rest of the network's K-buckets.
--JoinNode sends FINDNODE request to ConNode.
--ConNode receives a FINDNODE request with JoinNode's ID.
-
--ConNode calculates the distance between itself and JoinNode.
-   It goes to that K-bucket, and collects up to K of the closest nodes to the ID using the XOR metric
-   If the K-bucket is not full, compare it to the distance of buckets 2^i-1 and 2^i+1. Go to the bucket
-   with the closer distance until you have K nodes.
-   Once it has K nodes (or as many as it can get) it will send the list back to JoinNode.
--ConNode will then place JoinNode in the right K-bucket of it's routing table.
-
--JoinNode will receive a list of the K closest nodes given it's ID.
-  JoinNode will continuously send FINDNODE request with JoinNode's ID,
-  It will keep track of every node it has queried
-  Eventually, either JoinNode will find itself, or there is nobody left to send
-  FINDNODE requests to.
-
--JoinNode will stop sending requests and terminate the lookup since it has successfully joined the
- network.
-
-
-==================================================================================================
-
-===========COMMUNICATING BETWEEN NODES=============
-
-     =. Suppose that for 0 <= i < 10 that node i exists within the network.
-     	Suppose that K = 5.
-	Let key = 7. Suppose that node 5 is storing the key.
-	    -Then Nodes 7,6,5,4,3 will receive the store request and will store the key,
+     =. Suppose that for 0 <= i < 3 that node i exists within the network.
+     	Suppose that K = 2.
+	Let key = 7. Suppose that node 0 is storing the key.
+	    -Then Nodes 2,1 receive the store request and will store the key,
 	     because they are the k closest to the given key.
 
-     =. Suppose that 10 nodes exist in the network as above. And suppose that
-     	no nodes contains the key 4. Then node n calling find value for 4
+     =. Suppose that 2 (ID 0 and 1) nodes exist and contain no keys. Then calling "find 4"
 	will fail.
-	     -Node n will query all given nodes, and is unable to find the key 4.
-	     -the UI listener will send a failed Find Value response through the socket.
-	     -The UI process will print "Failure".
 
      =. Suppose that 10 nodes exist in the network as above. And suppose that
      	 key 5 exists within the network. Node n calling for key 5 will succed
@@ -195,13 +155,9 @@ A node wants to join the network, and has a contact.
 	      Node 0 will send a failure Find Value response.
 
 
-
-
-
-=============================================
+=======================================================================
 Suppose there is onle 1 node in the network
 Node A
-=============================================
 
 STORE (WITH ONE NODE) - TESTED SUCCESSFULLY
 
@@ -215,7 +171,7 @@ From the UI we say:
 
 A will store the given key in itself.
 
-==============================================
+=======================================================================
 
 FIND (if we didn't STORE anything) - TESTED SUCCESSFULLY
 
@@ -233,7 +189,7 @@ Node A will send a "Failure" message to the UI.
 
 The UI will print out "Failure" to the user.
 
-==============================================
+=======================================================================
 
 FIND (if we actually did STORE something) - TESTED SUCCESSFULLY
 
@@ -250,18 +206,10 @@ Node A will send a "Success" message to the UI.
 
 The UI will print out "Success" to the user.
 
-=============================================
-Suppose there are only 2 nodes in the network
+=======================================================================
 
-Node A (ID = 3) , Node B (ID = 4)
 
-3 XOR 4 = 7
-
-Node A is storing Node B in it's third K-bucket.
-Node B is storing Node A in it's third K-bucket.
-=============================================
-
-STORE (WITH TWO NODES) - TESTED SUCCESSFULLY
+STORE (WITH TWO NODES)
 
 From the UI we say:
 >store 5
@@ -285,9 +233,9 @@ From the UI we say:
 Node A and Node B will receive a STORE request, and since it received this from a fellow Node
 and not the UI, then it will simply push the given Key(5) into it's list of keys. 
 
-===========
+=======================================================================
 
-FIND (with the UI connected to Node A - assuming we have stored a key first) - TESTED SUCCESSFULLY
+FIND (with the UI connected to Node A - assuming we have stored a key first)
 
 From the UI we say:
 >find 5
@@ -303,9 +251,9 @@ Node A will send a "success" message to the UI.
 
 The UI will print a "success" message to the user.
 
-===========
+=======================================================================
 
-Find (with the UI connected to Node B - assuming we have stored a key first) - TESTED SUCCESSFULLY
+Find (with the UI connected to Node B - assuming we have stored a key first)
 
 From the UI we say:
 >find 5
@@ -321,10 +269,9 @@ Node B will send a "success" message to the UI.
 
 The UI will print a "success" message to the user.
 
-
-==================================================================================================
-
-===REFRESHER AND TIMEOUT TESTS====
+-------------------------------
+--REFRESHER AND TIMEOUT TESTS--
+-------------------------------
 
      =. Suppose that some node n is in the network. Further suppose that
      	n is dead.
@@ -339,14 +286,9 @@ The UI will print a "success" message to the user.
      =. Suppose Node 5 sends the response after Node 0 times out the request.
      	  -Node 0 drops the response because it doesn't match any request in the Timer Queue.
 
-=.Two nodes, IDs 0 and 1, testing the Refreshing Function.
+		 =.Two nodes, IDs 0 and 1, testing the Refreshing Function.
       Go through Routing Tables of Node 1, and sending a PING to everything in there.
       Should expect a PING response from Node 0. 
-
-
-
-
-
 
 
 ===================================================
