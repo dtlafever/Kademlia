@@ -19,19 +19,41 @@ Test Cases:
 
 --JOINING A NETWORK--
 
-     =. Node 0 joins the network with a contact. Node 0 fails to join
-     	-the contact that you specify doesn't exist
-	     -prints out "failed to join network" and quits
+=======================================================================
+TESTED SUCCESS. NODE JOINS WITH A CONTACT THAT DOESN'T EXIST
 
-     =. Node 0 joins the network. Node 0 starts the network and has
-     	an empty routing table.
-	-just one node, by itself
-	      -prints "joined the network"
-	      
-     =. Node 0 exists within the network. Node 1 joins the network with 0 as
-     	a contact. Node 1 successfully joins with 0 in it's Routing Table. And
-	Node 0 has node 1 in node 0's routing table.
+ -Node 0 joins the network with a contact.
+ -input:
+	./main 0 2 10.200.102.219
+ -(the IP and contact ID doesn't matter, it can be made up)
+ -output:
+	Contact Node Timed out.
+	This node has failed to join the network
 
+=======================================================================
+TESTED SUCCESS. SINGULAR NODE STARTS A NETWORK
+
+ -Node 0 joins the network. Node 0 starts the network and has
+  an empty routing table.
+ -input:
+	./main 0
+ -output:
+	We have started the network.
+
+=======================================================================
+TESTED SUCCESS. NODE 1 JOINS WITH NODE 0 AS CONTACT
+
+ -Node 0 exists in a network. Node 1 attempts to join with 0 as contact.
+ -input:
+	./main 1 0 (given IP)
+ -output:
+	We have joined a network.
+
+=======================================================================
+
+
+
+DID WE TEST THIS ONE?
      =. Suppose that enough nodes are in the network such that every
      	node's Routing table is full. All such nodes are still alive.
 	A new node n attempts to join, it fails to join.
@@ -40,16 +62,15 @@ Test Cases:
 
 
 ADDING SECOND NODE
+IN BETTER DETAIL = TESTED SUCCESSFULLY
 ============================================
 Suppose we have Node B and we want to join the network
-
 Node B (ID = 4) uses Node A (ID = 3) as it's contact
 ============================================
 
 -Node B must have a contact to join. It provides the ID of Node A
 -Node B calculates the distance between itself and Node A.
 -Node B places Node A into the appropriate K-bucket. (Dist = 7, so the third bucket)
-
 -Node B must now populate it and the rest of the network's K-buckets.
 -Node B sends FINDNODE request to Node A.
 -Node A receives a FINDNODE request with Node B's ID.
@@ -65,7 +86,8 @@ Node B is now successfully in the network!
 
 
 
-ADDING THIRD NODE 
+ADDING THIRD NODE
+IN BETTER DETAIL = TESTED SUCCESSFULLY
 ========================================
 Suppose ALPHA = 3 and K = 5
 
@@ -109,7 +131,6 @@ GENERAL CASE
 =======
 
 Suppose there are N nodes in the network, such that N < 2^32.
-
 A node wants to join the network, and has a contact.
 
 =======
@@ -174,13 +195,15 @@ A node wants to join the network, and has a contact.
 	      Node 0 will send a failure Find Value response.
 
 
+
+
+
 =============================================
 Suppose there is onle 1 node in the network
-
 Node A
 =============================================
 
-STORE (WITH ONE NODE)
+STORE (WITH ONE NODE) - TESTED SUCCESSFULLY
 
 From the UI we say:
 >store 10
@@ -194,7 +217,7 @@ A will store the given key in itself.
 
 ==============================================
 
-FIND (if we didn't STORE anything)
+FIND (if we didn't STORE anything) - TESTED SUCCESSFULLY
 
 From the UI the only thing we say is:
 >find 10
@@ -212,7 +235,7 @@ The UI will print out "Failure" to the user.
 
 ==============================================
 
-FIND (if we actually did STORE something)
+FIND (if we actually did STORE something) - TESTED SUCCESSFULLY
 
 From the UI we say:
 >store 10
@@ -238,7 +261,7 @@ Node A is storing Node B in it's third K-bucket.
 Node B is storing Node A in it's third K-bucket.
 =============================================
 
-STORE (WITH TWO NODES)
+STORE (WITH TWO NODES) - TESTED SUCCESSFULLY
 
 From the UI we say:
 >store 5
@@ -264,7 +287,7 @@ and not the UI, then it will simply push the given Key(5) into it's list of keys
 
 ===========
 
-FIND (with the UI connected to Node A - assuming we have stored a key first)
+FIND (with the UI connected to Node A - assuming we have stored a key first) - TESTED SUCCESSFULLY
 
 From the UI we say:
 >find 5
@@ -282,7 +305,7 @@ The UI will print a "success" message to the user.
 
 ===========
 
-Find (with the UI connected to Node B - assuming we have stored a key first)
+Find (with the UI connected to Node B - assuming we have stored a key first) - TESTED SUCCESSFULLY
 
 From the UI we say:
 >find 5
@@ -318,20 +341,19 @@ The UI will print a "success" message to the user.
      =. Suppose Node 5 sends the response after Node 0 times out the request.
      	  -Node 0 drops the response because it doesn't match any request in the Timer Queue.
 
-  =============================================
-  Suppose as the UI we try to contact a Node,
-  but it died and  was removed from the network
-  =============================================
-
-  The UI will send any type of request to the Node it is connected to.
-  There is a predefined point in time where the UI needs to give up waiting for a response.
-
-  If the predefined timeout arrives and there still is no response, the UI will print
-  to the user that the connection has timed out and ended.
-
-  The UI will also give the user the option to enter a new IP address to connect to.
+=.Two nodes, IDs 0 and 1, testing the Refreshing Function.
+      Go through Routing Tables of Node 1, and sending a PING to everything in there.
+      Should expect a PING response from Node 0. 
 
 
+
+
+
+
+
+===================================================
+
+ALL OF THE U.I. CASES TESTED SUCCESSFULLY
 =================================
 USER INTERFACE TEST CASES
 =================================
@@ -345,6 +367,21 @@ NOTES BEFOREHAND:
       -We are assuming the second argument is always an integer.
 
 ===============================================
+
+=============================================
+Suppose as the UI we try to contact a Node,
+but it died and  was removed from the network
+=============================================
+
+The UI will send any type of request to the Node it is connected to.
+There is a predefined point in time where the UI needs to give up waiting for a response.
+
+If the predefined timeout arrives and there still is no response, the UI will print
+to the user that the connection has timed out and ended.
+
+The UI will also give the user the option to enter a new IP address to connect to.
+
+=============================================
 
 Test Case #1 - Enter three arguments instead of one/two
 
@@ -407,17 +444,3 @@ Input:
 Output:
 Failure.
 
-==================
-
-Test Case #7 - Enter a store/find request and the node doesn't respond
-
-Input:
->find 3
-
-Output:
->Error: Request timed out. Please re-enter an IP:
-
-(Note: entering a new IP will have the socket close and reopen to the
-       IP given)
-
-============================================================
