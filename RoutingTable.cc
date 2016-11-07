@@ -10,6 +10,8 @@
 
 using namespace std;
 
+#define LOG_FILE "Logs/bucket.log"
+
 //Tags: Creatation, Check and Find, Modifying, Getting Stuff, Print Table
 
 //-----------------------Creation---------------------------------
@@ -18,7 +20,7 @@ using namespace std;
 //Post: table is an array of K kBuckets, that are each empty
 RoutingTable::RoutingTable(uint32_t id) {
   myId = id;
-	logOut.open("bucket.log", std::ofstream::out | std::ofstream::app);
+	logOut.open(LOG_FILE, std::ofstream::out | std::ofstream::app);
 }
 
 //Pre: id and address represents a new node not seen before

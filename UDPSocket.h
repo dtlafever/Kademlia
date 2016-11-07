@@ -6,6 +6,7 @@
 #include <string>
 
 #define MAX_CHAR 80
+#define LOG_DIR "Logs/"
 
 class UDPSocket : private Socket {
  public:

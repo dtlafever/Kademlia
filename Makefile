@@ -23,4 +23,4 @@ Node.o: Node.cpp
 main.o: main.cpp
 	$(GCC) -c main.cpp
 clean:                                                                          
-	rm -r *.o *.log main *~ ./LOGS/*
+	rm -r *.o *.log main *~ ./Logs/*

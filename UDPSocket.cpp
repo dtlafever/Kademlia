@@ -9,8 +9,9 @@
 UDPSocket::UDPSocket(uint32_t port, std::string fileName)
 {
   gethostname(hostName, MAX_CHAR);
-  fN = fileName;
-  fileLog.open(fileName, std::ofstream::out | std::ofstream::app);
+
+  fN = LOG_DIR + fileName;
+  fileLog.open(fN, std::ofstream::out | std::ofstream::app);
   fileLog << "--------START NETWORK--------" << std::endl;
   if (!Socket::create(UDP)) {
     fileLog << hostName << ": Could not create server socket." << std::endl;
