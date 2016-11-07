@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <cmath>
 #include <fstream>
+#include <unistd.h>
 
 using namespace std;
 
@@ -19,8 +20,10 @@ using namespace std;
 //Pre: id is the nodeID who owns this RoutingTable
 //Post: table is an array of K kBuckets, that are each empty
 RoutingTable::RoutingTable(uint32_t id) {
+	gethostname(hostName, MAX_CHAR);
   myId = id;
 	logOut.open(LOG_FILE, std::ofstream::out | std::ofstream::app);
+	logOut << hostName << ": --------START NETWORK--------" << std::endl;
 }
 
 //Pre: id and address represents a new node not seen before
@@ -217,11 +220,11 @@ void RoutingTable::log(int &i, Triple curNode, bool add)
 {
 	if(add)
 	{
-		logOut<<"Inserted Node - ";
+		logOut<< hostName << ": Inserted Node - ";
 	}
 	else
 	{
-		logOut<<"Deleted Node - ";
+		logOut<< hostName << ": Deleted Node - ";
 	}
 	
 	logOut <<"port :"<< curNode.port <<" \t node : " << curNode.node << " \t address: "<< curNode.address <<endl;
@@ -231,17 +234,17 @@ void RoutingTable::log(int &i, uint32_t nodeID, bool add)
 {
 	if(add)
 	{
-		logOut<<"Inserted Node - ";
+		logOut<< hostName << ": Inserted Node - ";
 	}
 	else
 	{
-		logOut<<"Deleted Node - ";
+		logOut<< hostName << ": Deleted Node - ";
 	}
 	
-	logOut <<"port : ---- \t node : " << nodeID << " \t address: ----"<<endl;
+	logOut << "port : ---- \t node : " << nodeID << " \t address: ----"<<endl;
 }
 
 void RoutingTable::logError(string msg)
 {
-	logOut << "ERROR :  "<< msg;
+	logOut << hostName << ": ERROR :  "<< msg;
 }

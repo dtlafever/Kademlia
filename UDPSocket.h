@@ -9,6 +9,11 @@
 #define LOG_DIR "Logs/"
 
 class UDPSocket : private Socket {
+ private:
+  std::ofstream fileLog;
+  std::string fN;
+  char hostName[MAX_CHAR];
+
  public:
   //PRE: the port we want to listen
   //POST: creates the socket and binds to the specified port.
@@ -49,11 +54,6 @@ class UDPSocket : private Socket {
   //PRE: takes a file name as input
   //POST: sets and opens that file.
   void setFileName(std::string fileName);
-  
- private:
-  std::ofstream fileLog;
-  std::string fN;
-  char hostName[MAX_CHAR];
 };
 
 #endif // !UDPSocket_class

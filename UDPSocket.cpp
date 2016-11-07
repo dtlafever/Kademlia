@@ -12,7 +12,7 @@ UDPSocket::UDPSocket(uint32_t port, std::string fileName)
 
   fN = LOG_DIR + fileName;
   fileLog.open(fN, std::ofstream::out | std::ofstream::app);
-  fileLog << "--------START NETWORK--------" << std::endl;
+  fileLog << hostName << ": --------START NETWORK--------" << std::endl;
   if (!Socket::create(UDP)) {
     fileLog << hostName << ": Could not create server socket." << std::endl;
     throw SocketException("Could not create server socket.");
