@@ -242,7 +242,6 @@ std::string Message::toString(MsgType type, uint32_t nodeID, uint32_t ID, bool U
 			{
 				sprintf(temp, "%u", ID); // convert to string
 				msg += msgStrings[FINDVALUE]+ std::string(temp);
-				std::cout << msg <<std::endl;
 
 			}
 			break;
