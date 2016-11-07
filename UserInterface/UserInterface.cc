@@ -197,6 +197,8 @@ string UserInterface::findKey(uint32_t ID){
 //      to determine whether our request was a success
 //      or failure.
 void UserInterface::handleMessage(string newMsg){
+  cout << "NewMSG: " << newMsg << endl;
+
   Message receivedMsg(newMsg);
   
   if(receivedMsg.getMsgType() == STORERESP){
