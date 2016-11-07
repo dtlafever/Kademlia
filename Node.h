@@ -9,13 +9,13 @@
 #include "MsgTimer.h"
 #include "constants.h"
 #include <mutex>
+#include <utility>
 
 #define UI_TIMEOUT 0
 #define PINGER_TIMEOUT 1
 #define REFRESH_TIMEOUT 2
 
 using namespace std;
-
 
 class Node
 {
@@ -26,7 +26,12 @@ class Node
   vector<uint32_t> keys;
   uint32_t ID;
   bool inNetwork;
-  vector<Triple> refresherVector;
+	// refresherVector[i].first = what we want to add to the routing Table
+	// refresherVector[i].second = what we need to ping
+  vector<pair<Triple, Triple>> refresherVector;
+	
+	// Counters for nodes that we need to refresh
+	uint32_t refreshCounters [NUMBITS];
   bool exit = false;
 	mutex outputLock;
 
@@ -56,6 +61,8 @@ class Node
 	
 	void clearTimeOut(vector<MsgTimer>& timer);
 	
+	uint32_t findInRefresherVector (uint32_t nodeid);
+
  public:
 
   //Pre: id is a valid node id that is not yet taken

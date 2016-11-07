@@ -8,6 +8,7 @@
 #include <thread>
 #include <iostream>
 #include <cmath>
+#include <cstring>
 
 //Node Construction, Node Listener,
 //Refresher and Update, User Interface, Sending
@@ -22,6 +23,7 @@ Node::Node(uint32_t nodeID) : RT(nodeID){
 	{
 		ID = nodeID;
 		inNetwork = true;
+		memset(refreshCounters, 0, sizeof(refreshCounters));
 	}
 	else {
 		printf("Invalid ID : %u \n", nodeID);
@@ -114,7 +116,8 @@ Node::Node(uint32_t nodeID, uint32_t contactID, uint32_t contactIP) : RT(nodeID)
 		RT.updateTable(contactID, contactIP); // Insert contact node in routing table
 		inNetwork = false; //at this point, no other node knows about us
 		bool recvContact = false;
-		
+		memset(refreshCounters, 0, sizeof(refreshCounters));
+
 		// Create a vector for timeouts
 		vector<MsgTimer> timeOut;
 		
@@ -257,7 +260,7 @@ void Node::startListener(){
 					aKey = receivedMessageOBJ.getID();
 					if (find(keys.begin(), keys.end(), aKey) == keys.end()){
 						keys.push_back(aKey);
-						refresherVector.push_back(sendTriple);
+						refresherVector.push_back(make_pair(sendTriple, Triple()));
 					}
 				}
 					break;
@@ -276,7 +279,7 @@ void Node::startListener(){
 					sendString = sendMessageOBJ.toString();
 					socket.sendMessage(sendString, senderIP, UIPORT);
 					
-					refresherVector.push_back(sendTriple);
+					refresherVector.push_back(make_pair(sendTriple, Triple()));
 				}
 					break;
 					
@@ -305,7 +308,7 @@ void Node::startListener(){
 						socket.sendMessage(sendString, senderIP, UIPORT);
 					}
 					
-					refresherVector.push_back(sendTriple);
+					refresherVector.push_back(make_pair(sendTriple, Triple()));
 				}
 					break;
 					
@@ -389,6 +392,19 @@ void Node::startRefresher()
 						// Checking in other threads timeouts
 						if(m<timeouts[PINGER_TIMEOUT].size() && timeouts[PINGER_TIMEOUT][m].getNodeIP() == IP) // If we found a timeout with the same IP
 						{
+							// Which one it corresponded to
+							int32_t index = findInRefresherVector(timeouts[PINGER_TIMEOUT][m].getNodeID());
+		
+							if (index != -1)
+							{
+								// erase it from the refresherVector
+								refresherVector.erase(refresherVector.begin()+index);
+								// get the Kbucket index
+								int32_t kbindex = RT.findKBucket(timeouts[PINGER_TIMEOUT][m].getNodeID());
+		
+								if(refreshCounters[kbindex]>0) refreshCounters[kbindex]--;
+							}
+							
 							// erase element in vector
 							timeouts[PINGER_TIMEOUT].erase(timeouts[PINGER_TIMEOUT].begin()+m);
 							found = true; // Update flag
@@ -411,7 +427,7 @@ void Node::startRefresher()
 					
 					if(!found)
 					{
-						if( msg.getNodeID() != ID)
+						if(msg.getNodeID() != ID)
 							RT.updateTable(msg.getNodeID(),IP);
 					}
 				}
@@ -449,25 +465,34 @@ void Node::startRefresher()
 			
 		}
 		
-		/// Update elements in the refreshor vector
-		for (int i=0; refresherVector.size()>0 && i<ALPHA; ++i)
+		/// Update elements in the refresher vector
+		for (int i=0; refresherVector.size()>0 && i<ALPHA && i<refresherVector.size(); ++i)
 		{
 			// try to update in table then ping if necessary
-			if ((refresherVector[0].node != ID)&&!RT.updateTable(refresherVector[0].node, refresherVector[0].address))
+			if ((refresherVector[i].first.node != ID)&&!RT.updateTable(refresherVector[i].first.node, refresherVector[i].first.address))
 			{
-				// Get LRU node
-				Triple tripleToRefresh = RT.getOldestNode(refresherVector[0].node);
+				int32_t index = RT.findKBucket(refresherVector[i].first.node);
 				
-				// PING
-				Message msg(PING, ID);
-				socket.sendMessage(msg.toString(), tripleToRefresh.address, REFRESHERPORT);
-				
-				// Add to the timeouts
-				MsgTimer timer(RESPONDTIME_PING, tripleToRefresh.node, tripleToRefresh.address);
-				timeouts[PINGER_TIMEOUT].push_back(timer);
+				if(refreshCounters[index]<K)
+				{
+					refreshCounters[index]++;
+					
+					// Get LRU node from the appropriate kbucket
+					Triple tripleToRefresh = RT.getOldestNode(refresherVector[i].first.node);
+					refresherVector[i].second = tripleToRefresh;
+					
+					// PING
+					Message msg(PING, ID);
+					socket.sendMessage(msg.toString(), tripleToRefresh.address, REFRESHERPORT);
+					
+					// Add to the timeouts
+					MsgTimer timer(RESPONDTIME_PING, tripleToRefresh.node, tripleToRefresh.address);
+					timeouts[PINGER_TIMEOUT].push_back(timer);
+				}
+				else refresherVector.erase(refresherVector.begin()+i);
 				
 			}
-			else refresherVector.erase(refresherVector.begin()); // Remove from the vector, the node was refreshed
+			else refresherVector.erase(refresherVector.begin()+i); // Remove from the vector, the node was refreshed
 		}
 		
 		/// Check PING timeouts
@@ -479,6 +504,19 @@ void Node::startRefresher()
 				// Checking if anything timed out and remove it.
 				if(i<timeouts[PINGER_TIMEOUT].size() && timeouts[PINGER_TIMEOUT][i].timedOut())
 				{
+					// Which one it corresponded to in the refreshervector
+					int32_t index = findInRefresherVector(timeouts[PINGER_TIMEOUT][i].getNodeID());
+					
+					if (index != -1)
+					{
+						// erase it from the refresherVector
+						refresherVector.erase(refresherVector.begin()+index);
+						// get the Kbucket index
+						int32_t kbindex = RT.findKBucket(timeouts[PINGER_TIMEOUT][i].getNodeID());
+						
+						if(refreshCounters[kbindex]>0) refreshCounters[kbindex]--;
+					}
+					
 					RT.deleteNode(timeouts[PINGER_TIMEOUT][i].getNodeID());
 					timeouts[PINGER_TIMEOUT].erase(timeouts[PINGER_TIMEOUT].begin()+i);
 					i--;
@@ -624,7 +662,7 @@ void Node::startUIListener() {
 					Triple refresh;
 					refresh.address = socketUI.getRemoteIP();
 					refresh.node = recvMsg.getNodeID();
-					refresherVector.push_back(refresh);
+					refresherVector.push_back(make_pair(refresh, Triple()));
 					
 					
 					if (!snapShot.nextExist()) {
@@ -678,7 +716,7 @@ void Node::startUIListener() {
 					Triple refresh;
 					refresh.address = socketUI.getRemoteIP();
 					refresh.node = recvMsg.getNodeID();
-					refresherVector.push_back(refresh);
+					refresherVector.push_back(make_pair(refresh, Triple()));
 					
 					Message sendMsg(FVRESPP, ID);
 					socketUI.sendMessage(sendMsg.toString(), ipUI, UIPORT);
@@ -701,7 +739,7 @@ void Node::startUIListener() {
 					sendTriple.address = senderIP;
 					sendTriple.port = UIPORT;
 					sendTriple.node = recvMsg.getNodeID();
-					refresherVector.push_back(sendTriple);
+					refresherVector.push_back(make_pair(sendTriple, Triple()));
 				}
 					break;
 				default:
@@ -843,4 +881,21 @@ void Node::sendUpToAlphaPing(KBucket &curKBucket, UDPSocket &socket, uint32_t & 
 		}
 		
 	}
+}
+
+uint32_t Node::findInRefresherVector (uint32_t nodeid)
+{
+	bool found = false;
+	uint32_t index = -1;
+	for(int i =0; i<refresherVector.size() && !found; ++i)
+	{
+		if(refresherVector[i].second.node == nodeid)
+		{
+			index= i;
+			found = true;
+		}
+			
+	}
+	
+	return index;
 }
