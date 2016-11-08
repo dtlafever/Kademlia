@@ -174,7 +174,8 @@ Node::Node(uint32_t nodeID, uint32_t contactID, uint32_t contactIP) : RT(nodeID)
 	    // Send a FINDNODE message to the next node.
 	    Message toSend(FINDNODE, ID, ID);
 	    socket.sendMessage(toSend.toString(), nextToAsk.address, UIPORT);
-	    printf("%s to %s\n", toSend.toString().c_str(), IP_toString(nextToAsk.address).c_str());
+	    printf("%s to %s\n", toSend.toString().c_str(), 
+			IP_toString(nextToAsk.address).c_str());
 				
 	    // Add a timeout
 	    MsgTimer timer(RESPONDTIME_UI, nextToAsk.node, nextToAsk.address);
@@ -218,7 +219,8 @@ void Node::mainStore(uint32_t aKey, Triple & sendTriple){
 }
 
 //get our KClosest and send it off to the sender
-void Node::mainFindNode(uint32_t aKey, Triple & sendTriple, uint32_t senderIP, UDPSocket & socket){
+void Node::mainFindNode(uint32_t aKey, Triple & sendTriple, 
+uint32_t senderIP, UDPSocket & socket){
 	Triple KClosest[K];
   int closestSize = RT.getKClosestNodes(aKey, KClosest); 
 	Message sendMessageOBJ(NONE, ID);
@@ -234,7 +236,8 @@ void Node::mainFindNode(uint32_t aKey, Triple & sendTriple, uint32_t senderIP, U
 }
 
 //return FVRESP if we have the key, oterhwise send Kclosest
-void Node::mainFindValue(uint32_t aKey, Triple & sendTriple, uint32_t senderIP, UDPSocket & socket){
+void Node::mainFindValue(uint32_t aKey, Triple & sendTriple, 
+uint32_t senderIP, UDPSocket & socket){
 	Triple KClosest[K];
   int closestSize = RT.getKClosestNodes(aKey, KClosest);
 	Message sendMessageOBJ(NONE, ID);
@@ -406,7 +409,9 @@ void Node::startRefresher()
 				 n<timeouts[REFRESH_TIMEOUT].size()) && !found; ++m, ++n)
 		  {
 		    // Checking in other threads timeouts
-		    if(m<timeouts[PINGER_TIMEOUT].size() && timeouts[PINGER_TIMEOUT][m].getNodeIP() == IP) // If we found a timeout with the same IP
+		    if(m<timeouts[PINGER_TIMEOUT].size() && 
+				timeouts[PINGER_TIMEOUT][m].getNodeIP() == IP) 
+				// If we found a timeout with the same IP
 		      {
 			// Which one it corresponded to
 			int32_t index = findInRefresherVector(timeouts[PINGER_TIMEOUT][m].getNodeID());
@@ -486,7 +491,8 @@ void Node::startRefresher()
 	}
 		
       /// Update elements in the refresher vector
-      for (int i=0; refresherVector.size()>0 && i<ALPHA && i<refresherVector.size(); ++i)
+      for (int i=0; refresherVector.size()>0 && i<ALPHA && 
+			i<refresherVector.size(); ++i)
 	{
 	  // try to update in table then ping if necessary
 	  if ((refresherVector[i].first.node != ID)&&
@@ -607,7 +613,8 @@ void Node::UIFindValue(bool & respondedToUI, Message & curMsg, Message & recvMsg
 }
 
 //Find Kclosest and then ask up to alpha at a time what their kclosest are 
-void Node::UIStore(Message & curMsg, Message & recvMsg, bool & respondedToUI, UDPSocket & socketUI, SnapShot & snapShot, uint32_t ipUI){
+void Node::UIStore(Message & curMsg, Message & recvMsg, 
+bool & respondedToUI, UDPSocket & socketUI, SnapShot & snapShot, uint32_t ipUI){
 	// Set the current message to the received request from the UI
 		curMsg.setType(recvMsg.getMsgType());
 		curMsg.setID(recvMsg.getID());
@@ -639,7 +646,8 @@ void Node::UIStore(Message & curMsg, Message & recvMsg, bool & respondedToUI, UD
 //read the kClosest and add the elements to our snapShot if they are a closer distance.
 //Then, if we have run out of Kclosest, then send store to the Kclosest if store,
 //otherwise send FVRESPN to the UI
-void Node::UIKClosest(Message & recvMsg, SnapShot & snapShot, Message & curMsg, UDPSocket & socketUI, bool & respondedToUI, uint32_t ipUI){
+void Node::UIKClosest(Message & recvMsg, SnapShot & snapShot, 
+Message & curMsg, UDPSocket & socketUI, bool & respondedToUI, uint32_t ipUI){
 	//ASSERT: this is a response from a node.
 	Triple kClos[K];
 	removeFromUITimeout(recvMsg.getNodeID());
@@ -703,7 +711,8 @@ void Node::UIKClosest(Message & recvMsg, SnapShot & snapShot, Message & curMsg, 
 }
 
 //someone has find the value, send true to UI
-void Node::UIFVResp(Message & recvMsg, UDPSocket & socketUI, bool & respondedToUI, uint32_t ipUI){
+void Node::UIFVResp(Message & recvMsg, UDPSocket & socketUI, 
+bool & respondedToUI, uint32_t ipUI){
 	removeFromUITimeout(recvMsg.getNodeID());
 				
 	//Add to refresh vector
@@ -744,7 +753,8 @@ void Node::UIFindNode(Message & recvMsg, UDPSocket & socketUI, uint32_t senderIP
 }
 
 //removes items from timeout if we recieve responses from nodes
-void Node::handleUITimeouts(Message & curMsg, SnapShot & snapShot, bool & respondedToUI, UDPSocket & socketUI, uint32_t ipUI){
+void Node::handleUITimeouts(Message & curMsg, SnapShot & snapShot, 
+bool & respondedToUI, UDPSocket & socketUI, uint32_t ipUI){
 	for (int i = 0; i < timeouts[UI_TIMEOUT].size(); i++)
 		{
 			if (timeouts[UI_TIMEOUT][i].timedOut()) {
@@ -899,7 +909,8 @@ void Node::removeFromUITimeout(uint32_t ID)
 //     send messages on.
 //POST: sends up to ALPHA nodes FINDVALUE and then add them to
 //      the timer queue.
-void Node::sendUpToAlphaKClos(SnapShot & ss, UDPSocket & sock, uint32_t msgID, MsgType mType)
+void Node::sendUpToAlphaKClos(SnapShot & ss, UDPSocket & sock, 
+uint32_t msgID, MsgType mType)
 {
 	
   Message sendMsg(mType, ID, msgID);
