@@ -10,9 +10,9 @@
 class MsgTimer {
 
 private:
-  uint32_t nodeID, nodeIP;
-  dur wait_for;
-  tp finish_time;
+  uint32_t nodeID, nodeIP;  //the node we are checking on timeout
+  dur wait_for;             //how long we should wait
+  tp finish_time;           //when the time becomes a timeout
 
 
 public:
