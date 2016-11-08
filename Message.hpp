@@ -27,7 +27,7 @@
 // ========================================================
 enum MsgType { PING, FINDNODE, FINDVALUE, STORE, KCLOSEST, PINGRESP, FVRESP, STORERESP, FVRESPP, FVRESPN, NONE};
 
-// IMPORTANT: This class assumes that anything passed to it is valid. It will not check if the contents in the array are garbage or not, if the size is wrong there is no garantee how the program is going to react.
+// IMPORTANT: This class assumes that anything passed to it is valid. It will not check if the contents of the KClosest array are garbage or not, if the string itself is manipulated when sending to the parse function there is no guarantee how the message will be parsed.
 
 class Message
 {
@@ -52,9 +52,20 @@ class Message
   // Number of valid elements in KClos
   uint32_t size =0;
 	
-  // This array stores the names of the different types to simplify the parsing
+  // This array stores the names of the different types to simplify the parsing and string creation
   const std::string msgStrings [11] = {"PING ", "FINDNODE ",  "FINDVALUE ", "STORE ", "KCLOSEST ", "PINGRESP", "FVRESP", "STORERESP", "FVRESPP", "FVRESPN",  "NONE "};
-		
+	
+	// This function prints the type of the current Message object, used for testing.
+	void printMessageType ();
+	
+	// PRE: Takes a string that contains the KClosest array to be parsed and put in the internal data member (KClos []). This function should only be called by the parse function.
+	// POST: The function parses the string to retrieve each element (Node IP, UDP Port, and Node ID)
+	void parseKClosest (std::string & message);
+	
+	// PRE: This function is called by the toString functions. It creates the string for the KCLOSEST message type
+	// POST: The function takes each triple (Node IP, UDP Port, and Node ID) and converts them to strings before adding them to the string msg.
+	void createKClosestMessage();
+
 public:
 	
   // Default constructor
@@ -64,9 +75,9 @@ public:
   // POST: Constructor that will call the parse function
   Message (std::string msg);
 	
-  // PRE:
-  // POST:
-  Message(MsgType type, uint32_t nodeID=-1, uint32_t ID = -1, bool UI = false);
+  // PRE: Takes the type of the message and the ID of the sender at least. The ID is dependent on the type of message: STORE, FINDNODE, FINDVALUE are the messages that need an ID. The UI boolean is by default set to false and is set to true only by the UserInterface program.
+  // POST: This Constructor initializes the internal members and calls to string to verify.
+  Message(MsgType type, uint32_t nodeID, uint32_t ID = -1, bool UI = false);
 	
   // Copy constructor
   Message (const  Message & rhs);
@@ -81,9 +92,9 @@ public:
   // POST: This function parses the message and updates the appropriate private members. This function alters the string and
   void parse (std::string );
 	
-  // PRE: takes a MsgType object and an ID which depends on the type of the message
+  // PRE: takes a MsgType object and an ID which depends on the type of the message. This function should only be used when the Message object was initialized previously with at least the nodeID of the sender and the message type.
   // POST: Creates a message to be able to send it in the appropriate format.
-  std::string toString (MsgType type, uint32_t nodeID=-1, uint32_t ID = -1, bool UI=false);
+  std::string toString (MsgType type, uint32_t nodeID, uint32_t ID = -1, bool UI=false);
 	
   // PRE: this function is to be used if the Message object is already created and we want to retrieve the string format.
   // POST: This function creates a string relative to its attributes that can be used when communicating. The function will return an empty string if it fails.
@@ -105,16 +116,16 @@ public:
   // POST:  This function does not check the types, it assumes it's taking the right input and just sets the internal message type.
   void setType(MsgType type);
 	
-  // PRE:
-  // POST:
+  // PRE: this function takes the ID we are searching for (for Message objects of type : STORE, FINDNODE and FINDVALUE).
+  // POST: Sets the internal member ID. This function assumes the ID is valid.
   void setID(uint32_t id);
 	
-  // PRE:
-  // POST:
+  // PRE: This function takes the nodeID we want the Message object to keep as a senderID.
+  // POST: The function sets the internal member NodeID to the id that is passed. The function assumes it is taking the right input for the senderID.
   void setNodeID(uint32_t id);
 	
-  // PRE:
-  // POST:
+  // PRE:takes a boolean to set the Message as a UI message or change it to non UI
+  // POST: Because the Message object is by default non UI, only the UserInterface program should use this function.
   void setUI(bool UI);
 	
   // PRE: Takes the array of triples to put in the message and the size of the array
@@ -125,12 +136,9 @@ public:
   // POST: returns the size of the array and updates the clos array passed by reference
   uint32_t getKClos (Triple clos[K]);
 	
-  void printMessageType ();
-	
+	// PRE: This function only applies to Message objects of type KCLOSEST. This function does not check if the message type is correct and it does not check that the id passed is valid.
+	// POST:It checks if a nodeID is present in the array returned in the message. It returns true only if the nodeID we are checking for is found.
   bool includes(uint32_t & id);
-
-  //ADDED A PRINT FUNCTION TO MAKE DEBUGGING EASIER
-  void mePrint();
 
 };
 #endif /* Message_cpp */
