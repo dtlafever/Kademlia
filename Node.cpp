@@ -662,6 +662,7 @@ Message & curMsg, UDPSocket & socketUI, bool & respondedToUI, uint32_t ipUI){
 				Triple refresh;
 				refresh.address = socketUI.getRemoteIP();
 				refresh.node = recvMsg.getNodeID();
+
 				mLock.lock();
 				refresherVector.push_back(make_pair(refresh, Triple()));
 				mLock.unlock();
@@ -719,12 +720,14 @@ bool & respondedToUI, uint32_t ipUI){
 	Triple refresh;
 	refresh.address = socketUI.getRemoteIP();
 	refresh.node = recvMsg.getNodeID();
+
 	mLock.lock();
 	refresherVector.push_back(make_pair(refresh, Triple()));
 	mLock.unlock();
 
 	if(!respondedToUI)
 		{
+			//ASSERT: Send message only once to UI
 			Message sendMsg(FVRESPP, ID);
 			socketUI.sendMessage(sendMsg.toString(), ipUI, UIPORT);
 			respondedToUI = true;
@@ -742,11 +745,13 @@ void Node::UIFindNode(Message & recvMsg, UDPSocket & socketUI, uint32_t senderIP
 				
 	// REspond with KCLOSEST
 	socketUI.sendMessage(sendMsg.toString(), senderIP, UIPORT);
-				
+	
+	//create triple for sending off
 	Triple sendTriple;
 	sendTriple.address = senderIP;
 	sendTriple.port = UIPORT;
 	sendTriple.node = recvMsg.getNodeID();
+
 	mLock.lock();
 	refresherVector.push_back(make_pair(sendTriple, Triple()));
 	mLock.unlock();
