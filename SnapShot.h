@@ -12,6 +12,8 @@ struct Quint{
   uint32_t compareID;
   bool     queried;
 Quint() : node(-1), address(0), port(0), compareID(0), queried(true) {}
+Quint(const Quint & ref) : node(ref.node), address(ref.address), port(ref.port), compareID(ref.compareID), queried(ref.queried) {}
+Quint(Quint & ref) : node(ref.node), address(ref.address), port(ref.port), compareID(ref.compareID), queried(ref.queried) {}
 };
 
 //DEEP copy of from onto to
