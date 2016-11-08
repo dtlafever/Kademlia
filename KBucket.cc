@@ -220,7 +220,6 @@ void KBucket::adjustNode(uint32_t nodeID) {
 //Pre: node exists within bucket
 //Post: triple containing the node is removed from the list
 //      adjust remaining triples as necessary
-/// TODO: check this function again
 void KBucket::deleteNode(uint32_t nodeID) {
   //Regardless if we know what the triple is beforehand, we still don;t
   //know where it is. And having the ID is more readily available

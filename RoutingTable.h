@@ -39,12 +39,15 @@ class RoutingTable {
   //           false otherwise
   bool addNode(uint32_t node, uint32_t address);
 	
+	// This function logs the operation (node insertion or deletion to  bucket.log)
 	// add = false -> deleting node
 	// add = true -> adding node
 	void log (int &i , Triple curNode, bool add = false) ;
 	
+	// This function logs the operation (node insertion or deletion to  bucket.log) but this one takes only a nodeID
 	void log(int &i, uint32_t nodeID, bool add= false);
 	
+	// This function logs an error message in "bucket.log"
 	void logError(string msg);
 
  public:
@@ -96,9 +99,6 @@ class RoutingTable {
 	//Post: RV = the nth kBucket such that
 	//      d = findDist(id) where 2^n <= d < 2^n+1
 	int findKBucket(uint32_t id) const ;
-
-	
-	
 };
 
 #endif

@@ -148,4 +148,12 @@ class Node
 	
 	void startUIListener();
 	
+	void checkPingTimeOut();
+	
+	void updateRefresherVectorElements (UDPSocket &);
+	
+	void handlePINGRESP(uint32_t & IP, Message &);
+	
+	void routingTableRefresh(UDPSocket & socket, KBucket & curKBucket, MsgTimer & lastRefresh, bool & refresh, uint32_t & i, uint32_t &j);
+	
 };
