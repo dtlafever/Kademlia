@@ -80,6 +80,15 @@ class Node
 
   bool joined();
 
+	//Store a given key into our keys
+	void mainStore(uint32_t aKey, Triple & sendTriple);
+
+	//get our KClosest and send it off to the sender
+	void mainFindNode(uint32_t aKey, Triple & sendTriple, uint32_t senderIP, UDPSocket & socket);
+
+	//return FVRESP if we have the key, oterhwise send Kclosest
+	void mainFindValue(uint32_t aKey, Triple & sendTriple, uint32_t senderIP, UDPSocket & socket);
+
   //Handles messages from other Nodes.
   //Everything is constant time
   //MAIN: port 6666
@@ -104,6 +113,27 @@ class Node
 
 	void startRefresher();
 	
+	//Look at our current keys and respond true to UI if we have it, otherwise send
+	//findvalue to up to alpha at a time to Kclosest
+	void UIFindValue(bool & respondedToUI, Message & curMsg, Message & recvMsg, uint32_t ipUI, SnapShot & snapShot, UDPSocket & socketUI);
+
+	//Find Kclosest and then ask up to alpha at a time what their kclosest are 
+	void UIStore(Message & curMsg, Message & recvMsg, bool & respondedToUI, UDPSocket & socketUI, SnapShot & snapSnot, uint32_t ipUI);
+
+	//read the kClosest and add the elements to our snapShot if they are a closer distance.
+	//Then, if we have run out of Kclosest, then send store to the Kclosest if store,
+	//otherwise send FVRESPN to the UI
+	void UIKClosest(Message & recvMsg, SnapShot & snapShot, Message & curMsg, UDPSocket & socketUI, bool & respondedToUI, uint32_t ipUI);
+
+	//someone has find the value, send true to UI
+	void UIFVResp(Message & recvMsg, UDPSocket & socketUI, bool & respondedToUI, uint32_t ipUI);
+
+	//specifically for the adding a node, repsond with our Kclosest
+	void UIFindNode(Message & recvMsg, UDPSocket & socketUI, uint32_t senderIP);
+
+	//removes items from timeout if we recieve responses from nodes
+	void handleUITimeouts(Message & curMsg, SnapShot & snapShot, bool & respondedToUI, UDPSocket & socketUI, uint32_t ipUI);
+
 	//Handles all UI
 	//Variable Time
 	//L1  : port 6667
