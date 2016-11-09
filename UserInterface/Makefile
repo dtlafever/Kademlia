@@ -24,7 +24,4 @@ UImain.o: UImain.cc
 	$(GCC) -c UImain.cc
 
 clean:
-	$(RM) *.o
-	$(RM) *.log
-	$(RM) UI
-	$(RM) *~
+	$(RM) *.o ./LOGS/* UI *~

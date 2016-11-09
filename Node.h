@@ -56,7 +56,6 @@ class Node
 	//POST: finds the node ID in the list and removes from timeout,
 	//      if it exist in the list.
 	void removeFromUITimeout(uint32_t ID);
-<<<<<<< HEAD
 	
 	// PRE: Assumes that the indices i & j (i = KBucket index, j = Index of a triple within the KBucket) are reset each time refresh flag is reset to true. The function takes the current KBucket we are refreshing, the socket through which we send the PING messages, lastRefresh which times when the Node starts refreshing the routingTable which is reset here after going through all triples in the RoutingTable, and the refresh flag which indicates if we are currently refreshing.
 	// POST: The function tries to find the next element to PING but makes sure that no more than ALPHA messages were already sent. If there is an element to ping it will send a PING message to the node and update the timeouts array
@@ -65,15 +64,6 @@ class Node
 //PRE: the snapshot we are currently using, as well as the socket to 
 //     send messages on.
 	//POST: sends up to ALPHA nodes FINDVALUE and then adds them to
-=======
-
-	void sendUpToAlphaPing(KBucket &curKBucket, UDPSocket &socket, 
-	uint32_t & i, uint32_t & j, MsgTimer & lastRefresh, bool & refresh);
-
-	//PRE: the snapshot we are currently using, as well as the socket to 
-	//     send messages on.
-	//POST: sends up to ALPHA nodes FINDVALUE and then add them to
->>>>>>> origin/master
 	//      the timer queue.
 	void sendUpToAlphaKClos(SnapShot & ss, UDPSocket & sock, 
 	uint32_t  msgID, MsgType mType);
