@@ -7,28 +7,27 @@
 
 #define MAXTHREADS 15 //maximum number of threads
 
-#define MAINPORT 6666
-#define UIPORT 6667
-#define REFRESHERPORT 6668
-#define TPORT 6669
+#define MAINPORT 6666      //Port for listening to other nodes
+#define UIPORT 6667        //Port for listening for UI requests and reponding to node requests
+#define REFRESHERPORT 6668 //Port for pinging
+#define TPORT 6669         //Port for sending message to UI terminal
 
 //GLOBAL VARIABLES FOR KADEMLIA NETWORK
 #define K 2
 #define NUMBITS 4
 #define ALPHA 3
 
-#define PINGTIME 60 //in seconds, the time to wait before refreshing the routing table
-#define RESPONDTIME_UI 10 //in seconds, the time to wait before 
-	//we consider a message timed out
+
+
+
+#define PINGTIME 60         //in seconds, the time to wait before refreshing the routing table
+#define RESPONDTIME_UI 10   //in seconds, the time to wait before 
+	                    //we consider a message timed out
 #define RESPONDTIME_PING 10 // in seconds, the time before 
-	//we consider that a PING request has timed out.
+	                    //we consider that a PING request has timed out.
 #define DELAY_DURATION chrono::duration<int, std::milli> delay(RESPONDTIME)
-
-//pinging a node
-#define MAXRECV 500
-
-//lets make chrono shorter
-#define TIME chrono::system_clock
+#define MAXRECV 500         //pinging a node
+#define TIME chrono::system_clock //lets make chrono shorter
 
 struct Triple {
 	//a myTriples represents a node who does not own this routing table
