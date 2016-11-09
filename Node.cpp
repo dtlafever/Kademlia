@@ -211,7 +211,8 @@ void Node::mainStore(uint32_t aKey, Triple & sendTriple){
 }
 
 //get our KClosest and send it off to the sender
-void Node::mainFindNode(uint32_t aKey, Triple & sendTriple, uint32_t senderIP, UDPSocket & socket){
+void Node::mainFindNode(uint32_t aKey, Triple & sendTriple, 
+uint32_t senderIP, UDPSocket & socket){
 	Triple KClosest[K];
 	int closestSize = RT.getKClosestNodes(aKey, KClosest);
 	Message sendMessageOBJ(NONE, ID);
@@ -227,7 +228,8 @@ void Node::mainFindNode(uint32_t aKey, Triple & sendTriple, uint32_t senderIP, U
 }
 
 //return FVRESP if we have the key, oterhwise send Kclosest
-void Node::mainFindValue(uint32_t aKey, Triple & sendTriple, uint32_t senderIP, UDPSocket & socket){
+void Node::mainFindValue(uint32_t aKey, Triple & sendTriple, 
+uint32_t senderIP, UDPSocket & socket){
 	Triple KClosest[K];
 	int closestSize = RT.getKClosestNodes(aKey, KClosest);
 	Message sendMessageOBJ(NONE, ID);
@@ -395,6 +397,7 @@ void Node::startRefresher()
 				}
 				break;
 					
+<<<<<<< HEAD
 				default:
 					printf("Unrecognized message received: %s\n", incoming.c_str());
 					break;
@@ -503,7 +506,10 @@ void Node::handlePINGRESP(uint32_t & IP, Message & msg)
 // Takes care of trying to PING, update or delete elements that have been inserted in the refreshervector by the main thread and the UI thread.
 void Node::updateRefresherVectorElements (UDPSocket & socket)
 {
-	for (int i=0; refresherVector.size()>0 && i<ALPHA && i<refresherVector.size(); ++i)
+	
+      /// Update elements in the refresher vector
+      for (int i=0; refresherVector.size()>0 && i<ALPHA && 
+			i<refresherVector.size(); ++i)
 	{
 		// try to update in table then ping if necessary
 		if ((refresherVector[i].first.node != ID)&&
@@ -620,8 +626,9 @@ void Node::UIFindValue(bool & respondedToUI, Message & curMsg, Message & recvMsg
 	}
 }
 
-//Find Kclosest and then ask up to alpha at a time what their kclosest are
-void Node::UIStore(Message & curMsg, Message & recvMsg, bool & respondedToUI, UDPSocket & socketUI, SnapShot & snapShot, uint32_t ipUI){
+//Find Kclosest and then ask up to alpha at a time what their kclosest are 
+void Node::UIStore(Message & curMsg, Message & recvMsg, 
+bool & respondedToUI, UDPSocket & socketUI, SnapShot & snapShot, uint32_t ipUI){
 	// Set the current message to the received request from the UI
 	curMsg.setType(recvMsg.getMsgType());
 	curMsg.setID(recvMsg.getID());
@@ -653,7 +660,8 @@ void Node::UIStore(Message & curMsg, Message & recvMsg, bool & respondedToUI, UD
 //read the kClosest and add the elements to our snapShot if they are a closer distance.
 //Then, if we have run out of Kclosest, then send store to the Kclosest if store,
 //otherwise send FVRESPN to the UI
-void Node::UIKClosest(Message & recvMsg, SnapShot & snapShot, Message & curMsg, UDPSocket & socketUI, bool & respondedToUI, uint32_t ipUI){
+void Node::UIKClosest(Message & recvMsg, SnapShot & snapShot, 
+Message & curMsg, UDPSocket & socketUI, bool & respondedToUI, uint32_t ipUI){
 	//ASSERT: this is a response from a node.
 	Triple kClos[K];
 	removeFromUITimeout(recvMsg.getNodeID());
@@ -717,23 +725,26 @@ void Node::UIKClosest(Message & recvMsg, SnapShot & snapShot, Message & curMsg, 
 }
 
 //someone has find the value, send true to UI
-void Node::UIFVResp(Message & recvMsg, UDPSocket & socketUI, bool & respondedToUI, uint32_t ipUI){
+void Node::UIFVResp(Message & recvMsg, UDPSocket & socketUI, 
+bool & respondedToUI, uint32_t ipUI){
 	removeFromUITimeout(recvMsg.getNodeID());
 	
 	//Add to refresh vector
 	Triple refresh;
 	refresh.address = socketUI.getRemoteIP();
 	refresh.node = recvMsg.getNodeID();
+
 	mLock.lock();
 	refresherVector.push_back(make_pair(refresh, Triple()));
 	mLock.unlock();
 	
 	if(!respondedToUI)
-	{
-		Message sendMsg(FVRESPP, ID);
-		socketUI.sendMessage(sendMsg.toString(), ipUI, UIPORT);
-		respondedToUI = true;
-	}
+		{
+			//ASSERT: Send message only once to UI
+			Message sendMsg(FVRESPP, ID);
+			socketUI.sendMessage(sendMsg.toString(), ipUI, UIPORT);
+			respondedToUI = true;
+		}
 }
 
 //specifically for the adding a node, repsond with our Kclosest
@@ -748,17 +759,20 @@ void Node::UIFindNode(Message & recvMsg, UDPSocket & socketUI, uint32_t senderIP
 	// REspond with KCLOSEST
 	socketUI.sendMessage(sendMsg.toString(), senderIP, UIPORT);
 	
+	//create triple for sending off
 	Triple sendTriple;
 	sendTriple.address = senderIP;
 	sendTriple.port = UIPORT;
 	sendTriple.node = recvMsg.getNodeID();
+
 	mLock.lock();
 	refresherVector.push_back(make_pair(sendTriple, Triple()));
 	mLock.unlock();
 }
 
 //removes items from timeout if we recieve responses from nodes
-void Node::handleUITimeouts(Message & curMsg, SnapShot & snapShot, bool & respondedToUI, UDPSocket & socketUI, uint32_t ipUI){
+void Node::handleUITimeouts(Message & curMsg, SnapShot & snapShot, 
+bool & respondedToUI, UDPSocket & socketUI, uint32_t ipUI){
 	for (int i = 0; i < timeouts[UI_TIMEOUT].size(); i++)
 	{
 		if (timeouts[UI_TIMEOUT][i].timedOut()) {
@@ -913,7 +927,8 @@ void Node::removeFromUITimeout(uint32_t ID)
 //     send messages on.
 //POST: sends up to ALPHA nodes FINDVALUE and then add them to
 //      the timer queue.
-void Node::sendUpToAlphaKClos(SnapShot & ss, UDPSocket & sock, uint32_t msgID, MsgType mType)
+void Node::sendUpToAlphaKClos(SnapShot & ss, UDPSocket & sock, 
+uint32_t msgID, MsgType mType)
 {
 	
 	Message sendMsg(mType, ID, msgID);

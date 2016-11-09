@@ -23,10 +23,11 @@ static std::string IP_toString(uint32_t ip){
 }
 
 class UDPSocket : private Socket {
+
  private:
-  std::ofstream fileLog;
-  std::string fN;
-  char hostName[MAX_CHAR];
+  std::ofstream fileLog;    //The log file we will use for this socket
+  std::string fN;           //The name of the log file
+  char hostName[MAX_CHAR];  //The hostname of the computer using this socket
 
  public:
   //PRE: the port we want to listen

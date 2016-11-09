@@ -20,12 +20,18 @@ using namespace std;
 class Node
 {
 
+//CLASS INVARIENT:
+// - Routing Table is configured such that each bucket contains up to K nodes
+//   where each node in an ith bucket is 2^i - 2^(i+1) XOR distance away
+// - ID is a 32bit unsigned that is unqiue to everyone in it's Routing Table
+
  private:
   
-  RoutingTable RT;
-  vector<uint32_t> keys;
-  uint32_t ID;
-  bool inNetwork;
+  RoutingTable RT;				//used for communicating to the network
+  vector<uint32_t> keys;	//the items this node has stored
+  uint32_t ID;						//our unique ID
+  bool inNetwork;					//whether we are in the network or not
+
 	// refresherVector[i].first = what we want to add to the routing Table
 	// refresherVector[i].second = what we need to ping
   vector<pair<Triple, Triple>> refresherVector;
@@ -50,6 +56,7 @@ class Node
 	//POST: finds the node ID in the list and removes from timeout,
 	//      if it exist in the list.
 	void removeFromUITimeout(uint32_t ID);
+<<<<<<< HEAD
 	
 	// PRE: Assumes that the indices i & j (i = KBucket index, j = Index of a triple within the KBucket) are reset each time refresh flag is reset to true. The function takes the current KBucket we are refreshing, the socket through which we send the PING messages, lastRefresh which times when the Node starts refreshing the routingTable which is reset here after going through all triples in the RoutingTable, and the refresh flag which indicates if we are currently refreshing.
 	// POST: The function tries to find the next element to PING but makes sure that no more than ALPHA messages were already sent. If there is an element to ping it will send a PING message to the node and update the timeouts array
@@ -58,8 +65,18 @@ class Node
 //PRE: the snapshot we are currently using, as well as the socket to 
 //     send messages on.
 	//POST: sends up to ALPHA nodes FINDVALUE and then adds them to
+=======
+
+	void sendUpToAlphaPing(KBucket &curKBucket, UDPSocket &socket, 
+	uint32_t & i, uint32_t & j, MsgTimer & lastRefresh, bool & refresh);
+
+	//PRE: the snapshot we are currently using, as well as the socket to 
+	//     send messages on.
+	//POST: sends up to ALPHA nodes FINDVALUE and then add them to
+>>>>>>> origin/master
 	//      the timer queue.
-	void sendUpToAlphaKClos(SnapShot & ss, UDPSocket & sock, uint32_t  msgID, MsgType mType);
+	void sendUpToAlphaKClos(SnapShot & ss, UDPSocket & sock, 
+	uint32_t  msgID, MsgType mType);
 	
 	//Pre: timer is from the constructor
 	//Post: Removes elements from timer that have timed out
@@ -90,10 +107,12 @@ class Node
 	void mainStore(uint32_t aKey, Triple & sendTriple);
 
 	//get our KClosest and send it off to the sender
-	void mainFindNode(uint32_t aKey, Triple & sendTriple, uint32_t senderIP, UDPSocket & socket);
+	void mainFindNode(uint32_t aKey, Triple & sendTriple, 
+	uint32_t senderIP, UDPSocket & socket);
 
 	//return FVRESP if we have the key, oterhwise send Kclosest
-	void mainFindValue(uint32_t aKey, Triple & sendTriple, uint32_t senderIP, UDPSocket & socket);
+	void mainFindValue(uint32_t aKey, Triple & sendTriple, 
+	uint32_t senderIP, UDPSocket & socket);
 
   //Handles messages from other Nodes.
   //Everything is constant time
@@ -118,24 +137,29 @@ class Node
 	
 	//Look at our current keys and respond true to UI if we have it, otherwise send
 	//findvalue to up to alpha at a time to Kclosest
-	void UIFindValue(bool & respondedToUI, Message & curMsg, Message & recvMsg, uint32_t ipUI, SnapShot & snapShot, UDPSocket & socketUI);
+	void UIFindValue(bool & respondedToUI, Message & curMsg, 
+	Message & recvMsg, uint32_t ipUI, SnapShot & snapShot, UDPSocket & socketUI);
 
 	//Find Kclosest and then ask up to alpha at a time what their kclosest are 
-	void UIStore(Message & curMsg, Message & recvMsg, bool & respondedToUI, UDPSocket & socketUI, SnapShot & snapSnot, uint32_t ipUI);
+	void UIStore(Message & curMsg, Message & recvMsg, 
+	bool & respondedToUI, UDPSocket & socketUI, SnapShot & snapSnot, uint32_t ipUI);
 
 	//read the kClosest and add the elements to our snapShot if they are a closer distance.
 	//Then, if we have run out of Kclosest, then send store to the Kclosest if store,
 	//otherwise send FVRESPN to the UI
-	void UIKClosest(Message & recvMsg, SnapShot & snapShot, Message & curMsg, UDPSocket & socketUI, bool & respondedToUI, uint32_t ipUI);
+	void UIKClosest(Message & recvMsg, SnapShot & snapShot, 
+	Message & curMsg, UDPSocket & socketUI, bool & respondedToUI, uint32_t ipUI);
 
 	//someone has find the value, send true to UI
-	void UIFVResp(Message & recvMsg, UDPSocket & socketUI, bool & respondedToUI, uint32_t ipUI);
+	void UIFVResp(Message & recvMsg, UDPSocket & socketUI, 
+	bool & respondedToUI, uint32_t ipUI);
 
 	//specifically for the adding a node, repsond with our Kclosest
 	void UIFindNode(Message & recvMsg, UDPSocket & socketUI, uint32_t senderIP);
 
 	//removes items from timeout if we recieve responses from nodes
-	void handleUITimeouts(Message & curMsg, SnapShot & snapShot, bool & respondedToUI, UDPSocket & socketUI, uint32_t ipUI);
+	void handleUITimeouts(Message & curMsg, SnapShot & snapShot, 
+	bool & respondedToUI, UDPSocket & socketUI, uint32_t ipUI);
 
 	//Handles all UI
 	//Variable Time

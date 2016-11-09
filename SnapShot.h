@@ -12,6 +12,8 @@ struct Quint{
   uint32_t compareID;
   bool     queried;
 Quint() : node(-1), address(0), port(0), compareID(0), queried(true) {}
+Quint(const Quint & ref) : node(ref.node), address(ref.address), port(ref.port), compareID(ref.compareID), queried(ref.queried) {}
+Quint(Quint & ref) : node(ref.node), address(ref.address), port(ref.port), compareID(ref.compareID), queried(ref.queried) {}
 };
 
 //DEEP copy of from onto to
@@ -41,12 +43,17 @@ using namespace std;
 
 class SnapShot{
 
+//CLASS INVARIENT:
+// - The array of closest is always sorted from least to greatest distance 
+//   from compareID
+// - size is never greater than K
+
  private:
 
-  Quint closest [K];
-  uint32_t compareID;
-	uint32_t creatorID;
-  int size;
+  Quint closest [K];	//array of current Kclosest to compareID
+  uint32_t compareID;	//the ID we want to compare distance to
+	uint32_t creatorID;	//the ID of who used this snapShot
+  int size;						//current size of the closest array
   
  public:
 

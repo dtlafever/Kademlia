@@ -13,8 +13,11 @@ class KBucket {
 
  private:
   
-  int numTriples;
-  Triple* bucket[K];     //each bucket has k triples in it
+ //CLASS INVARIENT:
+ // - numTriples <= K
+
+  int numTriples;    //number of triples currently in the bucket
+  Triple* bucket[K]; //each bucket has k triples in it
   mutex lock;
 
   //Pre: lock is currently unlocked

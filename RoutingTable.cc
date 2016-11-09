@@ -228,7 +228,8 @@ void RoutingTable::log(int &i, Triple curNode, bool add)
 		logOut<< hostName << ": Deleted Node - ";
 	}
 	
-	logOut <<"port :"<< curNode.port <<" \t node : " << curNode.node << " \t address: "<< curNode.address <<endl;
+	logOut <<"port :"<< curNode.port <<" \t node : " << 
+	curNode.node << " \t address: "<< curNode.address <<endl;
 }
 
 void RoutingTable::log(int &i, uint32_t nodeID, bool add)

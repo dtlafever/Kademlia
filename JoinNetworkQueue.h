@@ -3,13 +3,13 @@
 
 #include <vector>
 #include "constants.h"
-// maybe other stuff included
 
 class JoinNetworkQueue {
 
 private:
-  std::vector<Triple> seen_nodes;
-  std::vector<bool> node_checked;
+  std::vector<Triple> seen_nodes; //The nodes we need to join the queue
+  std::vector<bool> node_checked; //whether or not the coorsponding node
+                                  //has been checked
 
   // PRE: takes a Triple of the node we are attempting to add.
   //POST: returns true iff comparison is not already in seen_nodes

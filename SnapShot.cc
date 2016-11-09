@@ -61,14 +61,14 @@ SnapShot::SnapShot() {
 }
 
 //COPY CONSTRUCTOR
-//TODO: still broken
 SnapShot::SnapShot(SnapShot & ss) {
   creatorID = ss.getCreatorID();
   compareID = ss.getCompareID();
   size = ss.getSize();
-  //for (int i=0; i < ss.getSize(); i++){
-    //copyQuint(closest[i], ss.getElementQuint(i));
-  //}
+  for (int i=0; i < ss.getSize(); i++){
+    Quint temp(ss.getElementQuint(i));
+    copyQuint(closest[i], temp);
+  }
 }
 
 //PRE: an array of triples up to nodeSize.

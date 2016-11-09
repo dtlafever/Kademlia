@@ -14,12 +14,16 @@
 
 class RoutingTable {
 
+//CLASS INVARIENT:
+// - For each bucket i, there is no more than K nodes in the bucket where each
+//   node is no more than XOR distance from myID than 2^i -> 2^(i+1)
+
  private:
   
-  uint32_t myId;
-  KBucket table[NUMBITS];
-	std::ofstream logOut;
-  char hostName[MAX_CHAR];
+  uint32_t myId;            //our ID
+  KBucket table[NUMBITS];   //the array that holds our buckets
+	std::ofstream logOut;     //the log file for our KBuckets
+  char hostName[MAX_CHAR];  //the hostname to write to the log file
 
   //Pre: id1 and id2 are two identifiers
   //Post: RV = id1 XOR id2
