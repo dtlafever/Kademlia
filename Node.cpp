@@ -193,7 +193,6 @@ Node::Node(uint32_t nodeID, uint32_t contactID, uint32_t contactIP) : RT(nodeID)
 	  }
 	}
 		
-      cout << "hi ";
       // End of Id check else
     }
 	
