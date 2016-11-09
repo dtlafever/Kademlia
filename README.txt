@@ -17,18 +17,16 @@ NOTE: the node program expects either 1 or 3 arguments. The 1st is the node's
 
 
 
-
-
-
-
-
-
-
-
-Test Cases:
+``````````````````````````````````````````````````````````````````````
+``````````````````````````````````````````````````````````````````````
+                               TEST CASES
+``````````````````````````````````````````````````````````````````````
+``````````````````````````````````````````````````````````````````````
 
 ---------------------
+---------------------
 --JOINING A NETWORK--
+---------------------
 ---------------------
 
 =======================================================================
@@ -122,44 +120,19 @@ Node C (ID = 2) wants to join the network and uses Node A as a contact.
 
 Node C is now in the network!
 
+=======================================================================
 
-
+-------------------------------
 -------------------------------
 --COMMUNICATING BETWEEN NODES--
 -------------------------------
-
-     =. Suppose that for 0 <= i < 3 that node i exists within the network.
-     	Suppose that K = 2.
-	Let key = 7. Suppose that node 0 is storing the key.
-	    -Then Nodes 2,1 receive the store request and will store the key,
-	     because they are the k closest to the given key.
-
-     =. Suppose that 2 (ID 0 and 1) nodes exist and contain no keys. Then calling "find 4"
-	will fail.
-
-     =. Suppose that 10 nodes exist in the network as above. And suppose that
-     	 key 5 exists within the network. Node n calling for key 5 will succed
-	 (we really don't care which node gives us the value).
-	     -The UI listener will send a success Find Value response through the socket.
-	     -The UI process will print "Success".
-
-	
-     =. Suppose that nodes 0 and 1 exists in the network where node 1 is
-     	 storing the key 5. Further suppose that node 0 is trying to find the
-	 value associated with key 5 and that during the process, node 1 dies.
-	 The find value should fail.
-	     -If K >= 2, then the key 5 would have been stored in Node 0 itself.
-	      So it will find the key in itself and send a success Find Value response.
-	     -If K = 1, then Node 0 will not have the key and thus send KCLOSEST requests,
-	      but it will not receive a response because Node 1 has died. Therefore
-	      Node 0 will send a failure Find Value response.
-
+-------------------------------
 
 =======================================================================
 Suppose there is onle 1 node in the network
 Node A
 
-STORE (WITH ONE NODE) - TESTED SUCCESSFULLY
+STORE (WITH ONE NODE)
 
 From the UI we say:
 >store 10
@@ -173,7 +146,7 @@ A will store the given key in itself.
 
 =======================================================================
 
-FIND (if we didn't STORE anything) - TESTED SUCCESSFULLY
+FIND (if we didn't STORE anything)
 
 From the UI the only thing we say is:
 >find 10
@@ -191,7 +164,7 @@ The UI will print out "Failure" to the user.
 
 =======================================================================
 
-FIND (if we actually did STORE something) - TESTED SUCCESSFULLY
+FIND (if we actually did STORE something)
 
 From the UI we say:
 >store 10
@@ -269,14 +242,18 @@ Node B will send a "success" message to the UI.
 
 The UI will print a "success" message to the user.
 
+=======================================================================
+
+-------------------------------
 -------------------------------
 --REFRESHER AND TIMEOUT TESTS--
 -------------------------------
+-------------------------------
 
+=======================================================================
      =. Suppose that some node n is in the network. Further suppose that
      	n is dead.
 	  -at most after an hour, it should not exist in any Routing Table
-	  (INGY'S REFRESHER)
 
      =. Suppose node 0 is expecting a response from node 5. Node 5 dies,
      	 node 5 is ultimately removed from node 0's routing table.
@@ -286,7 +263,7 @@ The UI will print a "success" message to the user.
      =. Suppose Node 5 sends the response after Node 0 times out the request.
      	  -Node 0 drops the response because it doesn't match any request in the Timer Queue.
 
-		 =.Two nodes, IDs 0 and 1, testing the Refreshing Function.
+     =.Two nodes, IDs 0 and 1, testing the Refreshing Function.
       Go through Routing Tables of Node 1, and sending a PING to everything in there.
       Should expect a PING response from Node 0. 
 
