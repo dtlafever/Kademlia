@@ -238,7 +238,7 @@ void Node::mainFindValue(uint32_t aKey, Triple & sendTriple,
       //ASSERT: we found the key
       sendMessageOBJ.setType(FVRESP);
       sendMessageOBJ.setNodeID(ID);
-      socket.sendMessage(sendMessageOBJ.toString(), senderIP, MAINPORT);
+      socket.sendMessage(sendMessageOBJ.toString(), senderIP, UIPORT);
     }
   else {
     //ASSERT: we could not find in the key
@@ -664,6 +664,7 @@ void Node::UIKClosest(Message & recvMsg, SnapShot & snapShot,
   Triple kClos[K];
   removeFromUITimeout(recvMsg.getNodeID());
   int size = recvMsg.getKClos(kClos);
+  
   snapShot.addClosest(kClos, size);
 	
   switch (curMsg.getMsgType())
@@ -681,7 +682,7 @@ void Node::UIKClosest(Message & recvMsg, SnapShot & snapShot,
 	if (!snapShot.nextExist()&& !respondedToUI) {
 	  //ASSERT: we have found the K closest, send store messages
 	  Message sendMsg(STORE, ID, curMsg.getID());
-				
+	  
 	  for (int i = 0; i < snapShot.getSize(); i++)
 	    {
 	      socketUI.sendMessage(sendMsg.toString(),
@@ -725,6 +726,8 @@ void Node::UIKClosest(Message & recvMsg, SnapShot & snapShot,
 //someone has find the value, send true to UI
 void Node::UIFVResp(Message & recvMsg, UDPSocket & socketUI, 
 		    bool & respondedToUI, uint32_t ipUI){
+  //printf("START OF UI FV RESP ");
+  //printf("%d\n", respondedToUI);
   removeFromUITimeout(recvMsg.getNodeID());
 	
   //Add to refresh vector
@@ -738,9 +741,10 @@ void Node::UIFVResp(Message & recvMsg, UDPSocket & socketUI,
 	
   if(!respondedToUI)
     {
+      //printf("NOT RESPONDED TO UI\n");
       //ASSERT: Send message only once to UI
       Message sendMsg(FVRESPP, ID);
-      socketUI.sendMessage(sendMsg.toString(), ipUI, UIPORT);
+      socketUI.sendMessage(sendMsg.toString(), ipUI, TPORT);
       respondedToUI = true;
     }
 }
@@ -806,7 +810,7 @@ void Node::handleUITimeouts(Message & curMsg, SnapShot & snapShot,
 		//ASSERT: we have found the K closest and no value,
 		//        send UI that wouldn't couldnt find it.
 		Message sendMsg(FVRESPN, curMsg.getID());
-		socketUI.sendMessage(sendMsg.toString(), ipUI, UIPORT);
+		socketUI.sendMessage(sendMsg.toString(), ipUI, TPORT);
 		respondedToUI = true;
 	      }
 	    else
@@ -855,10 +859,12 @@ void Node::startUIListener() {
 	  
 	  // Parsing incoming string
 	  recvMsg.parse(strUI);
-			
+	  
 	  // Get UI IP
 	  if(recvMsg.getUI()){
+	    respondedToUI = false;
 	    snapShot.clear();
+	    snapShot.setCompareID(recvMsg.getID());
 	    ipUI = senderIP;
 	  }
 			

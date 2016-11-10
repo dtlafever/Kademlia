@@ -1,0 +1,169 @@
+lab-mcsp-16.academic.roanoke.edu: --------START NETWORK--------
+lab-mcsp-16.academic.roanoke.edu: Sent Message '0 FINDVALUE 5 UI' to 10.200.102.211.
+lab-mcsp-16.academic.roanoke.edu: Recieved Message '0 FVRESPN'.
+lab-mcsp-16.academic.roanoke.edu: Sent Message '0 STORE 5 UI' to 10.200.102.211.
+lab-mcsp-16.academic.roanoke.edu: Recieved Message '0 STORERESP'.
+lab-mcsp-16.academic.roanoke.edu: Sent Message '0 FINDVALUE 5 UI' to 10.200.102.211.
+lab-mcsp-16.academic.roanoke.edu: Recieved Message '0 FVRESPP'.
+lab-mcsp-16.academic.roanoke.edu: --------START NETWORK--------
+lab-mcsp-16.academic.roanoke.edu: Sent Message '0 FINDVALUE 5 UI' to 10.200.102.217.
+lab-mcsp-16.academic.roanoke.edu: --------START NETWORK--------
+lab-mcsp-16.academic.roanoke.edu: Sent Message '0 FINDVALUE 5 UI' to 10.200.102.217.
+lab-mcsp-17.academic.roanoke.edu: --------START NETWORK--------
+lab-mcsp-17.academic.roanoke.edu: Sent Message '0 FINDVALUE 5 UI' to 10.200.102.217.
+lab-mcsp-17.academic.roanoke.edu: Recieved Message '2 FVRESPN'.
+lab-mcsp-17.academic.roanoke.edu: Sent Message '0 FINDVALUE 3 UI' to 10.200.102.217.
+lab-mcsp-17.academic.roanoke.edu: Recieved Message '2 FVRESPP'.
+lab-mcsp-17.academic.roanoke.edu: Sent Message '0 FINDVALUE 5 UI' to 10.200.102.217.
+lab-mcsp-17.academic.roanoke.edu: --------START NETWORK--------
+lab-mcsp-17.academic.roanoke.edu: Sent Message '0 FINDVALUE 5 UI' to 10.200.102.217.
+lab-mcsp-17.academic.roanoke.edu: --------START NETWORK--------
+lab-mcsp-17.academic.roanoke.edu: Sent Message '0 STORE 5 UI' to 10.200.102.211.
+lab-mcsp-17.academic.roanoke.edu: Recieved Message '0 STORERESP'.
+lab-mcsp-17.academic.roanoke.edu: Sent Message '0 FINDVALUE 3 UI' to 10.200.102.211.
+lab-mcsp-17.academic.roanoke.edu: Recieved Message '0 FVRESPN'.
+lab-mcsp-17.academic.roanoke.edu: --------START NETWORK--------
+lab-mcsp-17.academic.roanoke.edu: Sent Message '0 FINDVALUE 3 UI' to 10.200.102.217.
+lab-mcsp-17.academic.roanoke.edu: Recieved Message '2 FVRESPN'.
+lab-mcsp-17.academic.roanoke.edu: Sent Message '0 FINDVALUE 5 UI' to 10.200.102.217.
+lab-mcsp-17.academic.roanoke.edu: --------START NETWORK--------
+lab-mcsp-17.academic.roanoke.edu: Sent Message '0 STORE 5 UI' to 10.200.102.211.
+lab-mcsp-17.academic.roanoke.edu: Recieved Message '0 STORERESP'.
+lab-mcsp-17.academic.roanoke.edu: Sent Message '0 FINDVALUE 5 UI' to 10.200.102.211.
+lab-mcsp-17.academic.roanoke.edu: Recieved Message '0 FVRESPP'.
+lab-mcsp-17.academic.roanoke.edu: Sent Message '0 FINDVALUE 3 UI' to 10.200.102.211.
+lab-mcsp-17.academic.roanoke.edu: Recieved Message '0 FVRESPN'.
+lab-mcsp-17.academic.roanoke.edu: --------START NETWORK--------
+lab-mcsp-17.academic.roanoke.edu: Sent Message '0 FINDVALUE 3 UI' to 10.200.102.217.
+lab-mcsp-17.academic.roanoke.edu: Recieved Message '2 FVRESPN'.
+lab-mcsp-17.academic.roanoke.edu: Sent Message '0 FINDVALUE 5 UI' to 10.200.102.217.
+lab-mcsp-17.academic.roanoke.edu: --------START NETWORK--------
+lab-mcsp-17.academic.roanoke.edu: Sent Message '0 STORE 3 UI' to 10.200.102.211.
+lab-mcsp-17.academic.roanoke.edu: Recieved Message '0 STORERESP'.
+lab-mcsp-17.academic.roanoke.edu: Sent Message '0 FINDVALUE 3 UI' to 10.200.102.211.
+lab-mcsp-17.academic.roanoke.edu: Recieved Message '0 FVRESPP'.
+lab-mcsp-17.academic.roanoke.edu: Sent Message '0 FINDVALUE 5 UI' to 10.200.102.211.
+lab-mcsp-17.academic.roanoke.edu: Recieved Message '0 FVRESPN'.
+lab-mcsp-17.academic.roanoke.edu: --------START NETWORK--------
+lab-mcsp-17.academic.roanoke.edu: Sent Message '0 FINDVALUE 3 UI' to 10.200.102.217.
+lab-mcsp-17.academic.roanoke.edu: --------START NETWORK--------
+lab-mcsp-17.academic.roanoke.edu: Sent Message '0 STORE 5 UI' to 10.200.102.211.
+lab-mcsp-17.academic.roanoke.edu: Recieved Message '0 STORERESP'.
+lab-mcsp-17.academic.roanoke.edu: Sent Message '0 FINDVALUE 5 UI' to 10.200.102.211.
+lab-mcsp-17.academic.roanoke.edu: Recieved Message '0 FVRESPP'.
+lab-mcsp-17.academic.roanoke.edu: Sent Message '0 FINDVALUE 4 UI' to 10.200.102.211.
+lab-mcsp-17.academic.roanoke.edu: Recieved Message '0 FVRESPN'.
+lab-mcsp-17.academic.roanoke.edu: --------START NETWORK--------
+lab-mcsp-17.academic.roanoke.edu: Sent Message '0 FINDVALUE 5 UI' to 10.200.102.217.
+lab-mcsp-17.academic.roanoke.edu: --------START NETWORK--------
+lab-mcsp-17.academic.roanoke.edu: Sent Message '0 STORE 5 UI' to 10.200.102.211.
+lab-mcsp-17.academic.roanoke.edu: Recieved Message '0 STORERESP'.
+lab-mcsp-17.academic.roanoke.edu: --------START NETWORK--------
+lab-mcsp-17.academic.roanoke.edu: Sent Message '0 FINDVALUE 5 UI' to 10.200.102.217.
+lab-mcsp-17.academic.roanoke.edu: --------START NETWORK--------
+lab-mcsp-17.academic.roanoke.edu: Sent Message '0 STORE 5 UI' to 10.200.102.211.
+lab-mcsp-17.academic.roanoke.edu: Recieved Message '0 STORERESP'.
+lab-mcsp-17.academic.roanoke.edu: --------START NETWORK--------
+lab-mcsp-17.academic.roanoke.edu: Sent Message '0 FINDVALUE 5 UI' to 10.200.102.217.
+lab-mcsp-17.academic.roanoke.edu: --------START NETWORK--------
+lab-mcsp-17.academic.roanoke.edu: Sent Message '0 STORE 5 UI' to 10.200.102.211.
+lab-mcsp-17.academic.roanoke.edu: Recieved Message '0 STORERESP'.
+lab-mcsp-17.academic.roanoke.edu: --------START NETWORK--------
+lab-mcsp-17.academic.roanoke.edu: Sent Message '0 FINDVALUE 5 UI' to 10.200.102.217.
+lab-mcsp-17.academic.roanoke.edu: --------START NETWORK--------
+lab-mcsp-17.academic.roanoke.edu: Sent Message '0 STORE 5 UI' to 10.200.102.211.
+lab-mcsp-17.academic.roanoke.edu: Recieved Message '0 STORERESP'.
+lab-mcsp-17.academic.roanoke.edu: --------START NETWORK--------
+lab-mcsp-17.academic.roanoke.edu: Sent Message '0 FINDVALUE 5 UI' to 10.200.102.217.
+lab-mcsp-17.academic.roanoke.edu: --------START NETWORK--------
+lab-mcsp-17.academic.roanoke.edu: Sent Message '0 STORE 5 UI' to 10.200.102.211.
+lab-mcsp-17.academic.roanoke.edu: Recieved Message '0 STORERESP'.
+lab-mcsp-17.academic.roanoke.edu: --------START NETWORK--------
+lab-mcsp-17.academic.roanoke.edu: Sent Message '0 FINDVALUE 5 UI' to 10.200.102.217.
+lab-mcsp-17.academic.roanoke.edu: --------START NETWORK--------
+lab-mcsp-17.academic.roanoke.edu: Sent Message '0 STORE 5 UI' to 10.200.102.211.
+lab-mcsp-17.academic.roanoke.edu: Recieved Message '0 STORERESP'.
+lab-mcsp-17.academic.roanoke.edu: --------START NETWORK--------
+lab-mcsp-17.academic.roanoke.edu: Sent Message '0 FINDVALUE 5 UI' to 10.200.102.217.
+lab-mcsp-17.academic.roanoke.edu: --------START NETWORK--------
+lab-mcsp-17.academic.roanoke.edu: Sent Message '0 STORE 5 UI' to 10.200.102.211.
+lab-mcsp-17.academic.roanoke.edu: Recieved Message '0 STORERESP'.
+lab-mcsp-17.academic.roanoke.edu: --------START NETWORK--------
+lab-mcsp-17.academic.roanoke.edu: Sent Message '0 FINDVALUE 5 UI' to 10.200.102.217.
+lab-mcsp-17.academic.roanoke.edu: Recieved Message '2 FVRESPP'.
+lab-mcsp-17.academic.roanoke.edu: Sent Message '0 FINDVALUE 3 UI' to 10.200.102.217.
+lab-mcsp-17.academic.roanoke.edu: Recieved Message '2 FVRESPN'.
+lab-mcsp-17.academic.roanoke.edu: --------START NETWORK--------
+lab-mcsp-17.academic.roanoke.edu: Sent Message '0 STORE 4 UI' to 10.200.102.217.
+lab-mcsp-17.academic.roanoke.edu: Recieved Message '15 STORERESP'.
+lab-mcsp-17.academic.roanoke.edu: Sent Message '0 STORE 4 UI' to 10.200.102.217.
+lab-mcsp-17.academic.roanoke.edu: Recieved Message '15 STORERESP'.
+lab-mcsp-17.academic.roanoke.edu: Sent Message '0 STORE 2 UI' to 10.200.102.217.
+lab-mcsp-17.academic.roanoke.edu: Recieved Message '15 STORERESP'.
+lab-mcsp-17.academic.roanoke.edu: --------START NETWORK--------
+lab-mcsp-17.academic.roanoke.edu: Sent Message '0 STORE 4 UI' to 10.200.102.217.
+lab-mcsp-17.academic.roanoke.edu: Recieved Message '15 STORERESP'.
+lab-mcsp-17.academic.roanoke.edu: Sent Message '0 STORE 2 UI' to 10.200.102.217.
+lab-mcsp-17.academic.roanoke.edu: Recieved Message '15 STORERESP'.
+lab-mcsp-17.academic.roanoke.edu: Sent Message '0 STORE 4 UI' to 10.200.102.217.
+lab-mcsp-17.academic.roanoke.edu: Recieved Message '15 STORERESP'.
+lab-mcsp-17.academic.roanoke.edu: Sent Message '0 STORE 4 UI' to 10.200.102.217.
+lab-mcsp-17.academic.roanoke.edu: Recieved Message '15 STORERESP'.
+lab-mcsp-17.academic.roanoke.edu: Sent Message '0 STORE 4 UI' to 10.200.102.217.
+lab-mcsp-17.academic.roanoke.edu: Recieved Message '15 STORERESP'.
+lab-mcsp-17.academic.roanoke.edu: Sent Message '0 STORE 4 UI' to 10.200.102.217.
+lab-mcsp-17.academic.roanoke.edu: Recieved Message '15 STORERESP'.
+lab-mcsp-17.academic.roanoke.edu: Sent Message '0 STORE 4 UI' to 10.200.102.217.
+lab-mcsp-17.academic.roanoke.edu: Recieved Message '15 STORERESP'.
+lab-mcsp-17.academic.roanoke.edu: Sent Message '0 STORE 4 UI' to 10.200.102.217.
+lab-mcsp-17.academic.roanoke.edu: Recieved Message '15 STORERESP'.
+lab-mcsp-17.academic.roanoke.edu: --------START NETWORK--------
+lab-mcsp-17.academic.roanoke.edu: Sent Message '0 STORE 4 UI' to 10.200.102.217.
+lab-mcsp-17.academic.roanoke.edu: Recieved Message '15 STORERESP'.
+lab-mcsp-17.academic.roanoke.edu: Sent Message '0 STORE 2 UI' to 10.200.102.217.
+lab-mcsp-17.academic.roanoke.edu: Recieved Message '15 STORERESP'.
+lab-mcsp-17.academic.roanoke.edu: Sent Message '0 STORE 14 UI' to 10.200.102.217.
+lab-mcsp-17.academic.roanoke.edu: Recieved Message '15 STORERESP'.
+lab-mcsp-17.academic.roanoke.edu: --------START NETWORK--------
+lab-mcsp-17.academic.roanoke.edu: Sent Message '0 STORE 5 UI' to 10.200.102.217.
+lab-mcsp-17.academic.roanoke.edu: Recieved Message '15 STORERESP'.
+lab-mcsp-17.academic.roanoke.edu: Sent Message '0 STORE 2 UI' to 10.200.102.217.
+lab-mcsp-17.academic.roanoke.edu: Recieved Message '15 STORERESP'.
+lab-mcsp-17.academic.roanoke.edu: Sent Message '0 STORE 14 UI' to 10.200.102.217.
+lab-mcsp-17.academic.roanoke.edu: Recieved Message '15 STORERESP'.
+lab-mcsp-17.academic.roanoke.edu: Sent Message '0 STORE 5 UI' to 10.200.102.217.
+lab-mcsp-17.academic.roanoke.edu: Recieved Message '15 STORERESP'.
+lab-mcsp-17.academic.roanoke.edu: Sent Message '0 STORE 2 UI' to 10.200.102.217.
+lab-mcsp-17.academic.roanoke.edu: Recieved Message '15 STORERESP'.
+lab-mcsp-17.academic.roanoke.edu: Sent Message '0 STORE 14 UI' to 10.200.102.217.
+lab-mcsp-17.academic.roanoke.edu: Recieved Message '15 STORERESP'.
+lab-mcsp-17.academic.roanoke.edu: Sent Message '0 STORE 4 UI' to 10.200.102.217.
+lab-mcsp-17.academic.roanoke.edu: Recieved Message '15 STORERESP'.
+lab-mcsp-17.academic.roanoke.edu: Sent Message '0 STORE 2 UI' to 10.200.102.217.
+lab-mcsp-17.academic.roanoke.edu: Recieved Message '15 STORERESP'.
+lab-mcsp-17.academic.roanoke.edu: Sent Message '0 STORE 14 UI' to 10.200.102.217.
+lab-mcsp-17.academic.roanoke.edu: Recieved Message '15 STORERESP'.
+lab-mcsp-17.academic.roanoke.edu: Sent Message '0 STORE 5 UI' to 10.200.102.217.
+lab-mcsp-17.academic.roanoke.edu: Recieved Message '15 STORERESP'.
+lab-mcsp-00.academic.roanoke.edu: --------START NETWORK--------
+lab-mcsp-00.academic.roanoke.edu: Sent Message '0 FINDVALUE 5 UI' to 10.200.102.211.
+lab-mcsp-00.academic.roanoke.edu: Recieved Message '0 FVRESPP'.
+lab-mcsp-00.academic.roanoke.edu: Sent Message '0 FINDVALUE 4 UI' to 10.200.102.211.
+lab-mcsp-00.academic.roanoke.edu: Recieved Message '0 FVRESPP'.
+lab-mcsp-17.academic.roanoke.edu: Sent Message '0 STORE 7 UI' to 10.200.102.217.
+lab-mcsp-17.academic.roanoke.edu: Recieved Message '15 STORERESP'.
+.
+lab-mcsp-00.academic.roanoke.edu: Sent Message '0 FINDVALUE 13 UI' to 10.200.102.211.
+lab-mcsp-00.academic.roanoke.edu: Recieved Message '0 FVRESPN'.
+lab-mcsp-00.academic.roanoke.edu: Sent Message '0 FINDVALUE 7 UI' to 10.200.102.211.
+lab-mcsp-00.academic.roanoke.edu: Recieved Message '0 FVRESPP'.
+lab-mcsp-17.academic.roanoke.edu: Sent Message '0 STORE 8 UI' to 10.200.102.217.
+lab-mcsp-17.academic.roanoke.edu: Recieved Message '15 STORERESP'.
+lab-mcsp-00.academic.roanoke.edu: --------START NETWORK--------
+lab-mcsp-00.academic.roanoke.edu: Sent Message '0 FINDVALUE 8 UI' to 10.200.102.212.
+lab-mcsp-00.academic.roanoke.edu: Recieved Message '4 FVRESPP'.
+lab-mcsp-14.academic.roanoke.edu: --------START NETWORK--------
+lab-mcsp-14.academic.roanoke.edu: Sent Message '0 STORE 5 UI' to 10.200.102.214.
+lab-mcsp-14.academic.roanoke.edu: Recieved Message '0 STORERESP'.
+lab-mcsp-14.academic.roanoke.edu: Sent Message '0 FINDVALUE 5 UI' to 10.200.102.214.
+lab-mcsp-14.academic.roanoke.edu: Recieved Message '0 FVRESPP'.

@@ -14,6 +14,7 @@ struct Quint{
 Quint() : node(-1), address(0), port(0), compareID(0), queried(true) {}
 Quint(const Quint & ref) : node(ref.node), address(ref.address), port(ref.port), compareID(ref.compareID), queried(ref.queried) {}
 Quint(Quint & ref) : node(ref.node), address(ref.address), port(ref.port), compareID(ref.compareID), queried(ref.queried) {}
+  //copy(Triple & ref) : node(ref.node), address(ref.address), port(ref.port) {}
 };
 
 //DEEP copy of from onto to

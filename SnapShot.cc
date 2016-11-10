@@ -36,7 +36,7 @@ uint32_t SnapShot::getCompareID(){
 //POST: changes the quint.compareID to nodeID
 void SnapShot::setCompareID(uint32_t nodeID) {
 	compareID = nodeID;
-	for (int i = 0; i < size; i++) {
+	for (int i = 0; i < K; i++) {
 		closest[i].compareID = nodeID;
 	}
 }
@@ -119,35 +119,45 @@ void SnapShot::addClosest(Triple * kClos, uint32_t kClosSize){
     }else{
       closest[size].queried = false;
     }
-	closest[size].compareID = compareID;
     size++;
     curKClosIndex++;
   }
+
   //ASSERT: we have added everything we can, sort closest
   sort(closest, closest + size, sortByDistance);
-
+  
   //ASSERT: that means size < K or size = K and
   //        we still might have items to
   //        consider from kClos
+  bool alreadyIn = false;
   while (curKClosIndex < kClosSize) {
-    if (getDistance(closest[size - 1].compareID, kClos[curKClosIndex].node) <
-	getDistance(closest[size - 1].compareID, closest[size - 1].node)) {
-      //ASSERT: change last item to our new one and re sort
-      
-      copyQuintFromTriple(closest[size - 1], kClos[curKClosIndex]);
-      if(kClos[curKClosIndex].node == creatorID){
-        closest[size - 1].queried = true;
-      }else{
-        closest[size - 1].queried = false;
+    alreadyIn = false;
+    for(int i=0; i < size; i++){
+      if(closest[i].node == kClos[curKClosIndex].node){
+	alreadyIn = true;
+	break;//this is for you Shende
       }
-			closest[size - 1].compareID = compareID;
-      sort(closest, closest + size, sortByDistance);
+    }
+    if(!alreadyIn){
+      if (getDistance(compareID, kClos[curKClosIndex].node) <
+	  getDistance(compareID, closest[size - 1].node)) {
+	//ASSERT: change last item to our new one and re sort
+      
+	copyQuintFromTriple(closest[size - 1], kClos[curKClosIndex]);
+	if(kClos[curKClosIndex].node == creatorID){
+	  closest[size - 1].queried = true;
+	}else{
+	  closest[size - 1].queried = false;
+	}
+	sort(closest, closest + size, sortByDistance);
+      }
     }
     curKClosIndex++;
   }
  
   //ASSERT: we have added everything we can, and closest
   //        now has added the appropriate triples from kClos
+
 }
 
 //PRE: Object defined

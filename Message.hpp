@@ -55,8 +55,6 @@ class Message
   // This array stores the names of the different types to simplify the parsing and string creation
   const std::string msgStrings [11] = {"PING ", "FINDNODE ",  "FINDVALUE ", "STORE ", "KCLOSEST ", "PINGRESP", "FVRESP", "STORERESP", "FVRESPP", "FVRESPN",  "NONE "};
 	
-	// This function prints the type of the current Message object, used for testing.
-	void printMessageType ();
 	
 	// PRE: Takes a string that contains the KClosest array to be parsed and put in the internal data member (KClos []). This function should only be called by the parse function.
 	// POST: The function parses the string to retrieve each element (Node IP, UDP Port, and Node ID)
@@ -67,7 +65,10 @@ class Message
 	void createKClosestMessage();
 
 public:
-	
+
+  // This function prints the type of the current Message object, used for testing.
+	void printMessageType ();
+  
   // Default constructor
   Message ();
 	
