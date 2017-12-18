@@ -1,6 +1,3 @@
-//Justin Giguere
-//Routing Table cc file
-
 #include "RoutingTable.h"
 #include <stdint.h>
 #include <iostream>

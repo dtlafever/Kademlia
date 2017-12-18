@@ -1,11 +1,3 @@
-//
-//  Message.hpp
-//  Kademlia
-//
-//  Created by Ingy on 9/25/16.
-//  Copyright © 2016 Roanoke. All rights reserved.
-//
-
 #ifndef Message_cpp
 #define Message_cpp
 #include <string>

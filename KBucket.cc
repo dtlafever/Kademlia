@@ -1,6 +1,3 @@
-//Justin Giguere
-//Header file for kBucket
-
 #include "constants.h"
 #include "KBucket.h"
 #include <stdlib.h>

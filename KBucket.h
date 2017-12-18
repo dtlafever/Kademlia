@@ -1,6 +1,3 @@
-//Justin Giguere
-//Header file for kBucket
-
 #ifndef INCLUDE_KBucket
 #define INCLUDE_KBucket
 

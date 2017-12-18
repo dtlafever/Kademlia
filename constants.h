@@ -30,7 +30,7 @@
 #define TIME chrono::system_clock //lets make chrono shorter
 
 struct Triple {
-	//a myTriples represents a node who does not own this routing table
+	//a Triple represents a node who does not own this routing table
 	//address is the ip address of where the node is
 	//port is where the node is listening
 	uint32_t address; // IP Address

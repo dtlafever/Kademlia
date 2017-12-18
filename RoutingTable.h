@@ -1,6 +1,3 @@
-//Justin Giguere
-//Routing Table Header
-
 #ifndef INCLUDE_RoutingTable
 #define INCLUDE_RoutingTable
 

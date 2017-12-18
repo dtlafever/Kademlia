@@ -27,7 +27,7 @@
 const int MAXHOSTNAME = 200;
 const int MAXCONNECTIONS = 20;
 
-//PRE: shende you better not read this
+//PRE: 
 //     takes a string in dot integer form
 //POST: returns the integer IP address
 static uint32_t getIPInt(std::string ip){
